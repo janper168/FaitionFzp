@@ -1,0 +1,673 @@
+﻿
+@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        float: left;
+        width: 24%;
+        height: 98%;
+        padding: 3px;
+        padding-right: 0px;
+        margin: 3px;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 15px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-bottom: 0;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 86%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container" id="LayerContainer1">
+    <div class="layerBar">一级区域</div>
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_150 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="buttonBar">
+            @*<button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i></button>*@
+            @*<button id="btn_add" class="btn blue"><i class="fa fa-plus"></i></button>
+                <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i></button>
+                <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i></button>*@
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="LayerTable1"></div>
+    </div>
+</div>
+<div class="container" id="LayerContainer2">
+    <div class="layerBar">二级区域</div>
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_150 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="buttonBar">
+            @*<button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i></button>*@
+            @*<button id="btn_add" class="btn blue"><i class="fa fa-plus"></i></button>
+                <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i></button>
+                <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i></button>*@
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="LayerTable2"></div>
+    </div>
+</div>
+<div class="container" id="LayerContainer3">
+    <div class="layerBar">三级区域</div>
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_150 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="buttonBar">
+            @*<button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i></button>*@
+            @*<button id="btn_add" class="btn blue"><i class="fa fa-plus"></i></button>
+                <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i></button>
+                <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i></button>*@
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="LayerTable3"></div>
+    </div>
+</div>
+<div class="container" id="LayerContainer4">
+    <div class="layerBar">四级区域</div>
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_150 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="buttonBar">
+            @*<button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i></button>*@
+            @*<button id="btn_add" class="btn blue"><i class="fa fa-plus"></i></button>
+                <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i></button>
+                <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i></button>*@
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="LayerTable4"></div>
+    </div>
+
+</div>
+<div style="clear:both;"></div>
+<script>
+
+    var $gridTable_layer1 = null;
+    var $gridTable_layer2 = null;
+    var $gridTable_layer3 = null;
+    var $gridTable_layer4 = null;
+
+    var jfkInit = (function ($, jkf) {
+
+    });
+
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'AreaId', width: 30, showName: 'ModuleId', hidden: true, align: 'center' },
+            { columnName: 'AreaCode', width: 160, showName: '区码', align: 'left' },
+            { columnName: 'AreaName', width: 160, showName: '区名', align: 'left' }
+        ]
+
+        $gridTable_layer1 = $('#LayerTable1').jkfGrid({
+            remoteAddress: '/Base/Area/GetAreas',
+            columnHeaders: colHeaders,
+            mainId: 'AreaId',
+        });
+
+        $gridTable_layer2 = $('#LayerTable2').jkfGrid({
+            remoteAddress: '/Base/Area/GetAreas',
+            columnHeaders: colHeaders,
+            mainId: 'AreaId',
+        });
+
+        $gridTable_layer3 = $('#LayerTable3').jkfGrid({
+            remoteAddress: '/Base/Area/GetAreas',
+            columnHeaders: colHeaders,
+            mainId: 'AreaId',
+        });
+
+        $gridTable_layer4 = $('#LayerTable4').jkfGrid({
+            remoteAddress: '/Base/Area/GetAreas',
+            columnHeaders: colHeaders,
+            mainId: 'AreaId',
+        });
+
+        $gridTable_layer1.getRemoteData({ keyWord: $("#LayerContainer2 #keyWord").val(), layer: 1 }, true);
+
+
+        //$('#LayerContainer1 #btn_refresh').click(function () {
+        //    $gridTable_layer1.getRemoteData({ keyWord: "", layer: 1 }, true);
+        //});
+
+        $("#LayerContainer1 #btn_search").click(function () {
+            if ($gridTable_layer1 != null) {
+                var keyWord = $("#LayerContainer1 #keyWord").val().trim();
+                $gridTable_layer1.getRemoteData({ keyWord: keyWord, layer: 1 }, true);
+            }
+        });
+        $("#LayerContainer1 #keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $(this).val().trim();
+                $gridTable.getRemoteData({ keyWord: keyWord, layer: 1 });
+            }
+        });
+
+        $("#LayerContainer2 #btn_search").click(function () {
+            if ($gridTable_layer2 != null) {
+                var keyWord = $("#LayerContainer2 #keyWord").val().trim();
+                $gridTable_layer2.getRemoteData({ keyWord: keyWord, layer: 2 }, true);
+            }
+        });
+        $("#LayerContainer2 #keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $(this).val().trim();
+                $gridTable_layer2.getRemoteData({ keyWord: keyWord, layer: 2 });
+            }
+        });
+
+        $("#LayerContainer3 #btn_search").click(function () {
+            if ($gridTable_layer3 != null) {
+                var keyWord = $("#LayerContainer3 #keyWord").val().trim();
+                $gridTable_layer3.getRemoteData({ keyWord: keyWord, layer: 3 }, true);
+            }
+        });
+        $("#LayerContainer3 #keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $(this).val().trim();
+                $gridTable_layer3.getRemoteData({ keyWord: keyWord, layer: 3 });
+            }
+        });
+
+        $("#LayerContainer4 #btn_search").click(function () {
+            if ($gridTable_layer4 != null) {
+                var keyWord = $("#LayerContainer4 #keyWord").val().trim();
+                $gridTable_layer4.getRemoteData({ keyWord: keyWord, layer: 4 }, true);
+            }
+        });
+        $("#LayerContainer4 #keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $(this).val().trim();
+                $gridTable_layer4.getRemoteData({ keyWord: keyWord, layer: 4 });
+            }
+        });
+
+        $gridTable_layer1.setTableLineDbclick(function ($tr) {
+
+            var areaId = $tr.find("td[id*=AreaId]").text();
+            //alert(areaId);
+            var layer = 1;
+            getSpecialArea(areaId, layer);
+
+        })
+
+        $gridTable_layer2.setTableLineDbclick(function ($tr) {
+
+            var areaId = $tr.find("td[id*=AreaId]").text();
+            //alert(areaId);
+            var layer = 2;
+            getSpecialArea(areaId, layer);
+
+        })
+
+        $gridTable_layer3.setTableLineDbclick(function ($tr) {
+
+            var areaId = $tr.find("td[id*=AreaId]").text();
+            //alert(areaId);
+            var layer = 3;
+            getSpecialArea(areaId, layer);
+
+        })
+
+        $gridTable_layer4.setTableLineDbclick(function ($tr) {
+
+            var areaId = $tr.find("td[id*=AreaId]").text();
+            //alert(areaId);
+            var layer = 4;
+            getSpecialArea(areaId, layer);
+
+        })
+
+        $("#LayerContainer1 #btn_add").click(function () {
+            $gridTable_layer1.openFrameWindow({
+                title: "新增-区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer1 #btn_edit").click(function () {
+
+            var AreaId = $gridTable_layer1.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            $gridTable_layer1.openFrameWindow({
+                title: "编辑--区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form?areaId=' + AreaId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer1 #btn_remove").click(function () {
+            var AreaId = $gridTable_layer1.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Area/RemoveForm', param: { areaId: AreaId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshTreeData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        $("#LayerContainer2 #btn_add").click(function () {
+            $gridTable_layer2.openFrameWindow({
+                title: "新增-区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer2 #btn_edit").click(function () {
+
+            var AreaId = $gridTable_layer2.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            $gridTable_layer2.openFrameWindow({
+                title: "编辑--区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form?areaId=' + AreaId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer2 #btn_remove").click(function () {
+            var AreaId = $gridTable_layer2.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Area/RemoveForm', param: { areaId: AreaId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshTreeData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        $("#LayerContainer3 #btn_add").click(function () {
+            $gridTable_layer3.openFrameWindow({
+                title: "新增-区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer3 #btn_edit").click(function () {
+
+            var AreaId = $gridTable_layer3.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            $gridTable_layer3.openFrameWindow({
+                title: "编辑--区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form?areaId=' + AreaId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer3 #btn_remove").click(function () {
+            var AreaId = $gridTable_layer3.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Area/RemoveForm', param: { areaId: AreaId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshTreeData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        });
+
+        $("#LayerContainer4 #btn_add").click(function () {
+            $gridTable_layer4.openFrameWindow({
+                title: "新增-区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer4 #btn_edit").click(function () {
+
+            var AreaId = $gridTable_layer4.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            $gridTable_layer4.openFrameWindow({
+                title: "编辑--区域",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Area/Form?areaId=' + AreaId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.areaIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#LayerContainer4 #btn_remove").click(function () {
+            var AreaId = $gridTable_layer4.getSelectRowValue("AreaId");
+            if (!AreaId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Area/RemoveForm', param: { areaId: AreaId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshTreeData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        });
+
+    });
+
+    function refreshTreeData_Layer1() {
+        if ($gridTable_layer1 != null) {
+            var keyWord = $("#LayerContainer1 #keyWord").val().trim();
+            $gridTable_layer1.getRemoteData({ keyWord: keyWord, layer: 1 });
+        }
+    }
+
+    function refreshTreeData_Layer2() {
+        if ($gridTable_layer2 != null) {
+            var keyWord = $("#LayerContainer2 #keyWord").val().trim();
+            $gridTable_layer2.getRemoteData({ keyWord: keyWord, layer: 2 });
+        }
+    }
+
+    function refreshTreeData_Layer3() {
+        if ($gridTable_layer3 != null) {
+            var keyWord = $("#LayerContainer3 #keyWord").val().trim();
+            $gridTable_layer3.getRemoteData({ keyWord: keyWord, layer: 3 });
+        }
+    }
+
+    function refreshTreeData_Layer4() {
+        if ($gridTable_layer4 != null) {
+            var keyWord = $("#LayerContainer4 #keyWord").val().trim();
+            $gridTable_layer4.getRemoteData({ keyWord: keyWord, layer: 4 });
+        }
+    }
+
+    function getSpecialArea(areaId, layer) {
+        $.httpPostAsync({
+            url: "/base/area/getSpecialArea",
+            param: { areaId: areaId, layer: layer }
+        }, function (res) {
+            if (res.code == 200) {
+                datas = res.datas;
+                $.each(datas, function (key, element) {
+                    //alert(key);
+                    //console.log("ele:" + element);
+                    if (key == "1") {
+                        $gridTable_layer1.setAndFlushData(element);
+                    } else if (key == "2") {
+                        $gridTable_layer2.setAndFlushData(element);
+                    } else if (key == "3") {
+                        $gridTable_layer3.setAndFlushData(element);
+                    } else if (key == "4") {
+                        $gridTable_layer4.setAndFlushData(element);
+                    }
+
+                });
+            } else {
+                top.jkf.showTips(res.errorMessage, 2);
+            }
+
+        });
+    }
+
+</script>

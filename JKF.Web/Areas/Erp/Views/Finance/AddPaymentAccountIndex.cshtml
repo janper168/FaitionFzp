@@ -1,0 +1,230 @@
+﻿@{
+    Layout = "_Form";
+}
+<style>
+    #AccountListTable {
+        border-collapse: collapse;
+        border: 1px solid lightgray;
+    }
+
+        #AccountListTable tr, #AccountListTable td {
+            border-collapse: collapse;
+            border: 1px solid lightgray;
+        }
+
+        #AccountListTable td {
+            width: 200px;
+            height: 32px;
+        }
+</style>
+
+<div id="Form" class="form" style="display: none; overflow:auto;height:fit-content; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Number">付款编码</label></div>
+            <input id="Number" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="SuppilerId">供应商</label></div>
+            <input id="SuppilerId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ProcessTime">处理时间</label></div>
+            <input id="ProcessTime" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="DiscountAmount">优惠金额</label></div>
+            <input id="DiscountAmount" type="text" data-required="" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row" style="height:100px;">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Remark">备注</label></div>
+            <textarea id="Remark" class="default-input" data-type="text" style="width:300px;height:80px;"></textarea>
+    </div>
+</div>
+</div>
+<div style="text-align:center;"><h5>付款账户信息</h5></div>
+<div style="margin-left:50px;"><button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增付款账号</button></div>
+<div style="margin-left:50px;">
+<table id="AccountListTable">
+        <tr>
+            <td>账号</td>
+            <td>付款金额</td>
+            <td>操作</td>
+        </tr>
+        <tr>
+            <td>合计</td>
+            <td>0</td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var formValidator = null;
+    var data = {};
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        $.setSelect({
+            url: "/Erp/Suppiler/GetAll",
+            textCtrlId: "SuppilerId",
+            ctrlId: "SuppilerId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+        var res = $.httpGet({ url: '/Erp/Finance/GetPaymentOrderNo', param: null });
+
+        if (res.code == 200) {
+            $("#Number").val(res.datas);
+        } 
+
+        $("#Form").show();
+
+        $("#btn_add").click(function (e) {
+            top.jkf.openFrame({
+                parentFrameId: $openIframe.attr("id"),
+                title: "添加付款账号",
+                width: 900,
+                height: 600,
+                level: 2,
+                url: '/Erp/Finance/AddPaymentAccountForm',
+                data: null,
+                hasMinButton: false,
+                hasMaxButton: true,
+                hasCloseButton: true,
+                isWazard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "确定",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.addAccountForm.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ]
+            });
+        });
+
+
+        formValidator = $("#Form").formValidator()
+    });
+
+
+    function calcTotal() {
+        var $trs = $("#AccountListTable").find("tr");
+        var $toBefored = $("#AccountListTable").find("tr").last();
+        var totalAmount = 0;
+        for (i in $trs) {
+            if (i >= 1 && i < $trs.length - 1) {
+                totalAmount += parseFloat($($trs.get(i)).find("td:eq(1)").text());
+            }
+        }
+        $toBefored.find("td").eq(1).text(totalAmount);
+        
+
+    }
+
+    function getAccount() {
+
+        var account = [];
+        var $trs = $("#AccountListTable").find("tr");
+        for (i in $trs) {
+            if (i >= 1 && i < $trs.length - 1) {
+                var AccountId = $($trs.get(i)).attr("id");
+                var PaymentAmount = parseInt($($trs.get(i)).find("td:eq(1)").text());
+
+                var item = { AccountId, PaymentAmount };
+                account.push(item);
+            }
+        }
+        return account;
+    }
+
+
+
+    function addNewAccount(data) {
+
+        if ($("#AccountListTable").find("tr#" + data.AccountId).length == 1) {
+            return;
+        }
+
+        var $toBefored = $("#AccountListTable").find("tr").last();
+        var trHtml = "<tr id='" + data.AccountId + "'>" +
+            "<td>" + data.Name + "</td>" +
+            "<td>" + data.PaymentAmount + "</td>" +
+            "<td><button id='delItem'>删除<button></td>" +
+            +"</tr>";
+
+        $(trHtml).insertBefore($toBefored);
+        calcTotal();
+
+        $("#delItem").click(function (e) {
+            $(this).parent().parent().remove();
+            calcTotal();
+        })
+    }
+
+    function saveForm() {
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if ($("#AccountListTable").find("tr").length == 2) {
+            top.jkf.showTips("请填写账户明细！", 3);
+            return false;
+        }
+
+        data.TotalAmount = parseFloat($("#AccountListTable").find("tr").last().find("td:eq(1)").text());
+        $.getFormData(data, $("#Form"));
+
+        var accountList = getAccount();
+        data.PaymentAccountList = accountList;
+
+        $.httpPostAsync({ url: '/Erp/Finance/SavePaymentOrdeForm', param: { Erp_PaymentOrder: data } }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips(res.errMsg, 2);
+            }
+        })
+    }
+</script>

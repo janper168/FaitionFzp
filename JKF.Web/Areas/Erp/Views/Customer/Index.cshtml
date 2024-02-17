@@ -1,0 +1,332 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+            <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+            <button id="btn_excelImportConfig" class="btn orange"><i class="fa fa-cogs"></i>导入配置</button>
+            <button id="btn_excelImport" class="btn yellow"><i class="fa fa-upload"></i>Excel导入配置</button>
+            <input id="ExcelUpload" type="file" style="display:none;" name="ExcelUpload" />
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="Erp_CustomerTable"></div>
+    </div>
+</div>
+<script>
+
+
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'Erp_CustomerId', width: 200, showName: 'showName', hidden: true, align: 'center' },
+            { columnName: 'Number', width: 150, showName: '编号', hidden: false, align: 'left' },
+            { columnName: 'Name', width: 200, showName: '名称', hidden: false, align: 'left' },
+            {
+                columnName: 'Level', width: 150, showName: '用户等级', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    switch (val) {
+                        case "1": return "普通用户";
+                        case "2": return "一级用户";
+                        case "3": return "二级用户";
+                        case "4": return "三级用户";
+                    }
+                }
+            },
+            { columnName: 'Phone', width: 200, showName: '手机', hidden: false, align: 'left' },
+            { columnName: 'Contact', width: 200, showName: '联系人', hidden: false, align: 'left' },
+            { columnName: 'Email', width: 200, showName: '邮箱', hidden: false, align: 'left' },
+            { columnName: 'Remark', width: 300, showName: '备注', hidden: false, align: 'left' },
+            {
+                columnName: 'Actived', width: 100, showName: '是否激活', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 1) return "是";
+                    else return "否";
+                }
+            },
+            { columnName: 'InitialArearsAmount', width: 100, showName: '期初欠款金额', hidden: false, align: 'left' },
+            { columnName: 'ArearsAmount', width: 100, showName: '欠款金额', hidden: false, align: 'left' },
+            {
+                columnName: 'ArearsStatus', width: 100, showName: '欠款状态', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 1) return "是";
+                    else return "否";
+                }
+            },
+
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#Erp_CustomerTable').jkfGrid({
+            remoteAddress: '/Erp/Customer/GetErp_Customers',
+            columnHeaders: colHeaders,
+            mainId: 'Erp_CustomerId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'Number',
+            sortOrder: 'asc'
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+            $gridTable.openFrameWindow({
+                title: "新增-客户",
+                width: 1200,
+                height: 700,
+                level: 1,
+                url: '/Erp/Customer/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_edit").click(function () {
+
+            var Erp_CustomerId = $gridTable.getSelectRowValue("Erp_CustomerId");
+            if (!Erp_CustomerId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (Erp_CustomerId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "编辑--客户",
+                width: 1200,
+                height: 700,
+                level: 1,
+                url: '/Erp/Customer/Form?Erp_CustomerId=' + Erp_CustomerId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+            var Erp_CustomerId = $gridTable.getSelectRowValue("Erp_CustomerId");
+            if (!Erp_CustomerId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Erp/Customer/RemoveForm', param: { Erp_CustomerId: Erp_CustomerId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        $("#btn_excelImport").click(function (e) {
+            $("#ExcelUpload").trigger("click");
+            //$(".moreButtonsBlock").toggleClass('select');
+        });
+
+        $("#ExcelUpload").change(function () {
+            if ($(this).val() != "") {
+                fileLoad(this);
+                $(this).val("");
+            }
+        })
+
+
+        $("#btn_excelImportConfig").click(function (e) {
+            //$(".moreButtonsBlock").toggleClass('select');
+            $gridTable.openFrameWindow({
+                title: "客户信息Excel导入配置",
+                width: 1300,
+                height: 700,
+                level: 1,
+                url: '/Base/Excel/ImportConfigIndex',
+                data: { moduleName: '客户管理' },
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+        });
+
+
+
+        //top.jkf.processAuthorizedButtons(".buttonBar");
+
+
+    });
+
+    function fileLoad(ele) {
+
+        var formData = new FormData();
+
+        var name = $(ele).val();
+        var files = $(ele)[0].files[0];
+
+        formData.append("file", files);
+        formData.append("name", name);
+
+        formData.append("moduleName", "客户管理");
+        formData.append("moduleKey", 'Erp_CustomerId');
+        formData.append("moduleType", "JKF.DB.Models.Erp_Customer");
+        formData.append("serviceType", "JKF.DB.Operation.Erp_CustomerService");
+        $.ajax({
+            url: "/Base/Excel/onPostUpload",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+
+            },
+            success: function (res) {
+                if (res.code == 200) {
+                    top.jkf.showTips("导入成功！", 1);
+                    window.location.reload();
+                } else {
+                    top.jkf.showTips("导入失败！", 2);
+                }
+
+            }
+            ,
+            error: function (res) {
+                top.jkf.showTips("导入失败！", 2);
+            }
+        });
+
+    }
+
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>

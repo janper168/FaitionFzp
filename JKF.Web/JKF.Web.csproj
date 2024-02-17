@@ -1,0 +1,366 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <UserSecretsId>34b1175b-b19d-46b4-ad49-6b05685e198c</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+  <PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
+	<RazorCompileOnBuild>false</RazorCompileOnBuild>
+	<MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="wwwroot\lib\新文件夹\**" />
+    <Content Remove="wwwroot\lib\新文件夹\**" />
+    <EmbeddedResource Remove="wwwroot\lib\新文件夹\**" />
+    <None Remove="wwwroot\lib\新文件夹\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Areas\WorkFlow\Views\Task\CheckForm.cshtml" />
+    <Content Remove="wwwroot\js\formVlidation.js" />
+    <Content Remove="wwwroot\js\jkf_grid - 复制.js" />
+    <Content Remove="wwwroot\kindeditor\kindeditor-all.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.25" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
+    <PackageReference Include="NPOI" Version="2.5.5" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Base\Data\" />
+    <Folder Include="Areas\Desktop\Data\" />
+    <Folder Include="Areas\Desktop\Models\" />
+    <Folder Include="Areas\Erp\Data\" />
+    <Folder Include="Areas\Erp\Models\" />
+    <Folder Include="Areas\File\Data\" />
+    <Folder Include="Areas\File\Models\" />
+    <Folder Include="Areas\WorkFlow\Data\" />
+    <Folder Include="Areas\WorkFlow\Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Areas\WorkFlow\Views\Task\CheckForm.cshtml" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.common.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.common.js.map" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.common.min.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.esm.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.esm.js.map" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.esm.min.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.js.map" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.min.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.simple.js" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.simple.js.map" />
+    <None Include="wwwroot\echarts\lib\dist\echarts.simple.min.js" />
+    <None Include="wwwroot\echarts\lib\dist\extension\bmap.js" />
+    <None Include="wwwroot\echarts\lib\dist\extension\bmap.js.map" />
+    <None Include="wwwroot\echarts\lib\dist\extension\bmap.min.js" />
+    <None Include="wwwroot\echarts\lib\dist\extension\dataTool.js" />
+    <None Include="wwwroot\echarts\lib\dist\extension\dataTool.js.map" />
+    <None Include="wwwroot\echarts\lib\dist\extension\dataTool.min.js" />
+    <None Include="wwwroot\echarts\lib\canteen.js" />
+    <None Include="wwwroot\echarts\lib\caseFrame.js" />
+    <None Include="wwwroot\echarts\lib\config.js" />
+    <None Include="wwwroot\echarts\lib\countup.js" />
+    <None Include="wwwroot\echarts\lib\dat.gui.min.js" />
+    <None Include="wwwroot\echarts\lib\draggable.js" />
+    <None Include="wwwroot\echarts\lib\ecSimpleOptionPlayer.js" />
+    <None Include="wwwroot\echarts\lib\ecSimpleTransform.js" />
+    <None Include="wwwroot\echarts\lib\ecStat-1.1.1.min.js" />
+    <None Include="wwwroot\echarts\lib\ecStat.min.js" />
+    <None Include="wwwroot\echarts\lib\facePrint.js" />
+    <None Include="wwwroot\echarts\lib\frameInsight.js" />
+    <None Include="wwwroot\echarts\lib\jquery.min.js" />
+    <None Include="wwwroot\echarts\lib\perlin.js" />
+    <None Include="wwwroot\echarts\lib\rearrange.js" />
+    <None Include="wwwroot\echarts\lib\simpleRequire.js" />
+    <None Include="wwwroot\echarts\lib\testHelper.js" />
+    <None Include="wwwroot\extension\bmap.js" />
+    <None Include="wwwroot\extension\bmap.js.map" />
+    <None Include="wwwroot\extension\bmap.min.js" />
+    <None Include="wwwroot\extension\dataTool.js" />
+    <None Include="wwwroot\extension\dataTool.js.map" />
+    <None Include="wwwroot\extension\dataTool.min.js" />
+    <None Include="wwwroot\kindeditor\.gitignore" />
+    <None Include="wwwroot\kindeditor\asp.net\bin\LitJSON.dll" />
+    <None Include="wwwroot\kindeditor\asp.net\demo.aspx" />
+    <None Include="wwwroot\kindeditor\asp\demo.asp" />
+    <None Include="wwwroot\kindeditor\asp\JSON_2.0.4.asp" />
+    <None Include="wwwroot\kindeditor\asp\UpLoad_Class.asp" />
+    <None Include="wwwroot\kindeditor\docs\ajax.rst" />
+    <None Include="wwwroot\kindeditor\docs\changelog.rst" />
+    <None Include="wwwroot\kindeditor\docs\classyext.py" />
+    <None Include="wwwroot\kindeditor\docs\classyext.pyc" />
+    <None Include="wwwroot\kindeditor\docs\cmd.rst" />
+    <None Include="wwwroot\kindeditor\docs\colorpicker.rst" />
+    <None Include="wwwroot\kindeditor\docs\conf.py" />
+    <None Include="wwwroot\kindeditor\docs\core.rst" />
+    <None Include="wwwroot\kindeditor\docs\dialog.rst" />
+    <None Include="wwwroot\kindeditor\docs\editor.rst" />
+    <None Include="wwwroot\kindeditor\docs\event.rst" />
+    <None Include="wwwroot\kindeditor\docs\index.rst" />
+    <None Include="wwwroot\kindeditor\docs\make.bat" />
+    <None Include="wwwroot\kindeditor\docs\Makefile" />
+    <None Include="wwwroot\kindeditor\docs\menu.rst" />
+    <None Include="wwwroot\kindeditor\docs\node.rst" />
+    <None Include="wwwroot\kindeditor\docs\option.rst" />
+    <None Include="wwwroot\kindeditor\docs\plugin.rst" />
+    <None Include="wwwroot\kindeditor\docs\qna.rst" />
+    <None Include="wwwroot\kindeditor\docs\range.rst" />
+    <None Include="wwwroot\kindeditor\docs\selector.rst" />
+    <None Include="wwwroot\kindeditor\docs\tabs.rst" />
+    <None Include="wwwroot\kindeditor\docs\theme.rst" />
+    <None Include="wwwroot\kindeditor\docs\upgrade.rst" />
+    <None Include="wwwroot\kindeditor\docs\upload.rst" />
+    <None Include="wwwroot\kindeditor\docs\uploadbutton.rst" />
+    <None Include="wwwroot\kindeditor\docs\usage.rst" />
+    <None Include="wwwroot\kindeditor\docs\widget.rst" />
+    <None Include="wwwroot\kindeditor\docs\_templates\classy\static\classy.css_t" />
+    <None Include="wwwroot\kindeditor\docs\_templates\classy\theme.conf" />
+    <None Include="wwwroot\kindeditor\Gruntfile.js" />
+    <None Include="wwwroot\kindeditor\jsp\demo.jsp" />
+    <None Include="wwwroot\kindeditor\jsp\lib\commons-fileupload-1.2.1.jar" />
+    <None Include="wwwroot\kindeditor\jsp\lib\commons-io-1.4.jar" />
+    <None Include="wwwroot\kindeditor\jsp\lib\json_simple-1.1.jar" />
+    <None Include="wwwroot\kindeditor\kindeditor-all-min.js" />
+    <None Include="wwwroot\kindeditor\kindeditor-all.js" />
+    <None Include="wwwroot\kindeditor\lang\ar.js" />
+    <None Include="wwwroot\kindeditor\lang\en.js" />
+    <None Include="wwwroot\kindeditor\lang\ko.js" />
+    <None Include="wwwroot\kindeditor\lang\ru.js" />
+    <None Include="wwwroot\kindeditor\lang\zh-CN.js" />
+    <None Include="wwwroot\kindeditor\lang\zh-TW.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\.htaccess" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\build.bat" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension-beta\contentScript.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension-beta\firebug-lite-beta.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension-beta\googleChrome.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension-beta\skin\xp\roundCorner.svg" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension\contentScript.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension\firebug-lite.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension\googleChrome.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\chrome-extension\skin\xp\roundCorner.svg" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\compress.bat" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\firebug-lite-beta.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\firebug-lite-debug.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\build\firebug-lite.js" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\plugin\proxy\proxy.php" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\skin\classic\roundCorner.svg" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\skin\light\roundCorner.svg" />
+    <None Include="wwwroot\kindeditor\lib\firebug-lite\skin\xp\roundCorner.svg" />
+    <None Include="wwwroot\kindeditor\lib\jquery.min.js" />
+    <None Include="wwwroot\kindeditor\lib\qunit\qunit.js" />
+    <None Include="wwwroot\kindeditor\php\demo.php" />
+    <None Include="wwwroot\kindeditor\php\JSON.php" />
+    <None Include="wwwroot\kindeditor\plugins\anchor\anchor.js" />
+    <None Include="wwwroot\kindeditor\plugins\autoheight\autoheight.js" />
+    <None Include="wwwroot\kindeditor\plugins\baidumap\baidumap.js" />
+    <None Include="wwwroot\kindeditor\plugins\clearhtml\clearhtml.js" />
+    <None Include="wwwroot\kindeditor\plugins\code\code.js" />
+    <None Include="wwwroot\kindeditor\plugins\code\prettify.js" />
+    <None Include="wwwroot\kindeditor\plugins\emoticons\emoticons.js" />
+    <None Include="wwwroot\kindeditor\plugins\filemanager\filemanager.js" />
+    <None Include="wwwroot\kindeditor\plugins\fixtoolbar\fixtoolbar.js" />
+    <None Include="wwwroot\kindeditor\plugins\flash\flash.js" />
+    <None Include="wwwroot\kindeditor\plugins\image\image.js" />
+    <None Include="wwwroot\kindeditor\plugins\insertfile\insertfile.js" />
+    <None Include="wwwroot\kindeditor\plugins\lineheight\lineheight.js" />
+    <None Include="wwwroot\kindeditor\plugins\link\link.js" />
+    <None Include="wwwroot\kindeditor\plugins\map\map.js" />
+    <None Include="wwwroot\kindeditor\plugins\media\media.js" />
+    <None Include="wwwroot\kindeditor\plugins\multiimage\images\swfupload.swf" />
+    <None Include="wwwroot\kindeditor\plugins\multiimage\multiimage.js" />
+    <None Include="wwwroot\kindeditor\plugins\pagebreak\pagebreak.js" />
+    <None Include="wwwroot\kindeditor\plugins\plainpaste\plainpaste.js" />
+    <None Include="wwwroot\kindeditor\plugins\preview\preview.js" />
+    <None Include="wwwroot\kindeditor\plugins\quickformat\quickformat.js" />
+    <None Include="wwwroot\kindeditor\plugins\table\table.js" />
+    <None Include="wwwroot\kindeditor\plugins\template\template.js" />
+    <None Include="wwwroot\kindeditor\plugins\wordpaste\wordpaste.js" />
+    <None Include="wwwroot\kindeditor\README.md" />
+    <None Include="wwwroot\kindeditor\src\ajax.js" />
+    <None Include="wwwroot\kindeditor\src\cmd.js" />
+    <None Include="wwwroot\kindeditor\src\colorpicker.js" />
+    <None Include="wwwroot\kindeditor\src\config.js" />
+    <None Include="wwwroot\kindeditor\src\core.js" />
+    <None Include="wwwroot\kindeditor\src\dialog.js" />
+    <None Include="wwwroot\kindeditor\src\edit.js" />
+    <None Include="wwwroot\kindeditor\src\event.js" />
+    <None Include="wwwroot\kindeditor\src\footer.js" />
+    <None Include="wwwroot\kindeditor\src\header.js" />
+    <None Include="wwwroot\kindeditor\src\html.js" />
+    <None Include="wwwroot\kindeditor\src\main.js" />
+    <None Include="wwwroot\kindeditor\src\menu.js" />
+    <None Include="wwwroot\kindeditor\src\node.js" />
+    <None Include="wwwroot\kindeditor\src\range.js" />
+    <None Include="wwwroot\kindeditor\src\selector.js" />
+    <None Include="wwwroot\kindeditor\src\tabs.js" />
+    <None Include="wwwroot\kindeditor\src\toolbar.js" />
+    <None Include="wwwroot\kindeditor\src\uploadbutton.js" />
+    <None Include="wwwroot\kindeditor\src\widget.js" />
+    <None Include="wwwroot\kindeditor\test\cmd.js" />
+    <None Include="wwwroot\kindeditor\test\core.js" />
+    <None Include="wwwroot\kindeditor\test\edit.js" />
+    <None Include="wwwroot\kindeditor\test\editor.js" />
+    <None Include="wwwroot\kindeditor\test\event.js" />
+    <None Include="wwwroot\kindeditor\test\html.js" />
+    <None Include="wwwroot\kindeditor\test\menu.js" />
+    <None Include="wwwroot\kindeditor\test\node.js" />
+    <None Include="wwwroot\kindeditor\test\range.js" />
+    <None Include="wwwroot\kindeditor\test\selector.js" />
+    <None Include="wwwroot\kindeditor\test\toolbar.js" />
+    <None Include="wwwroot\kindeditor\test\webdriver\all-chrome.bat" />
+    <None Include="wwwroot\kindeditor\test\webdriver\all-firefox.bat" />
+    <None Include="wwwroot\kindeditor\test\webdriver\all-ie.bat" />
+    <None Include="wwwroot\kindeditor\test\webdriver\all.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\KindEditorDriver.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\README.md" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriver.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverBase.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverContainer.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverElement.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverEnvironment.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverExceptions.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverSession.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\WebDriverSimpleItem.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\php-webdriver\__init__.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\test-default.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\test-dialog.php" />
+    <None Include="wwwroot\kindeditor\test\webdriver\test-unittest.php" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.js" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.js.map" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+    <None Include="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map" />
+    <None Include="wwwroot\lib\bootstrap\LICENSE" />
+    <None Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    <None Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+    <None Include="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <None Include="wwwroot\lib\jquery-validation\LICENSE.md" />
+    <None Include="wwwroot\lib\jquery\dist\jquery-ui.min.js" />
+    <None Include="wwwroot\lib\jquery\dist\jquery.js" />
+    <None Include="wwwroot\lib\jquery\dist\jquery.min.js" />
+    <None Include="wwwroot\lib\jquery\dist\jquery.min.map" />
+    <None Include="wwwroot\lib\My97DatePicker\calendar.js" />
+    <None Include="wwwroot\lib\My97DatePicker\lang\en.js" />
+    <None Include="wwwroot\lib\My97DatePicker\lang\zh-cn.js" />
+    <None Include="wwwroot\lib\My97DatePicker\lang\zh-tw.js" />
+    <None Include="wwwroot\lib\My97DatePicker\WdatePicker.js" />
+    <None Include="wwwroot\lib\My97DatePicker\开发包\lang\en.js" />
+    <None Include="wwwroot\lib\My97DatePicker\开发包\lang\zh-cn.js" />
+    <None Include="wwwroot\lib\My97DatePicker\开发包\lang\zh-tw.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JFK.BLL\JKF.BLL.csproj" />
+    <ProjectReference Include="..\JKF.Utils\JKF.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Areas\Base\Views\Role\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Areas\Base\Views\User\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Areas\Erp\Views\PurchaseReturn\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Areas\Erp\Views\Sales\Index.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Home\Error.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Utility\ChangePwdForm.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\js\tuxing.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\WorkFlow\Views\Task\CheckForm.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Erp\Views\PurchaseReturn\AddGoodsForm.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Erp\Views\PurchaseReturn\DetailForm.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Erp\Views\PurchaseReturn\Form.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Erp\Views\Sales\AddGoodsForm.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Erp\Views\Sales\DetailForm.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Erp\Views\Sales\Form.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\WorkFlow\Views\Task\CheckForm.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Erp\Views\PurchaseReturn\AddGoodsForm.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Erp\Views\PurchaseReturn\DetailForm.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Erp\Views\PurchaseReturn\Form.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Erp\Views\Sales\AddGoodsForm.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Erp\Views\Sales\DetailForm.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Erp\Views\Sales\Form.cshtml" />
+  </ItemGroup>
+
+</Project>

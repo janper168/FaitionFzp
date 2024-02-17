@@ -1,0 +1,839 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 80%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 50px;
+        border-top: 1px solid red;
+        border-bottom: 1px solid #ccc;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 98%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<body style="height:98%;border:0px solid black;">
+    <div id="WizardGroup" class="wizard_group">
+        <div id="step1" step-target="Form" class="wizard_step"><span class="text">1.模块设置</span><span id="chervon0" class="chervon"></span></div>
+        <div id="step2" step-target="ButtonListFrom" class="wizard_step"><span class="text">2.按钮设置</span><span id="chervon1" class="chervon"></span></div>
+        <div id="step3" step-target="ColumnListFrom" class="wizard_step"><span class="text">3.列表设置</span><span id="chervon2" class="chervon"></span></div>
+        <div id="step4" step-target="FormListFrom" class="wizard_step"><span class="text">4.表单设置</span><span id="chervon3" class="chervon"></span></div>
+    </div>
+    <div id="Form" class="form" style="display: block; height: 85%; border: 0px solid red;">
+        <div class="form_row">
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="EnCode">编码</label></div>
+                <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+            </div>
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="Name">名称</label></div>
+                <input id="Name" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+            </div>
+        </div>
+        <div class="form_row">
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="ParentId">上级</label></div>
+                <input id="ParentId" data-required="true" style="ime-mode:disabled" onkeypress="$.noPermitInput(event)" data-type="text_select" class="width_200 default-input" type="text" />
+            </div>
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="UrlAddress">Url地址</label></div>
+                <input id="UrlAddress" class="width_200 default-input" type="text" data-type="text" />
+            </div>
+        </div>
+        <div class="form_row">
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="Target">菜单类型</label></div>
+                <input class="blue" type="radio" value="1" name="Target" checked="checked">目录
+                <input class="blue" type="radio" value="2" name="Target">子菜单
+                <input id="Target" class="width_200 default-input" type="hidden" data-type="radio" />
+            </div>
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="Name">排序</label></div>
+                <input id="Sort" data-required="true" class="width_200 default-input" type="text" data-type="integer" />
+            </div>
+        </div>
+        <div class="form_row">
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="Name">图标</label></div>
+                <input id="Icon" class="width_200 default-input" type="text" data-type="text" /><button id="Icon_select" style="margin-top:0px;right:29px;top:1px;" class="btn blue"><span style="color:#fff;">...</span></button>
+            </div>
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="Description">描述</label></div>
+                <textarea id="Description" class="height_50 width_250 default-input" data-type="text"></textarea>
+            </div>
+        </div>
+        <div class="form_row">
+            <div class="form_item_half">
+                <div class="labelText"><label class="form_label" for="EnabledMark">是否有效</label></div>
+                <input class="blue" type="radio" value="1" name="EnabledMark" checked="checked" />是
+                <input class="blue" type="radio" value="0" name="EnabledMark">否
+                <input id="EnabledMark" class="width_200 default-input" type="hidden" data-type="radio" />
+            </div>
+        </div>
+    </div>
+    <div id="ButtonListFrom" class="form" style="display:block;height:85%;">
+        <div class="container" id="container">
+            <div class="toolLine">
+                @*<div class="searchBar">
+                        <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+                        <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+                    </div>*@
+                <div class="buttonBar">
+                    <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+                    <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+                    <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+                </div>
+            </div>
+            <div class="tableContent">
+                <div class="jkf_grid_tbl" id="moduleButtonListTable"></div>
+            </div>
+        </div>
+    </div>
+    <div id="ColumnListFrom" class="form" style="display:block;height:85%;">
+        <div class="container">
+            <div class="toolLine">
+                @*<div class="searchBar">
+                        <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+                        <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+                    </div>*@
+                <div class="buttonBar">
+                    <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+                    <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+                    <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+                </div>
+            </div>
+            <div class="tableContent">
+                <div class="jkf_grid_tbl" id="moduleColumnListTable"></div>
+            </div>
+        </div>
+    </div>
+    <div id="FormListFrom" class="form" style="display:block;height:85%;">
+        <div class="container">
+            <div class="toolLine">
+                @*<div class="searchBar">
+                        <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+                        <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+                    </div>*@
+                <div class="buttonBar">
+                    <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+                    <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+                    <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+                </div>
+            </div>
+            <div class="tableContent">
+                <div class="jkf_grid_tbl" id="moduleFormListTable"></div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        var parentIframe = null;
+        var currentIframe = null;
+        var curSelectIndex = 0;
+        var $steps = 0
+        var stepCount = null;
+        var $buttonGroup = null;
+        var $openIframe = null;
+        var moduleId = request('moduleId');
+        var module = {};
+
+        var $btn_prev = null;
+        var $btn_next = null;
+        var $btn_save = null;
+
+        var colButtonListHeaders = null;
+        var $gridTable_ButtonList = null;
+        var $gridTable_ColumnList = null;
+        var $gridTable_FromList = null;
+        var colButtonListData = [];
+        var colColumnListData = [];
+        var colFormListData = [];
+
+        var formValidator = null;
+
+
+        var jfkInit = (function ($, jkf) {
+
+            $("#EnCode").attr("data-check-exists-url", "/base/module/IsExistEnCode?keyValue=" + moduleId);
+            $("#Name").attr("data-check-exists-url", "/base/module/IsExistName?KeyValue=" + moduleId);
+
+
+            currentIframe = jkf.getIframeByElement(document.body);
+            jkf.openIframe = currentIframe;
+
+            $openIframe = $(currentIframe);
+
+            var parentIframeId = $openIframe.attr('data-parentId');
+
+            if (top.frames[parentIframeId].contentWindow != undefined) {
+                parentIframe = top.frames[parentIframeId].contentWindow;
+            }
+            else {
+                parentIframe = top.frames[parentIframeId];
+            }
+
+
+            var wizardFormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+            var $wizardForm = jkf.$topBody.find("#" + wizardFormId);
+
+            $buttonGroup = $wizardForm.find(".bottomBar .btn_group");
+
+            $btn_prev = $buttonGroup.find("#button_prev");
+            $btn_next = $buttonGroup.find("#button_next");
+            $btn_save = $buttonGroup.find("#button_save");
+
+
+
+            $.setTreeSelect({
+                url: "/Base/Module/GetModules",
+                textCtrlId: "ParentId",
+                ctrlId: "ParentId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: "0",
+                idKey: "ModuleId",
+                valueKey: "Name",
+                targetValue: 1,//目录
+                targetKey: "Target",
+                hideDownLevelKeyValue: moduleId,
+                width: 200,
+                height: 250
+            })
+
+            colButtonListHeaders = [
+                { columnName: 'ModuleButtonId', width: 30, showName: 'ModuleId', hidden: true, align: 'center' },
+                { columnName: 'ParentId', width: 30, showName: 'ParentId', hidden: true, align: 'center' },
+                { columnName: 'EnCode', width: 200, showName: '编码', align: 'left' },
+                { columnName: 'Name', width: 200, showName: '名称', align: 'left' },
+                { columnName: 'Icon', width: 150, showName: '图标', align: 'left' },
+                {
+                    columnName: 'EnabledMark', width: 100, showName: '是否有效', align: 'left',
+                    formatter: function (colValue) {
+                        if (colValue == 1) {
+                            return "<i class='fa fa-check'></i>";
+                        } else if (colValue == 0) {
+                            return "<i class='fa fa-close'></i>";
+                        }
+                    },
+                },
+                {
+                    columnName: 'Target', width: 200, showName: '类型', align: 'left',
+                    formatter: function (colValue) {
+                        if (colValue == 1) {
+                            return "普通";
+                        } else if (colValue == 2) {
+                            return "下拉";
+                        }
+                    },
+                }
+
+            ];
+            colColumnListHeaders = [
+                { columnName: 'ModuleColumnId', width: 30, showName: 'ModuleColumnId', hidden: true, align: 'center' },
+                { columnName: 'EnCode', width: 200, showName: '编码', align: 'left' },
+                { columnName: 'Name', width: 200, showName: '名称', align: 'left' },
+                {
+                    columnName: 'EnabledMark', width: 100, showName: '是否有效', align: 'left',
+                    formatter: function (colValue) {
+                        if (colValue == 1) {
+                            return "<i class='fa fa-check'></i>";
+                        } else if (colValue == 0) {
+                            return "<i class='fa fa-close'></i>";
+                        }
+                    },
+                },
+
+            ];
+            colFormListHeaders = [
+                { columnName: 'ModuleFormId', width: 30, showName: 'ModuleFormId', hidden: true, align: 'center' },
+                { columnName: 'EnCode', width: 200, showName: '编码', align: 'left' },
+                { columnName: 'Name', width: 200, showName: '名称', align: 'left' },
+                {
+                    columnName: 'EnabledMark', width: 100, showName: '是否有效', align: 'left',
+                    formatter: function (colValue) {
+                        if (colValue == 1) {
+                            return "<i class='fa fa-check'></i>";
+                        } else if (colValue == 0) {
+                            return "<i class='fa fa-close'></i>";
+                        }
+                    },
+                },
+            ];
+
+            $gridTable_ButtonList = $('#moduleButtonListTable').jkfGrid({
+                remoteAddress: null,
+                columnHeaders: colButtonListHeaders,
+                mainId: 'ModuleButtonId',
+                hasPager: false,
+                treeMode: true,
+                treeModeParentId: 'ParentId',
+                treeModeLevelColumn: 'Name',
+                showNumber: true,
+            });
+
+
+            $gridTable_ColumnList = $('#moduleColumnListTable').jkfGrid({
+                remoteAddress: null,
+                columnHeaders: colColumnListHeaders,
+                mainId: 'ModuleColumnId',
+                hasPager: false,
+                showNumber: true,
+
+            });
+
+            $gridTable_FormList = $('#moduleFormListTable').jkfGrid({
+                remoteAddress: null,
+                columnHeaders: colFormListHeaders,
+                mainId: 'ModuleFormId',
+                hasPager: false,
+                showNumber: true,
+
+            });
+
+            $("#Icon_select").click(function () {
+                top.jkf.openFrame({
+                    parentFrameId: $openIframe.attr("id"),
+                    title: '选择图标',
+                    width: 1000,
+                    height: 600,
+                    level: 2,
+                    url: "/Utility/Icon",
+                    data: null,
+                    hasMinButton: false,
+                    hasMaxButton: true,
+                    hasCloseButton: true,
+                    isWazard: false,
+                    buttonGroup: null
+                })
+
+            });
+
+
+            $("#ButtonListFrom #btn_add").click(function () {
+                //alert('ok');
+
+
+                $gridTable_ButtonList.openFrameWindow({
+                    title: "新增-模块按钮定义",
+                    width: 800,
+                    height: 500,
+                    level: 2,
+                    url: '/Base/Module/ModuleButtonForm',
+                    data: { moduleButton: null },
+                    hasMaxButton: true,
+                    hasMinButton: true,
+                    hasCloseButton: true,
+                    isWizard: false,
+                    parentFrameId: $openIframe.attr("id"),
+                    buttonGroup: [
+                        {
+                            buttonId: "button_save",
+                            buttonText: "保存",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.moduleButtonForm.contentWindow;
+                                openWin.saveForm(colButtonListData);
+
+                            }
+                        }
+                    ],
+                })
+
+            });
+
+            $("#ButtonListFrom #btn_edit").click(function () {
+                //alert('ok');
+
+                var moduleButtonId = $gridTable_ButtonList.getSelectRowValue("ModuleButtonId");
+                if (!moduleButtonId) {
+                    top.jkf.showTips('没有选中任何行', 3);
+                    return;
+                }
+
+                //console.log("222" + colButtonListData.length);
+
+                var selectedData = null;
+                for (var i in colButtonListData) {
+                    var data = colButtonListData[i];
+                    if (data.ModuleButtonId == moduleButtonId) {
+                        //console.log("333" + data);
+                        selectedData = data;
+                        break;
+                    }
+                }
+                $gridTable_ButtonList.openFrameWindow({
+                    title: "编辑-模块按钮定义",
+                    width: 800,
+                    height: 500,
+                    level: 2,
+                    url: '/Base/Module/ModuleButtonForm?moduleButtonId=' + moduleButtonId,
+                    data: { moduleButton: selectedData },
+                    hasMaxButton: true,
+                    hasMinButton: true,
+                    hasCloseButton: true,
+                    parentFrameId: $openIframe.attr("id"),
+                    isWizard: false,
+                    buttonGroup: [
+                        {
+                            buttonId: "button_save",
+                            buttonText: "保存",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.moduleButtonForm.contentWindow;
+                                openWin.saveForm(colButtonListData);
+
+                            }
+                        }
+                    ],
+                })
+
+            });
+
+            $("#ButtonListFrom #btn_remove").click(function () {
+
+                top.jkf.confirmFrame("是否确认删除？", function () {
+
+                    var moduleButtonId = $gridTable_ButtonList.getSelectRowValue("ModuleButtonId");
+                    if (!moduleButtonId) {
+                        top.jkf.showTips('没有选中任何行', 3);
+                        return;
+                    }
+
+                    var selectedData = null;
+                    for (var i in colButtonListData) {
+                        var data = colButtonListData[i];
+                        if (data.ParentId == moduleButtonId) {
+
+                            top.jkf.showTips('存在下级节点，无法删除', 3);
+                            return;
+                        }
+                    }
+                    for (var i in colButtonListData) {
+                        var data = colButtonListData[i];
+                        if (data.ModuleButtonId == moduleButtonId) {
+                            colButtonListData.splice(i, 1);
+                            setModuleButtonList(colButtonListData);
+                            top.jkf.showTips('删除成功', 1);
+                            break;
+                        }
+                    }
+
+                });
+
+            })
+
+
+            $("#ColumnListFrom #btn_add").click(function () {
+                //alert('ok');
+
+
+                $gridTable_ColumnList.openFrameWindow({
+                    title: "新增-模块列表定义",
+                    width: 700,
+                    height: 300,
+                    level: 2,
+                    url: '/Base/Module/ModuleColumnForm',
+                    data: { moduleColumn: null },
+                    hasMaxButton: true,
+                    hasMinButton: true,
+                    hasCloseButton: true,
+                    isWizard: false,
+                    parentFrameId: $openIframe.attr("id"),
+                    buttonGroup: [
+                        {
+                            buttonId: "button_save",
+                            buttonText: "保存",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.moduleColumnForm.contentWindow;
+                                openWin.saveForm(colColumnListData);
+
+                            }
+                        }
+                    ],
+                })
+
+            });
+
+            $("#ColumnListFrom #btn_edit").click(function () {
+                //alert('ok');
+
+                var moduleColumnId = $gridTable_ColumnList.getSelectRowValue("ModuleColumnId");
+                if (!moduleColumnId) {
+                    top.jkf.showTips('没有选中任何行', 3);
+                    return;
+                }
+
+                //console.log("222" + colColumnListData.length);
+
+                var selectedData = null;
+                for (var i in colColumnListData) {
+                    var data = colColumnListData[i];
+                    if (data.ModuleColumnId == moduleColumnId) {
+                        //console.log("333" + data);
+                        selectedData = data;
+                        break;
+                    }
+                }
+                $gridTable_ColumnList.openFrameWindow({
+                    title: "编辑-模块列表定义",
+                    width: 700,
+                    height: 300,
+                    level: 2,
+                    url: '/Base/Module/ModuleColumnForm?moduleColumnId=' + moduleColumnId,
+                    data: { moduleColumn: selectedData },
+                    hasMaxButton: true,
+                    hasMinButton: true,
+                    hasCloseButton: true,
+                    parentFrameId: $openIframe.attr("id"),
+                    isWizard: false,
+                    buttonGroup: [
+                        {
+                            buttonId: "button_save",
+                            buttonText: "保存",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.moduleColumnForm.contentWindow;
+                                openWin.saveForm(colColumnListData);
+
+                            }
+                        }
+                    ],
+                })
+
+            });
+
+            $("#ColumnListFrom #btn_remove").click(function () {
+
+                top.jkf.confirmFrame("是否确认删除？", function () {
+
+                    var moduleColumnId = $gridTable_ColumnList.getSelectRowValue("ModuleColumnId");
+                    if (!moduleColumnId) {
+                        top.jkf.showTips('没有选中任何行', 3);
+                        return;
+                    }
+
+                    var selectedData = null;
+                    for (var i in colColumnListData) {
+                        var data = colColumnListData[i];
+                        if (data.ParentId == moduleColumnId) {
+
+                            top.jkf.showTips('存在下级节点，无法删除', 3);
+                            return;
+                        }
+                    }
+                    for (var i in colColumnListData) {
+                        var data = colColumnListData[i];
+                        if (data.ModuleColumnId == moduleColumnId) {
+                            colColumnListData.splice(i, 1);
+                            setModuleColumnList(colColumnListData);
+                            top.jkf.showTips('删除成功', 1);
+                            break;
+                        }
+                    }
+
+                });
+            })
+
+            $("#FormListFrom #btn_add").click(function () {
+                //alert('ok');
+
+
+                $gridTable_FormList.openFrameWindow({
+                    title: "新增-模表单表定义",
+                    width: 700,
+                    height: 300,
+                    level: 2,
+                    url: '/Base/Module/ModuleFormForm',
+                    data: { moduleForm: null },
+                    hasMaxButton: true,
+                    hasMinButton: true,
+                    hasCloseButton: true,
+                    isWizard: false,
+                    parentFrameId: $openIframe.attr("id"),
+                    buttonGroup: [
+                        {
+                            buttonId: "button_save",
+                            buttonText: "保存",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.moduleFormForm.contentWindow;
+                                openWin.saveForm(colFormListData);
+
+                            }
+                        }
+                    ],
+                })
+
+            });
+
+            $("#FormListFrom #btn_edit").click(function () {
+                //alert('ok');
+
+                var moduleFormId = $gridTable_FormList.getSelectRowValue("ModuleFormId");
+                if (!moduleFormId) {
+                    top.jkf.showTips('没有选中任何行', 3);
+                    return;
+                }
+
+                //console.log("222" + colColumnListData.length);
+
+                var selectedData = null;
+                for (var i in colFormListData) {
+                    var data = colFormListData[i];
+                    if (data.ModuleFormId == moduleFormId) {
+                        //console.log("333" + data);
+                        selectedData = data;
+                        break;
+                    }
+                }
+                $gridTable_FormList.openFrameWindow({
+                    title: "编辑-模表单表定义",
+                    width: 700,
+                    height: 300,
+                    level: 2,
+                    url: '/Base/Module/ModuleFormForm?moduleFormId=' + moduleFormId,
+                    data: { moduleForm: selectedData },
+                    hasMaxButton: true,
+                    hasMinButton: true,
+                    hasCloseButton: true,
+                    parentFrameId: $openIframe.attr("id"),
+                    isWizard: false,
+                    buttonGroup: [
+                        {
+                            buttonId: "button_save",
+                            buttonText: "保存",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.moduleFormForm.contentWindow;
+                                openWin.saveForm(colFormListData);
+
+                            }
+                        }
+                    ],
+                })
+
+            });
+
+            $("#FormListFrom #btn_remove").click(function () {
+
+
+                top.jkf.confirmFrame("是否确认删除？", function () {
+
+                    var moduleFormId = $gridTable_FormList.getSelectRowValue("ModuleFormId");
+                    if (!moduleFormId) {
+                        top.jkf.showTips('没有选中任何行', 3);
+                        return;
+                    }
+
+                    var selectedData = null;
+                    for (var i in colFormListData) {
+                        var data = colFormListData[i];
+                        if (data.ParentId == moduleFormId) {
+
+                            top.jkf.showTips('存在下级节点，无法删除', 3);
+                            return;
+                        }
+                    }
+                    for (var i in colFormListData) {
+                        var data = colFormListData[i];
+                        if (data.ModuleFormId == moduleFormId) {
+                            colFormListData.splice(i, 1);
+                            setModuleFormList(colFormListData);
+                            top.jkf.showTips('删除成功', 1);
+                            break;
+                        }
+                    }
+
+                })
+            });
+
+
+            if (!!moduleId) {
+                getForm(moduleId);
+            }
+
+            $steps = $("#WizardGroup").find("div.wizard_step");
+            stepCount = $steps.length;
+
+            selectStep($steps, curSelectIndex);
+
+            formValidator = $("#Form").formValidator();
+        });
+
+        function selectStep($steps, stepIndex) {
+
+            var $curStep = $($steps.get(stepIndex));
+            $curStep.addClass("active").siblings().removeClass("active");
+            $curStep.append("<style>#chervon" + stepIndex + "::before{border-left-color: lightblue;}</style>");
+
+
+            var formSelectId = $curStep.attr("step-target");
+            $("#" + formSelectId).show();
+
+            $curStep.siblings().each(function () {
+                var $otherStep = $(this);
+                var chervonId = $(this).find(".chervon").attr("id");
+
+                $otherStep.append("<style>#" + chervonId + "::before{border-left-color: #fff;}</style>");
+
+                var formSelectId = $otherStep.attr("step-target");
+                $("#" + formSelectId).hide();
+
+            });
+
+            $steps.find(".chervon").removeClass("active");
+
+            if (stepIndex > 0) {
+                $curStep.prev().find(".chervon").addClass("active");
+                $curStep.find(".chervon").removeClass("active");
+            }
+
+            if (stepIndex == 0) {
+                $btn_prev.addClass("disabled");
+                $btn_next.removeClass("disabled");
+                $btn_save.addClass("disabled");
+            } else if (stepIndex > 0 && stepIndex < stepCount - 1) {
+                $btn_prev.removeClass("disabled");
+                $btn_next.removeClass("disabled");
+                $btn_save.addClass("disabled");
+            } else if (stepIndex == stepCount - 1) {
+                $btn_prev.removeClass("disabled");
+                $btn_next.addClass("disabled");
+                $btn_save.removeClass("disabled");
+            }
+
+            setSubListGridTable();
+        }
+
+        function getForm(moduleId) {
+            var res = $.httpGet({
+                url: '/Base/Module/GetForm', param: { moduleId: moduleId }
+            });
+
+            if (res.code == 200) {
+                module = res.datas;
+
+                $.setFormData(module, $("#Form"));
+
+                colButtonListData = module.ModuleButtonList;
+                //alert("1:"  +colButtonListData.length);
+                //setModuleButtonList(colButtonListData);
+
+                colColumnListData = module.ModuleColumnList;
+                //console.log("colColumnListData.length:" + colColumnListData.length);
+                //setModuleColumnList(colColummListData);
+
+                colFormListData = module.ModuleFormList;
+                //setModuleFormList(colFormListData);
+
+            }
+
+        }
+
+        function setModuleButtonList(moduleButtonList) {
+            $gridTable_ButtonList.setAndFlushData(moduleButtonList);
+        }
+
+        function setModuleColumnList(moduleColumnList) {
+            $gridTable_ColumnList.setAndFlushData(moduleColumnList);
+        }
+
+        function setModuleFormList(moduleFormList) {
+            $gridTable_FormList.setAndFlushData(moduleFormList);
+        }
+
+        function prev() {
+            if (curSelectIndex <= 0) {
+                return;
+            }
+
+            curSelectIndex--;
+            selectStep($steps, curSelectIndex);
+        }
+
+        function next() {
+            if (curSelectIndex >= 0 && curSelectIndex < stepCount - 1) {
+
+                if (curSelectIndex == 0) {
+
+                    if (!formValidator.valid()) {
+                        return false;
+                    }
+                }
+
+                curSelectIndex++;
+                selectStep($steps, curSelectIndex);
+
+            }
+
+        }
+
+        function setSubListGridTable() {
+            if (curSelectIndex == 1) {
+                setModuleButtonList(colButtonListData);
+            } else if (curSelectIndex == 2) {
+                setModuleColumnList(colColumnListData);
+            } else if (curSelectIndex == 3) {
+                setModuleFormList(colFormListData);
+            }
+        }
+
+        function selectIcon(icon) {
+            $("#Icon").val(icon);
+            $("#Icon").trigger("change");
+        }
+
+        function saveForm() {
+
+            if (curSelectIndex != stepCount - 1) {
+                return;
+            }
+
+            if (!!moduleId) module.moduleId = moduleId;
+            $.getFormData(module, $("#Form"));
+
+            //添加子元素
+            module.ModuleButtonList = colButtonListData;
+            module.ModuleColumnList = colColumnListData;
+            module.ModuleFormList = colFormListData;
+
+            $.httpPostAsync({ url: '/Base/Module/SaveForm', param: module }, function (res) {
+                if (res.code == 200) {
+                    top.jkf.showTips("保存成功！", 1);
+                    if (parentIframe != null) {
+                        parentIframe.refreshTreeData();
+                    }
+                    window.location.reload();
+                } else {
+                    top.jkf.showTips("保存失败！", 2);
+                }
+
+            })
+
+        }
+
+
+    </script>
+</body>

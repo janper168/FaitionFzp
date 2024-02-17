@@ -1,0 +1,43 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>formItemArea</Title>
+    <Author>Microsoft Corporation</Author>
+    <Shortcut>formItemArea</Shortcut>
+    <Description>表单项区域选择段</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>ItemName</ID>
+        <ToolTip>ItemName</ToolTip>
+        <Default>Item1</Default>
+      </Literal>
+      <Literal>
+        <ID>ChName</ID>
+        <ToolTip>ChName</ToolTip>
+        <Default>ChName</Default>
+      </Literal>
+	  <Literal>
+        <ID>type</ID>
+        <ToolTip>type</ToolTip>
+        <Default>text</Default>
+      </Literal>
+	  <Literal>
+        <ID>dataType</ID>
+        <ToolTip>dataType</ToolTip>
+        <Default>text_select</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="html"><![CDATA[<div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="Address">地区</label></div>
+            <input id="ProvinceId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />&nbsp;
+            <input id="CityId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />&nbsp;
+            <input id="AreaId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />&nbsp;
+            <input id="StreetId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />
+        </div>
+]]></Code>
+  </Snippet>
+</CodeSnippet>

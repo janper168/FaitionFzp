@@ -1,0 +1,122 @@
+﻿@{
+    Layout = "_Form2";
+}
+
+@* <script src="/echarts/lib/simpleRequire.js"></script>
+<script src="/echarts/lib/config.js?001"></script>
+<script src="/echarts/lib/jquery.min.js"></script> 
+<script src="/echarts/lib/facePrint.js"></script>
+<script src="/echarts/lib/testHelper.js"></script>
+<link rel="stylesheet" href="/echarts/lib/reset.css" /> *@
+<style>
+    .test-title {
+        height:0px !important;
+        background: #146402;
+        color: #fff;
+    }
+</style>
+<div id="main0"></div>
+<div>
+    请选择年份：<select id="year">
+    </select>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        var dateNow = new Date();
+
+        var year = dateNow.getFullYear();
+
+        $("#year").append("<option value="+year+">"+year+"年</option>")
+        for (var yearIndex = 1; yearIndex < 5; yearIndex++) { 
+            yearCurrent = year - yearIndex;
+            $("#year").append("<option value="+yearCurrent+">" + yearCurrent + "年</option>")
+        }
+        $("#year").change(function (e) { 
+            yearSelect = $(this).find("option:selected").val();
+            getYearStatics(yearSelect)
+        })
+
+        getYearStatics(year);
+    });
+
+    function getYearStatics(year) {
+        var datas = getForm(year)
+
+        var TotalQuantity = [];
+        var TotalAmount = [];
+
+        for (i in datas) {
+            TotalQuantity.push(datas[i].quantity);
+            TotalAmount.push(datas[i].amount);
+        }
+
+        require([
+            'echarts'
+        ], function (echarts) {
+
+            option = {
+                legend: {},
+                xAxis: {
+                    data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+                },
+                yAxis: [{
+                    min: 0
+                }, {
+                }],
+                grid: {
+                    left: 100
+                },
+                series: [{
+                    name: '销售量',
+                    type: 'bar',
+                    data: TotalQuantity,
+                    animation: true
+                }, {
+                    name: '销售额',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: TotalAmount
+                }]
+            };
+
+            $("#main0").html("");
+            chart = testHelper.create(echarts, 'main0', {
+                title: null,
+                option: option,
+                info: null
+            });
+        });
+    }
+
+
+    function getForm(year) {
+        var res = $.httpGet({
+            url: '/Erp/Statics/GetSalesStatics', param: { year: year}
+        });
+        if (res.code == 200) {
+            datas = res.datas;
+            return datas;
+        } else { 
+            return null;
+        }
+    }
+
+</script>

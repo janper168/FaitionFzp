@@ -1,0 +1,178 @@
+﻿
+@{
+    Layout = "_Form";
+}
+<div id="Form" class="form" style="display: block; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnCode">用户编码</label></div>
+            <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Account">用户账号</label></div>
+            <input id="Account" data-required="true" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="RealName">用户实名</label></div>
+            <input id="RealName" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Gender">性别</label></div>
+            <input class="blue" type="radio" value="1" name="Gender" checked="checked">男
+            <input class="blue" type="radio" value="2" name="Gender">女
+            <input id="Gender" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Birthday">生日</label></div>
+            <input id="Birthday" class="Wdate height_30_important width_200 default-input" type="text" data-type="date" onclick="WdatePicker();" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Telephone">电话</label></div>
+            <input id="Telephone" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Email">邮箱</label></div>
+            <input id="Email" class="width_200 default-input" type="text" data-type="regex" data-regex="^[a-zA-Z0-9_-]+@@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$" data-errorMsg="必须为邮箱！"/>
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Mobile">手机</label></div>
+            <input id="Mobile" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="OICQ">QQ</label></div>
+            <input id="OICQ" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="MSN">MSN</label></div>
+            <input id="MSN" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="WeChat">WeChat</label></div>
+            <input id="WeChat" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Description">备注</label></div>
+            <textarea id="Description" class="height_50 width_250 default-input" data-type="text"></textarea>
+        </div>
+    </div>
+    @* <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Password">密码</label></div>
+            <input id="Password" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+
+    </div> *@
+</div>
+
+<script>
+    //禁止后退键 作用于Firefox、Opera
+    document.onkeypress = top.jkf.banBackSpace;
+    //禁止后退键  作用于IE、Chrome
+    document.onkeydown = top.jkf.banBackSpace;
+
+    var parentIframe = null;
+    var currentIframe = null;
+    var userId = request('userId');
+    var departmentId = request('departmentId')
+    var user = {};
+
+    var formValidator = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        $("#EnCode").attr("data-check-exists-url", "/base/user/IsExistEnCode?keyValue=" + userId);
+        $("#Account").attr("data-check-exists-url", "/base/user/IsExistAccount?KeyValue=" + userId);
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.userIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+        var data = jkf.GetIFrameWindowData($Form);
+        var authorizedForms = data.authorizedForms;
+        jkf.processAuthorizedForms($("#Form"), authorizedForms);
+        $("#Form").show();
+        if (!!departmentId) {
+            getForm();
+        }
+
+        formValidator = $("#Form").formValidator()
+
+    });
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/User/GetForm', param: { userId: userId }
+
+        });
+
+        if (res.code == 200) {
+            user = res.datas;
+
+            $.setFormData(user, $("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!userId) user.UserId = userId;
+        $.getFormData(user, $("#Form"));
+
+        $.httpPostAsync({
+            url: '/Base/User/SaveForm', param: { user: user, departmentId: departmentId }
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshUserData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

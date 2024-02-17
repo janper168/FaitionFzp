@@ -1,0 +1,453 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+<style>
+    div#container {
+        width: 99%;
+        height: 98%;
+        padding: 3px;
+    }
+
+    div.searchLine {
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        border: 1px solid #ccc;
+    }
+
+        div.searchLine > button {
+            margin: 0px !important;
+        }
+
+    div.memberLayer {
+        width: 100%;
+        height: 90%;
+        border: 1px solid #ccc;
+        border-top: 0px;
+    }
+
+        div.memberLayer > .orginMemberLayer {
+            width: 49%;
+            float: left;
+            height: 100%;
+            border-right: 1px solid #ccc;
+        }
+
+        div.memberLayer > .selectMemberLayer {
+            width: 49%;
+            float: left;
+            height: 100%;
+        }
+
+    .userBlock {
+        width: 220px;
+        height: 80px;
+        float: left;
+        margin: 10px;
+        border: 1px solid #ccc;
+    }
+
+        .userBlock > .userIcon {
+            border-right: 1px solid #CCC;
+            float: left;
+            width: 30%;
+            height: 100%;
+            text-align: center;
+        }
+
+        .userBlock > .userInfo {
+            float: left;
+            width: 69%;
+            height: 100%;
+            line-height: 20px;
+        }
+
+            .userBlock > .userInfo > div {
+                height: 20px;
+                line-height: 20px;
+            }
+</style>
+<div id="container">
+    <div class="searchLine">&nbsp;&nbsp;<label for="selectCompany">公司：</label><input id="selectCompany" type="text" data-type="select_text" class="width_200 default-input" />&nbsp;<label for="selectDepartment">部门：</label><input id="selectDepartment" type="text" data-type="select_text" class="width_200 default-input" />&nbsp;&nbsp;<input id="keyWord" type="text" data-type="text" class="width_200 default-input" placeholder="请输入关键字" /><button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i></button></div>
+    <div class="memberLayer">
+        <div class="orginMemberLayer" id="orginMemberLayer"></div>
+        <div class="selectMemberLayer" id="selectMemberLayer"></div>
+    </div>
+
+</div>
+
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var postId = request('postId');
+
+    var companyId = request('companyId');
+    var departmentId = request('departmentId');
+
+    var orginDepartmentMember = [];
+    var selectUsers = [];
+    var selectDepartmentId = "";
+    var keyWord = "";
+
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.postMemberIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("#orginMemberLayer").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,//"hidden",
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+
+            $("#selectMemberLayer").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,//"hidden",
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+
+        $("btn_search").click(function () {
+            keyWord = $("#keyWord").val();
+            getDepartmentUsers();
+        })
+
+
+
+        $.httpPostAsync({ url: "/base/Post/getPostUsers?postId=" + postId }, function (res) {
+            if (res.code = 200) {
+                renderSelectDepartmentMembers(res.datas);
+            } else {
+                top.jkf.showTips("系统错误：" + res.errMsg, 2);
+            }
+
+        })
+
+        setTargetSelect();
+
+        $("#selectCompany").data('value', companyId);
+        $("#selectCompany").val($.getSelectValue("#selectCompany_select", $('body'), companyId));
+        $("#selectCompany").trigger("change");
+
+        $("#selectDepartment").data('value', departmentId);
+        $("#selectDepartment").val($.getSelectValue("#selectDepartment_select", $('body'), departmentId));
+        $("#selectDepartment").trigger("change");
+
+    });
+
+
+
+    function setTargetSelect() {
+
+        $.setTreeSelect({
+            url: "/Base/Company/GetCompanys",
+            //data: parentIframe.colButtonListData,
+            textCtrlId: "selectCompany",
+            ctrlId: "selectCompany_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "CompanyId",
+            valueKey: "FullName",
+            //targetValue: 2,//下拉
+            //targetKey: "Target",
+            //hideDownLevelKeyValue: postId,
+            width: 200,
+            height: 300
+        })
+
+        $('#selectCompany').change(function () {
+            var selectCompanyId = $(this).data("value");
+
+            $.setTreeSelect({
+                url: "/Base/Department/GetDepartments?companyId=" + selectCompanyId,
+                //data: parentIframe.colButtonListData,
+                textCtrlId: "selectDepartment",
+                ctrlId: "selectDepartment_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: "0",
+                idKey: "DepartmentId",
+                valueKey: "FullName",
+                //targetValue: 2,//下拉
+                //targetKey: "Target",
+                //hideDownLevelKeyValue: postId,
+                width: 200,
+                height: 300
+            })
+
+
+            $('#selectDepartment').change(function () {
+                getDepartmentUsers();
+            });
+
+        })
+
+    }
+
+    function getDepartmentUsers() {
+        selectDepartmentId = $("#selectDepartment").data("value");
+
+        $.httpPostAsync({
+            url: "/base/User/GetAllUsersWithParam?departmentId=" + selectDepartmentId, param: { keyWord: keyWord }
+        }, function (res) {
+            if (res.code = 200) {
+
+                if (!!res.datas && res.datas.length > 0) {
+                    pushOrginDepartmentMembers(selectDepartmentId, res.datas);
+
+                    renderOrginDepartmentMembers(selectDepartmentId, res.datas);
+                }
+
+            }
+            else {
+                top.jkf.showTips("系统错误：" + res.errMsg, 2);
+            }
+
+        });
+    }
+
+    function pushOrginDepartmentMembers(departmentId, datas) {
+
+        for (var i in orginDepartmentMember) {
+            if (orginDepartmentMember[i]["departmentId"] == departmentId) {
+                //alert(1);
+                //orginDepartmentMember[i]["oldMembers"] = orginDepartmentMember[i]["members"];
+                orginDepartmentMember[i]["members"] = datas;
+
+                return;
+            }
+        }
+
+        orginDepartmentMember.push({ departmentId: departmentId, members: datas })
+    }
+
+    function renderSelectDepartmentMembers(datas) {
+        $("#selectMemberLayer").empty();
+
+        for (var i in datas) {
+            var user = datas[i];
+
+            var $userBlock = renderUserBlock("selectMemberLayer", user);
+            $userBlock.data("user", user);
+            user.checked = true;
+
+            $userBlock.css("border", "2px solid green");
+
+            $userBlock.off("click");
+
+            $userBlock.click(function () {
+                $(this).css("border", "1px solid #ccc");
+                $(this).data("user").checked = false;
+
+                if ($("#orginMemberLayer").find("#userBlock_" + $(this).data("user").UserId).length == 1) {
+                    $("#orginMemberLayer").find("#userBlock_" + $(this).data("user").UserId).css("border", "1px solid #ccc");
+                    $("#orginMemberLayer").find("#userBlock_" + $(this).data("user").UserId).data("user").checked = false;
+                }
+                $(this).remove();
+            })
+
+        }
+
+    }
+
+
+    function renderOrginDepartmentMembers(departmentId, datas) {
+        $("#orginMemberLayer").empty();
+
+        for (var i in datas) {
+            var user = datas[i];
+            var $userBlock = renderUserBlock("orginMemberLayer", user);
+            $userBlock.data("user", user);
+
+            $userBlock.off("click");
+            $userBlock.click(function () {
+                selectUser($(this), $(this).data("user"));
+                $(this).css("border", "2px solid orange");
+            })
+            user.checked = false;
+        }
+
+        var $orginLayerUserBlocks = $("#orginMemberLayer").find(".userBlock");
+        var $selectLayerUserBlocks = $("#selectMemberLayer").find(".userBlock");
+        for (var i = 0; i < $orginLayerUserBlocks.length; i++) {
+            var data = $($orginLayerUserBlocks.get(i)).data("user");
+            for (var j = 0; j < $selectLayerUserBlocks.length; j++) {
+                var data2 = $($selectLayerUserBlocks.get(j)).data("user");
+
+                if (data.UserId == data2.UserId) {
+
+                    data.checked = data2.checked;
+                    if (data.checked == true) {
+                        $($orginLayerUserBlocks.get(i)).css("border", "2px solid orange");
+                    }
+                    else {
+                        $($orginLayerUserBlocks.get(i)).css("border", "1px solid #ccc");
+                    }
+                    break;
+                }
+            }
+
+        }
+
+
+        //for (var i in orginDepartmentMember) {
+        //    var departmentItem = orginDepartmentMember[i];
+        //    if (departmentItem["departmentId"] == departmentId) {
+
+        //        if (!!departmentItem["oldMembers"]) {
+        //            var members = departmentItem["oldMembers"];
+
+        //            for (var j in datas) {
+        //                var data = datas[j];
+        //                for (var k in members) {
+        //                    if (members[k]["UserId"] == data["UserId"]) {
+        //                        data.checked = members[k].checked;
+        //                        break;
+        //                    }
+        //                }
+        //                if (data.checked == true) {
+        //                    $("#orginMemberLayer").find("#userBlock_" + data.UserId).css("border", "2px solid orange")
+        //                }
+
+        //            }
+        //        }
+
+        //        break;
+        //    }
+        //}
+
+
+
+    }
+
+    function renderUserBlock(layerId, user) {
+        var htmlText = "<div id='userBlock_" + user.UserId + "' class='userBlock'><div class='userIcon'><i class='fa fa-user fa-5x'></i></div><div class='userInfo'></div></div>"
+        $("#" + layerId).append(htmlText);
+
+        var $userBlock = $("#" + layerId).find("#userBlock_" + user.UserId);
+
+        var $userInfo = $userBlock.find(".userInfo");
+
+        htmlText = "<div>姓名：" + user.RealName + "</div>"
+        htmlText += "<div>账号：" + user.Account + "</div>";
+        htmlText += "<div>公司：" + user.Department.Company.FullName + "</div>";
+        htmlText += "<div>部门：" + user.Department.FullName + "</div>";
+
+        $userInfo.append(htmlText);
+
+        var $userIcon = $userBlock.find(".userIcon");
+        if (user.Gender == 1) {
+            $userIcon.css("color", 'lightblue');
+        } else {
+            $userIcon.css("color", 'pink');
+        }
+        return $userBlock;
+    }
+
+    function selectUser($orginUserBlock, user) {
+
+        var $selectLayerUserBlocks = $("#selectMemberLayer").find(".userBlock");
+        for (var j = 0; j < $selectLayerUserBlocks.length; j++) {
+            var data = $($selectLayerUserBlocks.get(j)).data("user");
+
+            if (user.UserId == data.UserId) {
+                return;
+            }
+        }
+
+        user.checked = true;
+
+        var $userBlock = renderUserBlock("selectMemberLayer", user);
+        $userBlock.data("user", user);
+
+        $userBlock.css("border", "2px solid green");
+
+        $userBlock.off("click");
+        $userBlock.click(function () {
+            $(this).data("user").checked = false;
+            $(this).remove();
+            $orginUserBlock.css("border", "1px solid #ccc");
+        })
+
+    }
+
+    function getPostMember() {
+
+        var userList = [];
+        $("#selectMemberLayer").children(".userBlock").each(function (i, elem) {
+            userList.push({ PostId: postId, UserId: $(this).data("user").UserId });
+
+        })
+
+        return userList;
+    }
+
+
+    function saveForm() {
+
+        var post = null;
+        if (postId != null) {
+            var res = $.httpGet({ url: "/base/post/GetForm?postId=" + postId })
+            if (res.code == 200) {
+                post = res.datas;
+            } else {
+                top.jkf.showTips("获取岗位实体失败！");
+                return;
+            }
+        }
+        //alert(post.PostId);
+
+        if (!!post) {
+
+            var userList = getPostMember();
+            post.PostUserList = userList;
+            post.Department = null;
+
+            $.httpPostAsync({
+                url: '/Base/Post/SaveMemberForm', param: { post: post }
+            }, function (res) {
+                if (res.code == 200) {
+                    top.jkf.showTips("保存成功！", 1);
+                    //if (parentIframe != null) {
+                    //    parentIframe.refreshPostData();
+                    //}
+                    window.location.reload();
+                } else {
+                    top.jkf.showTips("保存失败！", 2);
+                }
+
+            })
+        }
+
+
+    }
+</script>

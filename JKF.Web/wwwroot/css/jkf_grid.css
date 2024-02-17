@@ -1,0 +1,140 @@
+/*body, * {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    font-size: 13px;
+    font-family: '微软雅黑'
+}*/
+
+.jkf_grid_tbl {
+    box-sizing: content-box;
+    background-color: #fefefe;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-left: 1px solid lightGray;
+    border-right: 1px solid lightGray;
+
+    
+}
+
+
+    .jkf_grid_tbl > #gridTable {
+        width: 100%;
+        /*overflow: hidden;*/
+    }
+
+#gridTable table#mainTbl,
+#gridTable table#headTbl {
+    table-layout: fixed;
+    word-break: break-all;
+    width: max-content; /*宽度为单元格的最大长度*/
+    height: max-content;
+    border: 0px solid lightGray;
+    border-collapse: collapse !important;
+    background-color: #fafafa;
+}
+
+.jkf_grid_tbl > #pager {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    height: 36px;
+    line-height: 36px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ccc;
+}
+
+table#mainTbl tr,
+table#headTbl tr {
+    height: 30px;
+    line-height: 30px;
+}
+
+table#headTbl th,table#mainTbl td {
+    border-right: 0.3px solid #ccc !important;
+    min-width:50px !important;
+}
+
+table#headTbl th {
+    border-bottom: 0.3px solid #ccc;
+    height: 26px;
+    line-height: 26px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 50px;
+    /*padding-left: 5px;*/
+    border-right: 0.3px solid transparent;
+}
+
+table#mainTbl td {
+    border:0px solid blue;
+    border-bottom: 0.3px solid #ccc;
+    height: 26px;
+    line-height: 26px;
+    min-width:50px;
+    overflow:hidden;
+    /*padding-left: 5px;*/
+    border-right: 0.3px solid transparent;
+}
+
+    table#mainTbl td div {
+
+        border: 0px solid red;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    table#mainTbl tr:hover {
+        background-color: #eee;
+    }
+
+    table#mainTbl td i.fold-click {
+        height:12px;
+        border:0px solid blue;
+        font-weight:bold;
+        color:blue;
+    }
+
+    table#headTbl thead tr {
+        background-image: repeating-linear-gradient(#ddd, #fff 40%, #ddd);
+        user-select: none;
+    }
+
+    table#headTbl thead tr th:hover {
+        font-size: 15px;
+        background-image: repeating-linear-gradient(lightblue, #fff 40%, lightblue);
+    }
+
+#moveTbl.moving {
+    box-shadow: #888888 0px 0px 15px;
+}
+
+th.NumberColumn, td.NumberColumn {
+    width:50px !important;
+    text-align:left !important;
+}
+
+th.checkboxHeader, td.checkboxHeader {
+    width:40px !important;
+    text-align:center;
+
+}
+
+.checkboxHeader > input[type=checkbox] {
+    margin-bottom:-2px;
+}
+
+button.navigation_btn {
+    border: 0px !important;
+    margin-top: 0px !important;
+    padding: 0px 8px 0px 8px !important;
+    /*background-color: #fff !important;*/
+    color: #fff;
+    margin-right: 3px;
+    margin-left: 3px;
+}

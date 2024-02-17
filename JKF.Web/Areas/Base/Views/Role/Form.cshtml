@@ -1,0 +1,128 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnCode">角色编码</label></div>
+            <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">角色名称</label></div>
+            <input id="Name" data-required="true" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="SortCode">排序</label></div>
+            <input id="SortCode" data-required="true" data-type="integer" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Descrition">备注</label></div>
+            <textarea id="Description" data-type="textarea" class="width_200 height_50 default-input"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var roleId = request('roleId');
+    var role = {};
+
+    var formValidator = null;
+
+    $("#EnCode").attr("data-check-exists-url", "/base/role/IsExistEnCode?keyValue=" + roleId);
+    $("#Name").attr("data-check-exists-url", "/base/role/IsExistName?KeyValue=" + roleId);
+
+
+
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+        var data = jkf.GetIFrameWindowData($Form);
+        var authorizedForms = data.authorizedForms;
+        jkf.processAuthorizedForms($("#Form"), authorizedForms);
+        $("#Form").show();
+
+        if (!!roleId) {
+
+            getForm();
+
+        }
+        
+        formValidator = $("#Form").formValidator()
+
+
+    });
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/Role/GetForm', param: { roleId: roleId }
+
+        });
+
+        if (res.code == 200) {
+            role = res.datas;
+
+            $.setFormData(role, $("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!roleId) role.roleId = roleId;
+        $.getFormData(role, $("#Form"));
+
+        $.httpPostAsync({ url: '/Base/Role/SaveForm', param: role }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

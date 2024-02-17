@@ -1,0 +1,367 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="FullName">公司名称</label></div>
+            <input id="FullName" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Nature">公司性质</label></div>
+            <input id="Nature" data-required="true" readonly="readonly" data-type="text_select" class="width_200 default-input" type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnCode">公司编码</label></div>
+            <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ShortName">公司简称</label></div>
+            <input id="ShortName" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ParentId">上级公司</label></div>
+            <input id="ParentId" data-required="true" data-type="text_select" class="width_200 default-input" readonly="readonly" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="FoundedTime">成立时间</label></div>
+            <input id="FoundedTime" data-required="true" class="Wdate height_30_important width_200 default-input" type="text" data-type="date" onclick="WdatePicker();" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Manager">负责人</label></div>
+            <input id="Manager" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="OuterPhone">电话</label></div>
+            <input id="OuterPhone" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Email">电子邮箱</label></div>
+            <input id="Email" class="width_200 default-input" type="text" data-type="regex" data-regex="^[a-zA-Z0-9_-]+@@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$" data-errorMsg="必须为邮箱！" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Fax">传真</label></div>
+            <input id="Fax" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Postalcode">邮编</label></div>
+            <input id="Postalcode" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="WebAddress">官网</label></div>
+            <input id="WebAddress" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="Address">地区</label></div>
+            <input id="ProvinceId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />&nbsp;
+            <input id="CityId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />&nbsp;
+            <input id="AreaId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />&nbsp;
+            <input id="StreetId" data-type="text_select" readonly="readonly" class="width_150 default-input" type="text" />
+        </div>
+
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="Address">详细地址</label></div>
+            <input id="Address" data-type="text" class="width_500 default-input" type="text" />
+        </div>
+    </div>
+
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="BusinessScope">经营范围</label></div>
+            <input id="BusinessScope" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Description">备注</label></div>
+            <textarea id="Description" class="height_50 width_250 default-input" data-type="text"></textarea>
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="SortCode">排序</label></div>
+            <input id="SortCode" data-required="true" data-type="integer" class="width_200 default-input" type="text" />
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var companyId = request('companyId');
+    var company = {};
+
+    var formValidator = null;
+
+
+    var jfkInit = (function ($, jkf) {
+
+        $("#EnCode").attr("data-check-exists-url", "/base/company/IsExistEnCode?keyValue=" + companyId);
+        $("#FullName").attr("data-check-exists-url", "/base/company/IsExistFullName?KeyValue=" + companyId);
+        $("#ShortName").attr("data-check-exists-url", "/base/company/IsExistShortName?KeyValue=" + companyId);
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+
+        setTargetSelect();
+
+        setAreaSelect();
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+        var data = jkf.GetIFrameWindowData($Form);
+        var authorizedForms = data.authorizedForms;
+        jkf.processAuthorizedForms($("#Form"), authorizedForms);
+        $("#Form").show();
+
+        if (!!companyId) {
+            getForm();
+        }
+
+        formValidator = $("#Form").formValidator()
+
+    });
+
+    function setTargetSelect() {
+
+        $.setTreeSelect({
+            url: "/Base/Company/GetCompanys",
+            textCtrlId: "ParentId",
+            ctrlId: "ParentId_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "CompanyId",
+            valueKey: "FullName",
+            hideDownLevelKeyValue: companyId,
+            width: 200,
+            height: 250
+        })
+
+        $.setTreeSelect({
+            url: "/Base/DataItems/GetDataItemDetailsByItemCode?itemCode=CompanyType",
+            textCtrlId: "Nature",
+            ctrlId: "Nature_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+
+    }
+
+    function setAreaSelect() {
+        $.setTreeSelect({
+            url: "/Base/Area/GetDownLevelAreas?layer=1&parentId=0",
+            textCtrlId: "ProvinceId",
+            ctrlId: "ProvinceId_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "AreaId",
+            valueKey: "AreaName",
+            width: 200,
+            height: 250
+        })
+
+        $("#ProvinceId").change(function () {
+            var provinceId = $(this).data("value");
+            $.setTreeSelect({
+                url: "/Base/Area/GetDownLevelAreas?layer=2&parentId=" + provinceId,
+                textCtrlId: "CityId",
+                ctrlId: "CityId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: provinceId,
+                idKey: "AreaId",
+                valueKey: "AreaName",
+                width: 200,
+                height: 250
+            })
+
+            $.setTreeSelect({
+                data: [],
+                textCtrlId: "AreaId",
+                ctrlId: "AreaId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: "0",
+                idKey: "AreaId",
+                valueKey: "AreaName",
+                width: 200,
+                height: 250
+            })
+
+            $.setTreeSelect({
+                data: [],
+                textCtrlId: "StreetId",
+                ctrlId: "StreetId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: "0",
+                idKey: "AreaId",
+                valueKey: "AreaName",
+                width: 200,
+                height: 250
+            })
+
+
+            $("#CityId").val("");
+            $("#AreaId").val("");
+            $("#StreetId").val("");
+            $("#CityId").data("value", "");
+            $("#AreaId").data("value", "");
+            $("#StreetId").data("value", "");
+
+        })
+
+        $("#CityId").change(function () {
+            var cityId = $(this).data("value");
+
+            $.setTreeSelect({
+                url: "/Base/Area/GetDownLevelAreas?layer=3&parentId=" + cityId,
+                textCtrlId: "AreaId",
+                ctrlId: "AreaId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: cityId,
+                idKey: "AreaId",
+                valueKey: "AreaName",
+                width: 200,
+                height: 250
+            })
+
+            $.setTreeSelect({
+                data: [],
+                textCtrlId: "StreetId",
+                ctrlId: "StreetId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: "0",
+                idKey: "AreaId",
+                valueKey: "AreaName",
+                width: 200,
+                height: 250
+            })
+
+
+            $("#AreaId").val("");
+            $("#StreetId").val("");
+
+            $("#AreaId").data("value", "");
+            $("#StreetId").data("value", "");
+
+
+        })
+        $("#AreaId").change(function () {
+            var areaId = $(this).data("value");
+
+            $.setTreeSelect({
+                url: "/Base/Area/GetDownLevelAreas?layer=4&parentId=" + areaId,
+                textCtrlId: "StreetId",
+                ctrlId: "StreetId_select",
+                parentIdKey: "ParentId",
+                topParentIdValue: areaId,
+                idKey: "AreaId",
+                valueKey: "AreaName",
+                width: 200,
+                height: 250
+            })
+
+            $("#StreetId").val("");
+            $("#StreetId").data("value", "");
+
+
+        })
+
+    }
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/Company/GetForm', param: { companyId: companyId }
+
+        });
+
+        if (res.code == 200) {
+            company = res.datas;
+
+            if (!!company.ProvinceId) {
+                $("#ProvinceId").data("value", company.ProvinceId);
+                $("#ProvinceId").trigger("change");
+
+                if (!!company.CityId) {
+                    $("#CityId").data("value", company.CityId);
+                    $("#CityId").trigger("change");
+
+                    if (!!company.AreaId) {
+                        $("#AreaId").data("value", company.AreaId);
+                        $("#AreaId").trigger("change");
+                    }
+                }
+            }
+
+            $.setFormData(company, $("#Form"));
+
+
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!companyId) company.companyId = companyId;
+        $.getFormData(company, $("#Form"));
+
+        $.httpPostAsync({ url: '/Base/Company/SaveForm', param: company }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshTreeData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

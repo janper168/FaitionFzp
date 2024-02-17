@@ -1,0 +1,2289 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<style>
+    * {
+        font-size: 12px;
+        font-family: 微软雅黑;
+        margin: 0px;
+        padding: 0px;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+    }
+
+    .wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
+    .leftRegion {
+        float: left;
+        width: 10%;
+        height: 100%;
+        border-right: 1px solid lightgray;
+    }
+
+    .rightRegion {
+        float: left;
+        width: 13%;
+        height: 100%;
+        border-left: 1px solid lightgray;
+    }
+
+    .middleRegion {
+        float: left;
+        width: 76%;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .clearFloat {
+        clear: both;
+    }
+
+    .myEditForm {
+        width: 100%;
+        height: 200%;
+    }
+
+    .contentRegion {
+        position: relative;
+        width: 96%;
+        height: 96%;
+        border: 1px dashed lightgray;
+        margin: 20px auto;
+    }
+
+    .itemObject {
+        position: relative;
+        width: 60px;
+        margin: 10px auto;
+        height: 60px;
+        border: 2px solid orange;
+        background-color: lightgray;
+    }
+
+    .clickAction {
+        border: 3px solid red;
+    }
+
+    .item {
+        position: absolute;
+        top: 20px;
+        width: 60px;
+        height: 20px;
+        text-align: center;
+    }
+
+    #titleEditor {
+        text-align: center;
+        width: 96%;
+        margin: 20px auto;
+        border: 1px dashed lightgray;
+        font-size: 30px;
+    }
+
+    #mainTableEditor {
+        text-align: center;
+        width: 96%;
+        margin: 20px auto;
+        border: 0px solid lightgray;
+        font-size: 14px;
+    }
+
+    .ItemEditor {
+        width: 96%;
+        height: auto;
+        margin: 20px auto;
+        display: none;
+    }
+
+    .titleSetting {
+    }
+
+    .titleInput, .mainTableLineInput, .textInput {
+        width: 100%;
+        height: 36px;
+        font-size: 14px;
+    }
+
+
+    #mainTableEditor table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid lightgray;
+        background-color: #f1f1f1;
+    }
+
+        #mainTableEditor table tr, .mainTableEdtor table tr td {
+            border-collapse: collapse;
+            border: 1px solid lightgray;
+        }
+
+    #moveBlock {
+        border: 1px dashed lightblue;
+        width: 100px;
+        height: 40px;
+        position: fixed;
+        top: auto;
+        left: auto;
+        display: none;
+    }
+
+    .inputRegion {
+        position: absolute;
+        padding: 2px;
+        border: 1px dashed lightblue;
+    }
+
+        .inputRegion.selected {
+            border: 2px dashed blue;
+        }
+
+    .inputTextWrapper {
+        float: left;
+        border: 0px solid green;
+    }
+
+    .textAreaWrapper {
+        float: left;
+        border: 0px solid green;
+    }
+
+    .dateTimeWrapper {
+        float: left;
+        border: 0px solid green;
+    }
+
+    .selectorWrapper{
+        float: left;
+        border: 0px solid green;
+    }
+
+    .filesWrapper{
+        float: left;
+        border: 0px solid green;
+    }
+
+    .customizedInputText {
+        width: 200px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .customizedTextArea {
+        width: 300px;
+        height: 100px;
+        font-size: 14px;
+    }
+
+    .customizedDateTime {
+        width: 200px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+        .customizedSelector{
+            width: 200px;
+            height: 30px;
+            font-size: 14px;
+        }
+
+    .customizedFiles{
+        width: 200px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .closeUpLeft {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        top: -6px;
+        left: -6px;
+        border-radius: 12px;
+        background-color: orange;
+    }
+
+        .closeUpLeft i {
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            color: blue;
+            font-size: 6px;
+        }
+
+    .inputBorder {
+        border: 0px solid red;
+        width: 76px;
+        height: 46px;
+        position: relative;
+        float: left;
+        margin-right: 2px;
+    }
+
+        .inputBorder .inner {
+            width: 100%;
+            height: 12px;
+            position: absolute;
+            left: 0;
+            top: 10px;
+            text-align: right;
+        }
+
+    #PrevAndSave {
+        border: 1px solid blue;
+        border-radius: 10px;
+        box-shadow: 0px 0px 5px;
+        position: fixed;
+        width: 50px;
+        height: 90px;
+        right: 10px;
+        bottom: 20px;
+    }
+
+    .CfgBtn {
+        text-align: center;
+        margin: 4px auto;
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        border: 1px solid green;
+        border-radius: 32px;
+        background-color: lightblue;
+        font-size: 12px;
+        color: orange;
+    }
+
+        .CfgBtn:hover {
+            border: 2px solid green;
+        }
+
+    #PreviewLayer {
+        display: none;
+        position: fixed;
+        width: 80%;
+        height: 80%;
+        border: 1px solid gray;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px;
+        top: 10%;
+        left: 10%;
+        background-color: white;
+        overflow: auto;
+    }
+
+        #PreviewLayer.show {
+            display: block;
+        }
+
+        #PreviewLayer .content {
+            position: relative;
+            width: 100%;
+            height: 200%;
+        }
+
+    #titleShow {
+        text-align: center;
+        width: 96%;
+        margin: 20px auto;
+        border: 0px dashed lightgray;
+        font-size: 30px;
+    }
+
+    #mainTableShow {
+        text-align: center;
+        width: 96%;
+        margin: 20px auto;
+        border: 0px solid gray;
+        font-size: 14px;
+    }
+
+        #mainTableShow table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid lightgray;
+            background-color: #f1f1f1;
+        }
+
+            #mainTableShow table tr, .mainTableShow table tr td {
+                border-collapse: collapse;
+                border: 1px solid lightgray;
+            }
+
+    .inputTextShow {
+        position: absolute;
+    }
+
+    .textAreaShow {
+        position: absolute;
+    }
+
+    .dateTimeShow {
+        position: absolute;
+    }
+
+    .selectorShow {
+        position: absolute;
+    }
+
+    .filesShow {
+        position: absolute;
+    }
+</style>
+<div class="wrapper" style="user-select:none;">
+    <div class="leftRegion">
+        <div class="itemObject" id="titleBlock">
+            <div class="item">
+                标题
+            </div>
+        </div>
+        <div class="itemObject" id="mianFormBlock">
+            <div class="item">
+                主单表格
+            </div>
+        </div>
+        <div class="itemObject" id="inputTextBlock">
+            <div class="item">
+                文本框
+            </div>
+        </div>
+        <div class="itemObject" id="textAreaBlock">
+            <div class="item">
+                文本域
+            </div>
+        </div>
+        <div class="itemObject" id="dateTimeBlock">
+            <div class="item">
+                日期时间
+            </div>
+        </div>
+        <div class="itemObject" id="selectorBlock">
+            <div class="item">
+                选择框
+            </div>
+        </div>
+        <div class="itemObject" id="filesBlock">
+            <div class="item">
+                附件    
+            </div>
+        </div>
+    </div>
+    <div class="middleRegion">
+        <div class="myEditForm">
+            <div class="contentRegion">
+                <div id="titleEditor">请编辑表单标题</div>
+                <div id="mainTableEditor">
+                    <table></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="rightRegion">
+        <div class="ItemEditor" id="titleSetting">
+            <lable for="titleName">
+                标题内容：
+                <input id="titleName" placeholder="请填写表单标题" class="titleInput" />
+            </lable>
+        </div>
+        <div class="ItemEditor" id="mainTableSetting">
+            <lable for="mainTableLine">
+                主表格行数：
+                <input id="mainTableLine" placeholder="请填写主表格行数(正整数)" class="mainTableLineInput" value="3" />
+            </lable>
+            <lable for="mainTableLine1Height">
+                行1高度(px)：
+                <input id="mainTableLine1Height" placeholder="请填写行1高度" class="mainTableLineInput" value="80" />
+            </lable>
+            <lable for="mainTableLine2Height">
+                行2高度(px)：
+                <input id="mainTableLine2Height" placeholder="请填写行2高度" class="mainTableLineInput" value="80" />
+            </lable>
+            <lable for="mainTableLine3Height">
+                行3高度(px)：
+                <input id="mainTableLine3Height" placeholder="请填写行3高度" class="mainTableLineInput" value="80" />
+            </lable>
+            <lable for="mainTableLine4Height">
+                行4高度(px)：
+                <input id="mainTableLine4Height" placeholder="请填写行4高度" class="mainTableLineInput" value="0" />
+            </lable>
+            <lable for="mainTableLine5Height">
+                行5高度(px)：
+                <input id="mainTableLine5Height" placeholder="请填写行5高度" class="mainTableLineInput" value="0" />
+            </lable>
+            <lable for="mainTableLine6Height">
+                行6高度(px)：
+                <input id="mainTableLine6Height" placeholder="请填写行6高度" class="mainTableLineInput" value="0" />
+            </lable>
+            <lable for="mainTableLine7Height">
+                行7高度(px)：
+                <input id="mainTableLine7Height" placeholder="请填写行7高度" class="mainTableLineInput" value="0" />
+            </lable>
+            <lable for="mainTableLine8Height">
+                行8高度(px)：
+                <input id="mainTableLine8Height" placeholder="请填写行8高度" class="mainTableLineInput" value="0" />
+            </lable>
+        </div>
+        <div class="ItemEditor" id="inputTextSetting">
+            <lable for="labelName">
+                项目名称：
+                <input id="labelName" placeholder="请填写项目名称" class="textInput" type="text" />
+            </lable>
+            <lable for="labelName">
+                项目id：
+                <input id="labelId" placeholder="请填写项目id" class="textInput" type="text" />
+            </lable>
+            <lable for="inputTextWidth">
+                文本框宽度(px)：
+                <input id="inputTextWidth" placeholder="请填写项目宽度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="inputTextHeight">
+                文本框高度(px)：
+                <input id="inputTextHeight" placeholder="请填写项目高度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="inputTextLeft">
+                左边距离(px)：
+                <input id="inputTextLeft" placeholder="左边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="inputTextTop">
+                顶边距离(px)：
+                <input id="inputTextTop" placeholder="顶边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="RegexInputTextSelect">
+                正则表达式类型：
+                <select id="RegexInputTextSelect" class="textInput">
+                    <option value="0">无验证</option>
+                    <option value="1">非空</option>
+                    <option value="2">数字</option>
+                    <option value="3">邮箱</option>
+                    <option value="4">手机</option>
+                    <option value="5">自定义规则</option>
+                </select>
+            </lable>
+            <lable for="RegexInputTextCustomized">
+                自定义正则表达式：
+                <input id="RegexInputTextCustomized" type="text" placeholder="请填写自定义正则表达式" class="textInput" />
+            </lable>
+        </div>
+        <div class="ItemEditor" id="textAreaSetting">
+            <lable for="labelName">
+                项目名称：
+                <input id="labelName" placeholder="请填写项目名称" class="textInput" type="text" />
+            </lable>
+            <lable for="labelName">
+                项目id：
+                <input id="labelId" placeholder="请填写项目id" class="textInput" type="text" />
+            </lable>
+            <lable for="textAreaWidth">
+                文本域宽度(px)：
+                <input id="textAreaWidth" placeholder="请填写项目宽度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="textAreaHeight">
+                文本域高度(px)：
+                <input id="textAreaHeight" placeholder="请填写项目高度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="textAreaLeft">
+                左边距离(px)：
+                <input id="textAreaLeft" placeholder="左边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="textAreaTop">
+                顶边距离(px)：
+                <input id="textAreaTop" placeholder="顶边距离(px)" class="textInput" type="text" />
+            </lable>
+        </div>
+        <div class="ItemEditor" id="dateTimeSetting">
+            <lable for="labelName">
+                项目名称：
+                <input id="labelName" placeholder="请填写项目名称" class="textInput" type="text" />
+            </lable>
+            <lable for="labelName">
+                项目id：
+                <input id="labelId" placeholder="请填写项目id" class="textInput" type="text" />
+            </lable>
+            <lable for="dateTimeWidth">
+                日期控件宽度(px)：
+                <input id="dateTimeWidth" placeholder="请填写项目宽度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="dateTimeHeight">
+                日期控件高度(px)：
+                <input id="dateTimeHeight" placeholder="请填写项目高度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="textAreaLeft">
+                左边距离(px)：
+                <input id="dateTimeLeft" placeholder="左边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="dateTimeTop">
+                顶边距离(px)：
+                <input id="dateTimeTop" placeholder="顶边距离(px)" class="textInput" type="text" />
+            </lable>
+        </div>
+        <div class="ItemEditor" id="selectorSetting">
+            <lable for="labelName">
+                项目名称：
+                <input id="labelName" placeholder="请填写项目名称" class="textInput" type="text" />
+            </lable>
+            <lable for="labelName">
+                项目id：
+                <input id="labelId" placeholder="请填写项目id" class="textInput" type="text" />
+            </lable>
+            <lable for="selectorWidth">
+                选择框宽度(px)：
+                <input id="selectorWidth" placeholder="请填写项目宽度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="selectorHeight">
+                选择框高度(px)：
+                <input id="selectorHeight" placeholder="请填写项目高度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="selectorLeft">
+                左边距离(px)：
+                <input id="selectorLeft" placeholder="左边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="selectorTop">
+                顶边距离(px)：
+                <input id="selectorTop" placeholder="顶边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="itemsDefine">
+                选择项目集合：
+                <textArea id="itemsDefine" placeholder="(格式: {值1}:{名1};{值2}:{名2})" class="textInput"></textArea>
+            </lable>
+        </div>
+        <div class="ItemEditor" id="filesSetting">
+            <lable for="labelName">
+                项目名称：
+                <input id="labelName" placeholder="请填写项目名称" class="textInput" type="text" />
+            </lable>
+            <lable for="labelName">
+                项目id：
+                <input id="labelId" placeholder="请填写项目id" class="textInput" type="text" />
+            </lable>
+            <lable for="filesWidth">
+               文件框宽度(px)：
+                <input id="filesWidth" placeholder="请填写项目宽度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="filesHeight">
+                选择框高度(px)：
+                <input id="filesHeight" placeholder="请填写项目高度(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="filesLeft">
+                左边距离(px)：
+                <input id="filesLeft" placeholder="左边距离(px)" class="textInput" type="text" />
+            </lable>
+            <lable for="filesTop">
+                顶边距离(px)：
+                <input id="filesTop" placeholder="顶边距离(px)" class="textInput" type="text" />
+            </lable>
+           @*  <lable for="itemsDefine">
+                选择项目集合：
+                <textArea id="itemsDefine" placeholder="(格式: {值1}:{名1};{值2}:{名2})" class="textInput"></textArea>
+            </lable> *@
+        </div>
+    </div>
+    <div class="clearFloat"></div>
+    <div id="moveBlock">请拖动对象...</div>
+    <div id="PrevAndSave">
+        <div class="CfgBtn" id="saveCfg">
+            保存
+        </div>
+        <div class="CfgBtn" id="previewCfg">
+            预览
+        </div>
+    </div>
+    <div id="PreviewLayer">
+        <div class="content"></div>
+    </div>
+</div>
+
+<script>
+    //主表单的默认表格行数
+    var mainTableLineDefault = 3;
+    var moveBlockOriginPoint = { x: 0, y: 0 };
+    //拖动对象是否鼠标按下
+    var isMoveBlockMouseDown = false;
+    //移动对象类型
+    var moveTypeId = "";
+    //文本框控件索引
+    var inputTextObjectIndex = 0;
+    //文本域控件索引
+    var textAreaObjectIndex = 0;
+    //日期时间控件索引
+    var dateTimeObjectIndex = 0;
+    //选择框控件索引
+    var selectorObjectIndex = 0;
+    //文件控件索引
+    var filesObjectIndex = 0;
+    //虚框选中
+    var inputRegionClick = false;
+
+    var saveCfgProfile = {
+    };
+    var saveCfgProfileJson; //= '{"FormTitle":"请假单","TableLineCount":2,"MainTableLinesHeight":[100,200,0,0,0,0,0,0],"InputTextRegions":[{"Label":"文本框: ","Id":"inputTextObjectIndex_0","Width":150,"Height":30,"Top":104,"Left":349},{"Label":"文本框: ","Id":"inputTextObjectIndex_1","Width":150,"Height":34,"Top":105,"Left":40},{"Label":"文本框: ","Id":"inputTextObjectIndex_2","Width":150,"Height":30,"Top":102,"Left":667}]}';
+
+    var parentIframe = null;
+    var currentIframe = null;
+    var CustomizedFormId = request('CustomizedFormId');
+    var CustomizedForm = {};
+    var formValidator = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.designFormIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        $("#Form").show();
+
+        if (!!CustomizedFormId) {
+            getForm();
+        }
+
+        //鼠标进入和离开
+        $(".itemObject").hover(function () {
+            $(this).css("background-color", "lightblue");
+        },
+            function () {
+                $(this).css("background-color", "lightgray");
+            }
+        ).click(function () {//点击
+            //alert(1)
+            $(this).addClass("clickAction");
+            $(this).siblings().removeClass("clickAction");
+            $(".inputRegion").removeClass("selected");
+            $(".inputRegion").attr("inputRegionClick", false);
+            displayRightRegionContent();//右部区域展示
+
+        });
+
+        //标题编辑按键事件
+        $("#titleName").keyup(function (e) {
+            $("#titleEditor").text(!$(this).val() ? $(this).attr("placeholder") : $(this).val());
+        })
+
+        //修改主表行数按键事件
+        $("#mainTableLine").keyup(function () {
+            renderMianTable();
+        });
+
+        //每行高度按键事件
+        for (var i = 1; i <= 8; i++) {
+            $("#mainTableLine" + i + "Height").keyup(function () {
+                renderMianTable();
+            })
+        }
+
+        //添加文本框控件鼠标按下
+        $(".itemObject#inputTextBlock").mousedown(function (e) {
+            if ($(this).hasClass("clickAction") == false) return;
+            else $(".middleRegion").scrollTop(0);
+            moveBlockOriginPoint.x = e.clientX;
+            moveBlockOriginPoint.y = e.clientY;
+            isMoveBlockMouseDown = true;
+            moveTypeId = "#inputTextBlock";
+
+        });
+
+        //添加文本域控件鼠标按下
+        $(".itemObject#textAreaBlock").mousedown(function (e) {
+            if ($(this).hasClass("clickAction") == false) return;
+            else $(".middleRegion").scrollTop(0);
+            moveBlockOriginPoint.x = e.clientX;
+            moveBlockOriginPoint.y = e.clientY;
+            isMoveBlockMouseDown = true;
+            moveTypeId = "#textAreaBlock";
+
+        });
+
+        //添加日期控件鼠标按下
+        $(".itemObject#dateTimeBlock").mousedown(function (e) {
+            if ($(this).hasClass("clickAction") == false) return;
+            else $(".middleRegion").scrollTop(0);
+            moveBlockOriginPoint.x = e.clientX;
+            moveBlockOriginPoint.y = e.clientY;
+            isMoveBlockMouseDown = true;
+            moveTypeId = "#dateTimeBlock";
+
+        });
+
+        //添加选择框控件鼠标按下
+        $(".itemObject#selectorBlock").mousedown(function (e) {
+            if ($(this).hasClass("clickAction") == false) return;
+            else $(".middleRegion").scrollTop(0);
+            moveBlockOriginPoint.x = e.clientX;
+            moveBlockOriginPoint.y = e.clientY;
+            isMoveBlockMouseDown = true;
+            moveTypeId = "#selectorBlock";
+
+        });
+
+        //添加文件控件鼠标按下
+        $(".itemObject#filesBlock").mousedown(function (e) {
+            if ($(this).hasClass("clickAction") == false) return;
+            else $(".middleRegion").scrollTop(0);
+            moveBlockOriginPoint.x = e.clientX;
+            moveBlockOriginPoint.y = e.clientY;
+            isMoveBlockMouseDown = true;
+            moveTypeId = "#filesBlock";
+
+        });
+
+
+        //拖动对象
+        $('body').mousemove(function (e) {
+            if (isMoveBlockMouseDown == true) {
+                $("#moveBlock").show().css({ top: e.clientY, left: e.clientX });
+            }
+        }).mouseup(function (e) { //鼠标释放
+            if (isMoveBlockMouseDown == true) {
+                $("#moveBlock").hide();
+                newMoveTypeCtrl(e);
+                isMoveBlockMouseDown = false;
+            }
+        })
+
+        $("#saveCfg").click(function () {
+            
+            saveCfgProfile.FormTitle = $("#titleEditor").text();
+            var tableLineCount = parseInt($("#mainTableLine").val());
+            saveCfgProfile.TableLineCount = tableLineCount;
+
+            saveCfgProfile.MainTableLinesHeight = [];
+            for (var i = 1; i <= 8; i++) {
+                saveCfgProfile.MainTableLinesHeight.push(parseInt($("#mainTableLine" + i + "Height").val()));
+            }
+
+            var $InputTextCtrls = [];
+            var $textAreaCtrls = [];
+            var $dateTimeCtrls = [];
+            var $selectorCtrls = [];
+            var $filesCtrls = [];
+
+            $(".inputRegion").each(function () {
+                var $that = $(this);
+                var $inputTextRegion = $that.find(".customizedInputText");
+                if ($inputTextRegion.length ==1) {
+                    $InputTextCtrls.push($that);
+                }
+            })
+
+            $(".inputRegion").each(function () {
+                var $that = $(this);
+
+                var $textAreaRegion = $that.find(".customizedTextArea");
+                if ($textAreaRegion.length == 1) {
+                    $textAreaCtrls.push($that);
+                }
+            })
+
+            $(".inputRegion").each(function () {
+                var $that = $(this);
+
+                var $dateTimeRegion = $that.find(".customizedDateTime");
+                if ($dateTimeRegion.length == 1) {
+                    $dateTimeCtrls.push($that);
+                }
+            })
+
+            $(".inputRegion").each(function () {
+                var $that = $(this);
+
+                var $selectorRegion = $that.find(".customizedSelector");
+                if ($selectorRegion.length == 1) {
+                    $selectorCtrls.push($that);
+                }
+            })
+
+            $(".inputRegion").each(function () {
+                var $that = $(this);
+
+                var $filesRegion = $that.find(".customizedFiles");
+                if ($filesRegion.length == 1) {
+                    $filesCtrls.push($that);
+                }
+            })
+
+            //console.log("$textAreaRegion.length:" + $textAreaCtrls.length);
+
+            saveCfgProfile.InputTextRegions = [];
+
+            $.each($InputTextCtrls, function (index, $elem) {
+
+                var labelName = $elem.find(".inputBorder .inner").text();
+                var $inputText = $elem.find(".customizedInputText");
+                var id = $inputText.attr("id");
+                var width = $inputText.width();
+                var height = $inputText.height();
+                var top = parseInt($elem.css("top"));
+                var left = parseInt($elem.css("left"));
+                var RegexInputTextSelect = $elem.attr("RegexInputTextSelect");
+                var RegexInputTextCustomized = $elem.attr("RegexInputTextCustomized");
+
+                var InputTextRegion =
+                {
+                    Label: labelName,
+                    Id: id,
+                    Width: width,
+                    Height: height,
+                    Top: top,
+                    Left: left,
+                    RegexInputTextSelect: RegexInputTextSelect,
+                    RegexInputTextCustomized: RegexInputTextCustomized
+                }
+                saveCfgProfile.InputTextRegions.push(InputTextRegion);
+
+            });
+
+            saveCfgProfile.TextAreaRegions = [];
+
+            $.each($textAreaCtrls, function (index, $elem) {
+
+
+                var labelName = $elem.find(".inputBorder .inner").text();
+                var $textArea = $elem.find(".customizedTextArea");
+                var id = $textArea.attr("id");
+                var width = $textArea.width();
+                var height = $textArea.height();
+                var top = parseInt($elem.css("top"));
+                var left = parseInt($elem.css("left"));
+
+                var TextAreaRegion =
+                {
+                    Label: labelName,
+                    Id: id,
+                    Width: width,
+                    Height: height,
+                    Top: top,
+                    Left: left
+                }
+                saveCfgProfile.TextAreaRegions.push(TextAreaRegion);
+
+            })
+
+            saveCfgProfile.DateTimeRegions = [];
+
+            $.each($dateTimeCtrls, function (index, $elem) {
+
+
+                var labelName = $elem.find(".inputBorder .inner").text();
+                var $dateTime = $elem.find(".customizedDateTime");
+                var id = $dateTime.attr("id");
+                var width = $dateTime.width();
+                var height = $dateTime.height();
+                var top = parseInt($elem.css("top"));
+                var left = parseInt($elem.css("left"));
+
+                var DateTimeRegion =
+                {
+                    Label: labelName,
+                    Id: id,
+                    Width: width,
+                    Height: height,
+                    Top: top,
+                    Left: left
+                }
+                saveCfgProfile.DateTimeRegions.push(DateTimeRegion);
+
+            })
+
+            saveCfgProfile.SelectorRegions = [];
+
+            $.each($selectorCtrls, function (index, $elem) {
+
+
+                var labelName = $elem.find(".inputBorder .inner").text();
+                var $selector = $elem.find(".customizedSelector");
+                var id = $selector.attr("id");
+                var width = $selector.width();
+                var height = $selector.height();
+                var top = parseInt($elem.css("top"));
+                var left = parseInt($elem.css("left"));
+                var itemsDefine = $selector.attr("itemsDefine");
+
+                var SelectorRegion =
+                {
+                    Label: labelName,
+                    Id: id,
+                    Width: width,
+                    Height: height,
+                    Top: top,
+                    Left: left,
+                    ItemsDefine: itemsDefine
+                }
+                saveCfgProfile.SelectorRegions.push(SelectorRegion);
+
+            })
+
+            saveCfgProfile.FilesRegions = [];
+
+            //alert($filesCtrls.length);
+            $.each($filesCtrls, function (index, $elem) {
+                //alert(index);
+                var labelName = $elem.find(".inputBorder .inner").text();
+                //var $files = $elem;
+                var id = $elem.attr("id");
+                var width = $elem.width();
+                var height = $elem.height();
+                var top = parseInt($elem.css("top"));
+                var left = parseInt($elem.css("left"));
+                //var itemsDefine = $selector.attr("itemsDefine");
+
+                var FilesRegion =
+                {
+                    Label: labelName,
+                    Id: id,
+                    Width: width,
+                    Height: height,
+                    Top: top,
+                    Left: left,
+                   // ItemsDefine: itemsDefine
+                }
+               //alert("111:"+FilesRegion)
+                saveCfgProfile.FilesRegions.push(FilesRegion);
+
+            })
+
+
+            saveCfgProfileJson = JSON.stringify(saveCfgProfile)
+            console.log("222:"+saveCfgProfileJson);
+        })
+
+        $("#previewCfg").click(function () {
+
+            //标题
+            var formTitle = saveCfgProfile.FormTitle;
+
+            //清空内容
+            var $content = $("#PreviewLayer").find(".content");
+            $content.html("");
+
+            //添加标题
+            var formTitleHtml = "<div><div id='titleShow'>" + formTitle + "</div></div>";
+            $content.append(formTitleHtml);
+
+            //添加表格
+            var formMainTableHtml = "<div><div id='mainTableShow'><table></table></div></div>";
+            $content.append(formMainTableHtml);
+
+            var $mainTable = $content.find("#mainTableShow").find("table");
+            var mainTableContentHtml = "";
+
+            for (var i = 0; i < saveCfgProfile.TableLineCount; i++) {
+                if (saveCfgProfile.MainTableLinesHeight[i] !== 0) {
+                    mainTableContentHtml += "<tr><td style='height:" + saveCfgProfile.MainTableLinesHeight[i] + "px'></td></tr>"
+                }
+            }
+
+            $mainTable.append(mainTableContentHtml);
+
+            //添加文本框
+            var inputTextRegions = saveCfgProfile.InputTextRegions;
+
+            for (var i = 0; i < inputTextRegions.length; i++) {
+                var Label = inputTextRegions[i].Label;
+                var Id = inputTextRegions[i].Id;
+                var Width = inputTextRegions[i].Width;
+                var Height = inputTextRegions[i].Height;
+                var Top = inputTextRegions[i].Top;
+                var Left = inputTextRegions[i].Left;
+
+                var inputTextRegionHtml = "<div class='inputTextShow'>" + Label + "&nbsp;&nbsp;<input type='text' /></div>";
+
+                $content.append(inputTextRegionHtml);
+                var $lastRegion = $content.find(".inputTextShow").eq(i);
+                var $lastRegionInputText = $lastRegion.find(":input[type=text]");
+
+                $lastRegionInputText.attr("id", Id);
+                $lastRegionInputText.width(Width);
+                $lastRegionInputText.height(Height);
+                $lastRegion.css("top", Top - 20);
+                $lastRegion.css("left", Left);
+
+            }
+
+            //添加文本域
+            var textAreaRegions = saveCfgProfile.TextAreaRegions;
+
+            for (var i = 0; i < textAreaRegions.length; i++) {
+
+                var Label = textAreaRegions[i].Label;
+                var Id = textAreaRegions[i].Id;
+                var Width = textAreaRegions[i].Width;
+                var Height = textAreaRegions[i].Height;
+                var Top = textAreaRegions[i].Top;
+                var Left = textAreaRegions[i].Left;
+                //console.log("234:" + Label);
+
+                var textAreaRegionHtml = "<div class='textAreaShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<textArea style='vertical-align:middle;'></textArea></div>";
+
+                $content.append(textAreaRegionHtml);
+                var $lastRegion = $content.find(".textAreaShow").eq(i);
+                var $lastRegionInputText = $lastRegion.find("textArea");
+
+                $lastRegionInputText.attr("id", Id);
+                $lastRegionInputText.width(Width);
+                $lastRegionInputText.height(Height);
+                $lastRegion.css("top", Top - 20);
+                $lastRegion.css("left", Left);
+
+            }
+
+            //添加日期时间
+            var dateTimeRegions = saveCfgProfile.DateTimeRegions;
+
+            for (var i = 0; i < dateTimeRegions.length; i++) {
+
+                var Label = dateTimeRegions[i].Label;
+                var Id = dateTimeRegions[i].Id;
+                var Width = dateTimeRegions[i].Width;
+                var Height = dateTimeRegions[i].Height;
+                var Top = dateTimeRegions[i].Top;
+                var Left = dateTimeRegions[i].Left;
+   
+
+                var dateTimeRegionHtml = "<div class='dateTimeShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<input data-required='true' class='Wdate  default-input' type='text' data-type='date' onclick='WdatePicker({dateFmt:\"yyyy-MM-dd HH:mm:ss\"}); ' /></div>";
+
+                $content.append(dateTimeRegionHtml);
+                var $lastRegion = $content.find(".dateTimeShow").eq(i);
+                var $lastRegionInputText = $lastRegion.find("input");
+
+                $lastRegionInputText.attr("id", Id);
+                $lastRegionInputText.width(Width);
+                $lastRegionInputText.height(Height);
+                $lastRegion.css("top", Top - 20);
+                $lastRegion.css("left", Left);
+
+            }
+
+            //添加选择框
+            var selectorRegions = saveCfgProfile.SelectorRegions;
+
+            for (var i = 0; i < selectorRegions.length; i++) {
+
+                var Label = selectorRegions[i].Label;
+                var Id = selectorRegions[i].Id;
+                var Width = selectorRegions[i].Width;
+                var Height = selectorRegions[i].Height;
+                var Top = selectorRegions[i].Top;
+                var Left = selectorRegions[i].Left;
+                var ItemsDefine = selectorRegions[i].ItemsDefine;
+
+                var selectorRegionHtml = "<div class='selectorShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<select  class='default-input' ></select></div>";
+
+                $content.append(selectorRegionHtml);
+                var $lastRegion = $content.find(".selectorShow").eq(i);
+                var $lastRegionSelector = $lastRegion.find("select");
+
+                $lastRegionSelector.attr("id", Id);
+                $lastRegionSelector.width(Width);
+                $lastRegionSelector.height(Height);
+                $lastRegion.css("top", Top - 20);
+                $lastRegion.css("left", Left);
+
+                if (!!ItemsDefine) {
+                    var keyValues = ItemsDefine.split(';');
+                    for (var i in keyValues) {
+                        var items = keyValues[i];
+                        var name = items.split(':')[1];
+                        var value = items.split(':')[0];
+                        $lastRegionSelector.append('<option value="' + value + '">' + name + '</option>');
+                    }
+                    $lastRegionSelector.attr("itemsDefine", ItemsDefine);
+                }
+                $lastRegionSelector.attr("itemsDefine", "");
+
+            }
+
+            //添加文件
+            var filesRegions = saveCfgProfile.FilesRegions;
+
+            for (var i = 0; i < filesRegions.length; i++) {
+
+                var Label = filesRegions[i].Label;
+                var Id = filesRegions[i].Id;
+                var Width = filesRegions[i].Width;
+                var Height = filesRegions[i].Height;
+                var Top = filesRegions[i].Top;
+                var Left = filesRegions[i].Left;
+                var ItemsDefine = filesRegions[i].ItemsDefine;
+                var filesRegionHtml = "<div class='filesShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<button class='blue' style='width:200px;height:30px;text-align:center;'>添加</button></div>";
+               // var selectorRegionHtml = "<div class='selectorShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<select  class='default-input' ></select></div>";
+
+                $content.append(filesRegionHtml);
+                var $lastRegion = $content.find(".filesShow").eq(i);
+                var $lastRegionButton= $lastRegion.find("button");
+
+                //$lastRegionSelector.attr("id", Id);
+                //$lastRegionButton.width(Width);
+                //$lastRegionButton.height(Height);
+                $lastRegion.css("top", Top - 20);
+                $lastRegion.css("left", Left);
+
+                // if (!!ItemsDefine) {
+                //     var keyValues = ItemsDefine.split(';');
+                //     for (var i in keyValues) {
+                //         var items = keyValues[i];
+                //         var name = items.split(':')[1];
+                //         var value = items.split(':')[0];
+                //         $lastRegionSelector.append('<option value="' + value + '">' + name + '</option>');
+                //     }
+                //     $lastRegionSelector.attr("itemsDefine", ItemsDefine);
+                // }
+                // $lastRegionSelector.attr("itemsDefine", "");
+
+            }
+
+            $("#PreviewLayer").toggleClass("show");
+        })
+
+
+        //对修改的表单加载json
+        LoadCfgProfileJson();
+
+    });
+
+    function LoadCfgProfileJson() {
+        if (!!saveCfgProfileJson) {
+            saveCfgProfile = JSON.parse(saveCfgProfileJson);
+            //标题
+            $("#titleEditor").html(saveCfgProfile.FormTitle);
+            renderMianTableInit();
+            renderTextInputInit();
+            renderTextAreaInit();
+            renderDateTimeInit();
+            renderSelectorInit();
+            renderFilesInit();
+        }
+    }
+
+    //显示项目label的位置
+    function displayDateTimeBorderInnerPosition($inputRegion) {
+
+        var $labelOutter = $inputRegion.find(".inputBorder");
+        var $labelInner = $labelOutter.find(".inner");
+        var height = $inputRegion.find(".dateTimeWrapper").height();
+        $labelOutter.height(height);
+        $labelInner.css("top", ($labelOutter.height() - 12) / 2);
+    }
+
+    //显示项目label的位置
+    function displayTextAreaBorderInnerPosition($inputRegion) {
+
+        var $labelOutter = $inputRegion.find(".inputBorder");
+        var $labelInner = $labelOutter.find(".inner");
+        var height = $inputRegion.find(".textAreaWrapper").height();
+        $labelOutter.height(height);
+        $labelInner.css("top", ($labelOutter.height() - 12) / 2);
+    }
+
+    //显示textInput项目label的位置
+    function displayInputBorderInnerPosition($inputRegion) {
+
+        var $labelOutter = $inputRegion.find(".inputBorder");
+        var $labelInner = $labelOutter.find(".inner");
+        var height = $inputRegion.find(".inputTextWrapper").height();
+        $labelOutter.height(height);
+        $labelInner.css("top", ($labelOutter.height() - 12) / 2);
+    }
+
+    //显示项目label的位置
+    function displaySelectorBorderInnerPosition($inputRegion) {
+
+        var $labelOutter = $inputRegion.find(".inputBorder");
+        var $labelInner = $labelOutter.find(".inner");
+        var height = $inputRegion.find(".selectorWrapper").height();
+        $labelOutter.height(height);
+        $labelInner.css("top", ($labelOutter.height() - 12) / 2);
+    }
+
+    //显示项目label的位置
+    function displayFilesBorderInnerPosition($inputRegion) {
+
+        var $labelOutter = $inputRegion.find(".inputBorder");
+        var $labelInner = $labelOutter.find(".inner");
+        var height = $inputRegion.find(".filesWrapper").height();
+        $labelOutter.height(height);
+        $labelInner.css("top", ($labelOutter.height() - 12) / 2);
+    }
+
+
+    //初始化时渲染文本框
+    function renderTextInputInit() {
+        var inputTextRegions = saveCfgProfile.InputTextRegions;
+        if (!inputTextRegions) return;
+        moveTypeId = "#inputTextBlock";
+        //批量添加控件
+        for (var i = 0; i < inputTextRegions.length; i++) {
+            newMoveTypeCtrl(null, inputTextRegions[i]);
+        }
+    }
+
+    //初始化时渲染文本域
+    function renderTextAreaInit() {
+        var textAreaRegions = saveCfgProfile.TextAreaRegions;
+        if (!textAreaRegions) return;
+        moveTypeId = "#textAreaBlock";
+        //批量添加控件
+        for (var i = 0; i < textAreaRegions.length; i++) {
+            newMoveTypeCtrl(null, textAreaRegions[i]);
+        }
+    }
+
+    //初始化时渲染日期时间
+    function renderDateTimeInit() {
+        var dateTimeRegions = saveCfgProfile.DateTimeRegions;
+        if (!dateTimeRegions) return;
+        moveTypeId = "#dateTimeBlock";
+        //批量添加控件
+        for (var i = 0; i < dateTimeRegions.length; i++) {
+            newMoveTypeCtrl(null, dateTimeRegions[i]);
+        }
+    }
+
+    //初始化时渲染选择框
+    function renderSelectorInit() {
+        var selectorRegions = saveCfgProfile.SelectorRegions;
+        if (!selectorRegions) return;
+        moveTypeId = "#selectorBlock";
+        //批量添加控件
+        for (var i = 0; i < selectorRegions.length; i++) {
+            newMoveTypeCtrl(null, selectorRegions[i]);
+        }
+    }
+
+    //初始化时渲染选择框
+    function renderFilesInit() {
+        var filesRegions = saveCfgProfile.FilesRegions;
+        if (!filesRegions) return;
+        moveTypeId = "#filesBlock";
+        //批量添加控件
+        for (var i = 0; i < filesRegions.length; i++) {
+            newMoveTypeCtrl(null, filesRegions[i]);
+        }
+    }
+
+    //初始化时渲染主表格
+    function renderMianTableInit() {
+        var tWidth = $("#mainTableEditor").width();
+        $("#mainTableEditor").html("<table width=" + tWidth + "></table>");
+
+        var showLine = saveCfgProfile.TableLineCount;
+        var linesHeight = saveCfgProfile.MainTableLinesHeight;
+
+        //右边栏赋值
+        $("#mainTableLine").val(showLine);
+
+        for (var i = 0; i < 8; i++) {
+            var j = i + 1;
+            $("#mainTableLine" + j + "Height").val(linesHeight[i]);
+        }
+        //编辑区域画表格
+        var trHtml = "";
+        for (var i = 1; i <= linesHeight.length; i++) {
+            if (!!parseInt($("#mainTableLine" + i + "Height").val())) {
+                trHtml += "<tr><td height=" + linesHeight[i - 1] + "></td></tr>"
+            }
+        }
+
+        $("#mainTableEditor").find("table").append(trHtml);
+    }
+
+    //渲染主表格
+    function renderMianTable() {
+        var tWidth = $("#mainTableEditor").width();
+        $("#mainTableEditor").html("<table width=" + tWidth + "></table>");
+
+        var showLine = mainTableLineDefault;
+        var linesHeight = [];
+
+        showLine = parseInt($("#mainTableLine").val());
+
+        linesHeight.push(-999);
+        for (var i = 1; i <= 8; i++) {
+            linesHeight.push(parseInt($("#mainTableLine" + i + "Height").val()));
+        }
+
+        var trHtml = "";
+        for (var i = 1; i <= linesHeight.length; i++) {
+            if (!!parseInt($("#mainTableLine" + i + "Height").val())) {
+                trHtml += "<tr><td height=" + linesHeight[i] + "></td></tr>"
+            }
+        }
+
+        $("#mainTableEditor").find("table").append(trHtml);
+    }
+
+    //初始化文本框
+    function initInputTextSetting() {
+        $("#inputTextSetting").find("input[type=text]").val("");
+    }
+    //初始化文本框
+    function initTextAreaSetting() {
+        $("#textAreaSetting").find("input[type=text]").val("");
+    }
+    //初始化日期时间
+    function initDateTimeSetting() {
+        $("#dateTimeSetting").find("input[type=text]").val("");
+    }
+    //初始化选择框
+    function initSelectorSetting() {
+        $("#selectorSetting").find("input[type=text]").val("");
+        $("#selectorSetting").find("textArea").val("");
+    }
+
+    //初始化选择框
+    function initFilesSetting() {
+        // $("#filesSetting").find("input[type=text]").val("");
+        // $("#filesSetting").find("textArea").val("");
+    }
+
+    function displayRightRegionContent() {
+        initInputTextSetting();
+        initTextAreaSetting();
+        initDateTimeSetting();
+        initSelectorSetting();
+        initFilesSetting();
+
+        $(".itemObject").each(function () {
+            if ($(this).hasClass("clickAction")) {
+                switch ($(this).attr("id")) {
+                    case "titleBlock":
+                        $("#titleSetting").show().siblings().hide();
+                        break;
+                    case "mianFormBlock":
+                        $("#mainTableSetting").show().siblings().hide();
+                        break;
+                    case "inputTextBlock":
+                        $("#inputTextSetting").show().siblings().hide();
+                        break;
+                    case "textAreaBlock":
+                        $("#textAreaSetting").show().siblings().hide();
+                        break;
+                    case "dateTimeBlock":
+                        $("#dateTimeSetting").show().siblings().hide();
+                        break;
+                    case "selectorBlock":
+                        $("#selectorSetting").show().siblings().hide();
+                        break;
+                   case "filesBlock":
+                        $("#filesSetting").show().siblings().hide();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+
+    //显示文本框的右侧面板并填充属性
+    function displayRightRegionContentForInputText($inputRegion) {
+        var labelName = $inputRegion.find(".inputBorder .inner").text();
+        var $inputText = $inputRegion.find(".customizedInputText");
+        var id = $inputText.attr("id");
+        var width = $inputText.width();
+        var height = $inputText.height();
+        var top = parseInt($inputRegion.css("top"));
+        var left = parseInt($inputRegion.css("left"));
+        var RegexInputTextSelect = $inputRegion.attr("RegexInputTextSelect");
+        var RegexInputTextCustomized = $inputRegion.attr("RegexInputTextCustomized");
+
+        $("#inputTextSetting").find("#labelName").val(labelName).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".inputBorder .inner").text($(this).val());
+            });
+        $("#inputTextSetting").find("#labelId").val(id).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedInputText").attr("id", $(this).val());
+            });
+        $("#inputTextSetting").find("#inputTextWidth").val(width).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedInputText").width($(this).val());
+            });
+        $("#inputTextSetting").find("#inputTextHeight").val(height).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.find(".customizedInputText").height($(this).val());
+                    displayInputBorderInnerPosition($inputRegion);
+                }
+            });
+        $("#inputTextSetting").find("#inputTextTop").val(top).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("top", $(this).val() + "px");
+                }
+            });
+        $("#inputTextSetting").find("#inputTextLeft").val(left).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("left", $(this).val() + "px");
+                }
+            });
+        $("#inputTextSetting").find("#RegexInputTextSelect").val(RegexInputTextSelect).
+            change(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.attr("RegexInputTextSelect", $(this).find("option:selected").val());
+                }
+            });
+        $("#inputTextSetting").find("#RegexInputTextCustomized").val(RegexInputTextCustomized).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.attr("RegexInputTextCustomized", $(this).val());
+                }
+            });
+        
+    }
+
+    //显示文本域的右侧面板并填充属性
+    function displayRightRegionContentForTextArea($inputRegion) {
+        var labelName = $inputRegion.find(".inputBorder .inner").text();
+        var $inputText = $inputRegion.find(".customizedTextArea");
+        var id = $inputText.attr("id");
+        var width = $inputText.width();
+        var height = $inputText.height();
+        var top = parseInt($inputRegion.css("top"));
+        var left = parseInt($inputRegion.css("left"));
+
+        $("#textAreaSetting").find("#labelName").val(labelName).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".inputBorder .inner").text($(this).val());
+            });
+        $("#textAreaSetting").find("#labelId").val(id).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedTextArea").attr("id", $(this).val());
+            });
+        $("#textAreaSetting").find("#textAreaWidth").val(width).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedTextArea").width($(this).val());
+            });
+        $("#textAreaSetting").find("#textAreaHeight").val(height).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.find(".customizedTextArea").height($(this).val());
+                    displayInputBorderInnerPosition($inputRegion);
+                }
+            });
+        $("#textAreaSetting").find("#textAreaTop").val(top).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("top", $(this).val() + "px");
+                }
+            });
+        $("#textAreaSetting").find("#textAreaLeft").val(left).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("left", $(this).val() + "px");
+                }
+            });
+    }
+
+    //显示日期时间的右侧面板并填充属性
+    function displayRightRegionContentForDateTime($inputRegion) {
+        var labelName = $inputRegion.find(".inputBorder .inner").text();
+        var $inputText = $inputRegion.find(".customizedDateTime");
+        var id = $inputText.attr("id");
+        var width = $inputText.width();
+        var height = $inputText.height();
+        var top = parseInt($inputRegion.css("top"));
+        var left = parseInt($inputRegion.css("left"));
+
+        $("#dateTimeSetting").find("#labelName").val(labelName).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".inputBorder .inner").text($(this).val());
+            });
+        $("#dateTimeSetting").find("#labelId").val(id).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedDateTime").attr("id", $(this).val());
+            });
+        $("#dateTimeSetting").find("#dateTimeWidth").val(width).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedDateTime").width($(this).val());
+            });
+        $("#dateTimeSetting").find("#dateTimeHeight").val(height).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.find(".customizedDateTime").height($(this).val());
+                    displayDateTimeBorderInnerPosition($inputRegion);
+                }
+            });
+        $("#dateTimeSetting").find("#dateTimeTop").val(top).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("top", $(this).val() + "px");
+                }
+            });
+        $("#dateTimeSetting").find("#dateTimeLeft").val(left).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("left", $(this).val() + "px");
+                }
+            });
+    }
+
+    //显示选择框的右侧面板并填充属性
+    function displayRightRegionContentForSelector($inputRegion) {
+        var labelName = $inputRegion.find(".inputBorder .inner").text();
+        var $selector = $inputRegion.find(".customizedSelector");
+        var id = $selector.attr("id");
+        var width = $selector.width();
+        var height = $selector.height();
+        var top = parseInt($inputRegion.css("top"));
+        var left = parseInt($inputRegion.css("left"));
+        var itemsDefine = $selector.attr("itemsDefine");
+
+        $("#selectorSetting").find("#labelName").val(labelName).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".inputBorder .inner").text($(this).val());
+            });
+        $("#selectorSetting").find("#labelId").val(id).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedSelector").attr("id", $(this).val());
+            });
+        $("#selectorSetting").find("#selectorWidth").val(width).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".customizedDateTime").width($(this).val());
+            });
+        $("#selectorSetting").find("#selectorHeight").val(height).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.find(".customizedDateTime").height($(this).val());
+                    displaySelectorBorderInnerPosition($inputRegion);
+                }
+            });
+        $("#selectorSetting").find("#selectorTop").val(top).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("top", $(this).val() + "px");
+                }
+            });
+        $("#selectorSetting").find("#selectorLeft").val(left).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("left", $(this).val() + "px");
+                }
+            });
+        $("#selectorSetting").find("#itemsDefine").val(itemsDefine).
+            blur(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {                
+                    console.log("111111111")
+                    $selector.html('');
+                    var define = $(this).val();
+                    var items = define.split(';');
+                    for (var i in items) {
+                        var val = items[i].split(':')[0];
+                        var name = items[i].split(':')[1];
+                        $selector.append("<option value='" + val + "'>" + name + "</option>");
+                    }
+                    $selector.attr("itemsDefine", define);
+                }
+            });
+    }
+
+    //显示选择框的右侧面板并填充属性
+    function displayRightRegionContentForFiles($inputRegion) {
+        var labelName = $inputRegion.find(".inputBorder .inner").text();
+        var $files = $inputRegion;//.find(".customizedFiles");
+        var id = $files.attr("id");
+        var width = $files.width();
+        var height = $files.height();
+        var top = parseInt($inputRegion.css("top"));
+        var left = parseInt($inputRegion.css("left"));
+        //var itemsDefine = $selector.attr("itemsDefine");
+
+        $("#filesSetting").find("#labelName").val(labelName).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find(".inputBorder .inner").text($(this).val());
+            });
+        $("#filesSetting").find("#labelId").val(id).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.attr("id", $(this).val());
+            });
+        $("#filesSetting").find("#filesWidth").val(width).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true")
+                    $inputRegion.find("button").width($(this).val());
+            });
+        $("#filesSetting").find("#filesHeight").val(height).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.find("button").height($(this).val());
+                    displaySelectorBorderInnerPosition($inputRegion);
+                }
+            });
+        $("#filesSetting").find("#filesTop").val(top).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("top", $(this).val() + "px");
+                }
+            });
+        $("#filesSetting").find("#filesLeft").val(left).
+            keyup(function (e) {
+                if ($inputRegion.attr("inputRegionClick") == "true") {
+                    $inputRegion.css("left", $(this).val() + "px");
+                }
+            });
+        // $("#filesSetting").find("#itemsDefine").val(itemsDefine).
+        //     blur(function (e) {
+        //         if ($inputRegion.attr("inputRegionClick") == "true") {
+        //             //console.log("111111111")
+        //             $selector.html('');
+        //             var define = $(this).val();
+        //             var items = define.split(';');
+        //             for (var i in items) {
+        //                 var val = items[i].split(':')[0];
+        //                 var name = items[i].split(':')[1];
+        //                 $selector.append("<option value='" + val + "'>" + name + "</option>");
+        //             }
+        //             $selector.attr("itemsDefine", define);
+        //         }
+        //     });
+    }
+
+    //创建控件
+    function newMoveTypeCtrl(e, inputTextRegion) {
+        //console.log("newMoveTypeCtrl:" + moveTypeId);
+        switch (moveTypeId) {            
+            case "#textAreaBlock":
+                //console.log("111111:" + moveTypeId);
+                var Label = "";
+                var Id = "";
+                var Width = 0;
+                var Height = 0;
+                var Top = 0;
+                var Left = 0;
+            
+                if (!e && inputTextRegion) {
+                     Label = inputTextRegion.Label;
+                     Id = inputTextRegion.Id;
+                     Width = inputTextRegion.Width;
+                     Height = inputTextRegion.Height;
+                     Top = inputTextRegion.Top;
+                     Left = inputTextRegion.Left;
+                }
+
+                var x = e ? e.clientX : 0;
+                var y = e ? e.clientY : 0;
+
+                var contentRegionLeft = $(".contentRegion").offset().left;
+                var contentRegionTop = $(".contentRegion").offset().top;
+
+                //新建文本域控件
+                if ((e && (x - contentRegionLeft > 0 && y - contentRegionTop > 0)) || inputTextRegion) {
+                    var inputNewHtml = "<div class='inputRegion'><div class='inputBorder'><div class='inner'>文本域:</div></div><div class='textAreaWrapper'><textArea class='customizedTextArea' id='textAreaObjectIndex_" + textAreaObjectIndex + "' ></textArea></div><div class='closeUpLeft'><i class='fa fa-close'></i></div></div>";
+                    textAreaObjectIndex++;
+
+                    $(".contentRegion").append(inputNewHtml);
+
+                    var $lastinputRegion = $(".contentRegion").find(".inputRegion:last");
+                    $lastinputRegion.attr("inputRegionClick", false);
+
+                    //如果是初始化
+                    if (!e && inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find(".customizedTextArea");
+                        $inputTextInner.attr("id", inputTextRegion.Id);
+                        $inputTextInner.width(inputTextRegion.Width);
+                        $inputTextInner.height(inputTextRegion.Height);
+                        $lastinputRegion.find(".inputBorder .inner").text(Label);
+                    }
+
+                    if (e && !inputTextRegion) {
+                        $lastinputRegion.css({ left: x - contentRegionLeft, top: y - contentRegionTop });
+
+                    } else if (inputTextRegion) {
+                        $lastinputRegion.css({ left: Left, top: Top });
+                    }
+
+                    $lastinputRegion.find("i").click(function (e) {
+                        $(this).parent().parent().remove();
+                    });
+
+                    //文本域双击，显示右侧修改面版
+                    $lastinputRegion.dblclick(function () {
+                        if ($(this).attr("inputRegionClick") == "false") {
+                            $("#textAreaBlock").trigger("click");
+                            $(this).addClass("selected").siblings().removeClass("selected");                        
+                            displayRightRegionContentForTextArea($(this));//右部区域展示
+                            $(this).attr("inputRegionClick", true).siblings().attr("inputRegionClick", false);
+                        } else {
+                            $(this).removeClass("selected").siblings().removeClass("selected");
+                            initInputTextSetting();
+                            $(this).attr("inputRegionClick", false).siblings().attr("inputRegionClick", false);
+                        }
+                    })
+
+                    var clickOffsetLeft = 0;
+                    var clickOffsetTop = 0;
+                    var OffsetMouseDown = false;
+
+                    $lastinputRegion.mousedown(function (e) {
+                        if ($lastinputRegion.hasClass("selected") == false) {
+                            return;
+                        }
+                        if (OffsetMouseDown == false) {
+                            var offsetLeft = $(this).offset().left;
+                            var offsetTop = $(this).offset().top;
+
+                            clickOffsetLeft = e.clientX - offsetLeft;
+                            clickOffsetTop = e.clientY - offsetTop;
+
+                            OffsetMouseDown = true;
+                        }
+
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    $('body').mousemove(function (e) {
+                        if (OffsetMouseDown == true) {
+                            var top = e.clientY - clickOffsetTop - contentRegionTop + ($('.middleRegion').get(0)).scrollTop;
+                            var left = e.clientX - clickOffsetLeft - contentRegionLeft;
+                            $lastinputRegion.css({
+                                top: top, left: left
+                            });
+                            $("#textAreaSetting").find("#textAreaTop").val(top);
+                            $("#textAreaSetting").find("#textAreaLeft").val(left);
+                        }
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    displayTextAreaBorderInnerPosition($lastinputRegion);
+                }
+
+                break;
+            case "#inputTextBlock"://文本框
+                //console.log("222222:" + moveTypeId);    
+                var Label = "";
+                var Id = "";
+                var Width = 0;
+                var Height = 0;
+                var Top = 0;
+                var Left = 0;
+                var RegexInputTextSelect = "0";
+                var RegexInputTextCustomized = "";
+
+                if (!e && inputTextRegion) {
+                     Label = inputTextRegion.Label;
+                     Id = inputTextRegion.Id;
+                     Width = inputTextRegion.Width;
+                     Height = inputTextRegion.Height;
+                     Top = inputTextRegion.Top;
+                     Left = inputTextRegion.Left;
+                     RegexInputTextSelect = inputTextRegion.RegexInputTextSelect;
+                     RegexInputTextCustomized = inputTextRegion.RegexInputTextCustomized;
+                }
+
+                var x = e ? e.clientX : 0;
+                var y = e ? e.clientY : 0;
+
+                var contentRegionLeft = $(".contentRegion").offset().left;
+                var contentRegionTop = $(".contentRegion").offset().top;
+
+                //新建文本框控件
+                if ((e && (x - contentRegionLeft > 0 && y - contentRegionTop > 0)) || inputTextRegion) {
+                    var inputNewHtml = "<div class='inputRegion'><div class='inputBorder'><div class='inner'>文本框:</div></div><div class='inputTextWrapper'><input class='customizedInputText' id='inputTextObjectIndex_" + inputTextObjectIndex + "' /></div><div class='closeUpLeft'><i class='fa fa-close'></i></div></div>";
+                    inputTextObjectIndex++;
+
+                    $(".contentRegion").append(inputNewHtml);
+
+                    var $lastinputRegion = $(".contentRegion").find(".inputRegion:last");
+                    $lastinputRegion.attr("inputRegionClick", false);
+
+                    //如果是初始化
+                    if (!e && inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find(".customizedInputText");
+                        $inputTextInner.attr("id", inputTextRegion.Id);
+                        $inputTextInner.width(inputTextRegion.Width);
+                        $inputTextInner.height(inputTextRegion.Height);
+                        $lastinputRegion.find(".inputBorder .inner").text(Label);
+                    }
+
+                    if (e && !inputTextRegion) {
+                        $lastinputRegion.css({ left: x - contentRegionLeft, top: y - contentRegionTop });
+                    } else if (inputTextRegion) {
+                        $lastinputRegion.css({ left: Left, top: Top });
+                    }
+
+                    $lastinputRegion.attr("RegexInputTextSelect",RegexInputTextSelect);
+                    $lastinputRegion.attr("RegexInputTextCustomized", RegexInputTextCustomized);
+
+                    $lastinputRegion.find("i").click(function (e) {
+                        $(this).parent().parent().remove();
+                    });
+
+                    //文本框双击，显示右侧修改面版
+                    $lastinputRegion.dblclick(function () {
+                        if ($(this).attr("inputRegionClick") == "false") {
+                            $("#inputTextBlock").trigger("click");
+                            $(this).addClass("selected").siblings().removeClass("selected");                         
+                            displayRightRegionContentForInputText($(this));//右部区域展示
+                            $(this).attr("inputRegionClick", true).siblings().attr("inputRegionClick", false);
+                        } else {
+                            $(this).removeClass("selected").siblings().removeClass("selected");
+                            initInputTextSetting();
+                            $(this).attr("inputRegionClick", false).siblings().attr("inputRegionClick", false);
+                        }
+                    })
+
+                    var clickOffsetLeft = 0;
+                    var clickOffsetTop = 0;
+                    var OffsetMouseDown = false;
+
+                    $lastinputRegion.mousedown(function (e) {
+                        if ($lastinputRegion.hasClass("selected") == false) {
+                            return;
+                        }
+                        if (OffsetMouseDown == false) {
+                            var offsetLeft = $(this).offset().left;
+                            var offsetTop = $(this).offset().top;
+
+                            clickOffsetLeft = e.clientX - offsetLeft;
+                            clickOffsetTop = e.clientY - offsetTop;
+
+                            OffsetMouseDown = true;
+                        }
+
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    $('body').mousemove(function (e) {
+                        if (OffsetMouseDown == true) {
+                            var top = e.clientY - clickOffsetTop - contentRegionTop + ($('.middleRegion').get(0)).scrollTop;
+                            var left = e.clientX - clickOffsetLeft - contentRegionLeft;
+                            $lastinputRegion.css({
+                                top: top, left: left
+                            });
+                            $("#inputTextSetting").find("#inputTextTop").val(top);
+                            $("#inputTextSetting").find("#inputTextLeft").val(left);
+                        }
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    displayInputBorderInnerPosition($lastinputRegion);
+                }
+
+                break;
+            case "#dateTimeBlock"://文本框
+
+                var Label = "";
+                var Id = "";
+                var Width = 0;
+                var Height = 0;
+                var Top = 0;
+                var Left = 0;
+
+                if (!e && inputTextRegion) {
+                     Label = inputTextRegion.Label;
+                     Id = inputTextRegion.Id;
+                     Width = inputTextRegion.Width;
+                     Height = inputTextRegion.Height;
+                     Top = inputTextRegion.Top;
+                     Left = inputTextRegion.Left;
+                }
+
+                var x = e ? e.clientX : 0;
+                var y = e ? e.clientY : 0;
+
+                var contentRegionLeft = $(".contentRegion").offset().left;
+                var contentRegionTop = $(".contentRegion").offset().top;
+
+                //新建文本框控件
+                if ((e && (x - contentRegionLeft > 0 && y - contentRegionTop > 0)) || inputTextRegion) {
+                    var inputNewHtml = "<div class='inputRegion'><div class='inputBorder'><div class='inner'>日期时间:</div></div><div class='dateTimeWrapper'><input class='customizedDateTime Wdate  default-input'  onclick='WdatePicker({dateFmt:\"yyyy-MM-dd HH:mm:ss\"})';  id='dateTimeObjectIndex_" + dateTimeObjectIndex + "' /></div><div class='closeUpLeft'><i class='fa fa-close'></i></div></div>";
+                    dateTimeObjectIndex++;
+
+                    $(".contentRegion").append(inputNewHtml);
+
+                    var $lastinputRegion = $(".contentRegion").find(".inputRegion:last");
+                    $lastinputRegion.attr("inputRegionClick", false);
+
+                    //如果是初始化
+                    if (!e && inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find(".customizedDateTime");
+                        $inputTextInner.attr("id", inputTextRegion.Id);
+                        $inputTextInner.width(inputTextRegion.Width);
+                        $inputTextInner.height(inputTextRegion.Height);
+                        $lastinputRegion.find(".inputBorder .inner").text(Label);
+                    }
+
+                    if (e && !inputTextRegion) {
+                        $lastinputRegion.css({ left: x - contentRegionLeft, top: y - contentRegionTop });
+                    } else if (inputTextRegion) {
+                        $lastinputRegion.css({ left: Left, top: Top });
+                    }
+
+                    $lastinputRegion.find("i").click(function (e) {
+                        $(this).parent().parent().remove();
+                    });
+
+                    //文本框双击，显示右侧修改面版
+                    $lastinputRegion.dblclick(function () {
+                        if ($(this).attr("inputRegionClick") == "false") {
+                            $("#dateTimeBlock").trigger("click");
+                            $(this).addClass("selected").siblings().removeClass("selected");                 
+                            displayRightRegionContentForDateTime($(this));//右部区域展示
+                            $(this).attr("inputRegionClick", true).siblings().attr("inputRegionClick", false);
+                        } else {
+                            $(this).removeClass("selected").siblings().removeClass("selected");
+                            initInputTextSetting();
+                            $(this).attr("inputRegionClick", false).siblings().attr("inputRegionClick", false);
+                        }
+                    })
+
+                    var clickOffsetLeft = 0;
+                    var clickOffsetTop = 0;
+                    var OffsetMouseDown = false;
+
+                    $lastinputRegion.mousedown(function (e) {
+                        if ($lastinputRegion.hasClass("selected") == false) {
+                            return;
+                        }
+                        if (OffsetMouseDown == false) {
+                            var offsetLeft = $(this).offset().left;
+                            var offsetTop = $(this).offset().top;
+
+                            clickOffsetLeft = e.clientX - offsetLeft;
+                            clickOffsetTop = e.clientY - offsetTop;
+
+                            OffsetMouseDown = true;
+                        }
+
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    $('body').mousemove(function (e) {
+                        if (OffsetMouseDown == true) {
+                            var top = e.clientY - clickOffsetTop - contentRegionTop + ($('.middleRegion').get(0)).scrollTop;
+                            var left = e.clientX - clickOffsetLeft - contentRegionLeft;
+                            $lastinputRegion.css({
+                                top: top, left: left
+                            });
+                            $("#dateTimeSetting").find("#dateTimeTop").val(top);
+                            $("#dateTimeSetting").find("#dateTimeLeft").val(left);
+                        }
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    displayDateTimeBorderInnerPosition($lastinputRegion);
+                }
+
+                break;
+            case "#selectorBlock"://选择框
+
+                var Label = "";
+                var Id = "";
+                var Width = 0;
+                var Height = 0;
+                var Top = 0;
+                var Left = 0;
+                var ItemsDefine = "";
+
+                if (!e && inputTextRegion) {
+                    Label = inputTextRegion.Label;
+                    Id = inputTextRegion.Id;
+                    Width = inputTextRegion.Width;
+                    Height = inputTextRegion.Height;
+                    Top = inputTextRegion.Top;
+                    Left = inputTextRegion.Left;
+                    ItemsDefine = inputTextRegion.ItemsDefine;
+                }
+
+                var x = e ? e.clientX : 0;
+                var y = e ? e.clientY : 0;
+
+                var contentRegionLeft = $(".contentRegion").offset().left;
+                var contentRegionTop = $(".contentRegion").offset().top;
+
+                //新建选择框控件
+                if ((e && (x - contentRegionLeft > 0 && y - contentRegionTop > 0)) || inputTextRegion) {
+                    var inputNewHtml = "<div class='inputRegion'><div class='inputBorder'><div class='inner'>选择框:</div></div><div class='selectorWrapper'><select class='customizedSelector'  id='selectorObjectIndex_" + selectorObjectIndex + "' ></select></div><div class='closeUpLeft'><i class='fa fa-close'></i></div></div>";
+                    selectorObjectIndex++;
+
+                    $(".contentRegion").append(inputNewHtml);
+
+                    var $lastinputRegion = $(".contentRegion").find(".inputRegion:last");
+                    $lastinputRegion.attr("inputRegionClick", false);
+
+                    //如果是初始化
+                    if (!e && inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find(".customizedSelector");
+                        $inputTextInner.attr("id", inputTextRegion.Id);
+                        $inputTextInner.width(inputTextRegion.Width);
+                        $inputTextInner.height(inputTextRegion.Height);
+                        $lastinputRegion.find(".inputBorder .inner").text(Label);
+                        $inputTextInner.attr("itemsDefine", ItemsDefine);
+                    }
+
+                    if (e && !inputTextRegion) {
+                        $lastinputRegion.css({ left: x - contentRegionLeft, top: y - contentRegionTop });
+                    } else if (inputTextRegion) {
+                        $lastinputRegion.css({ left: Left, top: Top });
+                    }
+
+                    $lastinputRegion.find("i").click(function (e) {
+                        $(this).parent().parent().remove();
+                    });
+
+                    //文本框双击，显示右侧修改面版
+                    $lastinputRegion.dblclick(function () {
+                        if ($(this).attr("inputRegionClick") == "false") {
+                            $("#selectorBlock").trigger("click");
+                            $(this).addClass("selected").siblings().removeClass("selected");                       
+                            displayRightRegionContentForSelector($(this));//右部区域展示
+                            $(this).attr("inputRegionClick", true).siblings().attr("inputRegionClick", false);
+                        } else {
+                            $(this).removeClass("selected").siblings().removeClass("selected");
+                            initInputTextSetting();
+                            $(this).attr("inputRegionClick", false).siblings().attr("inputRegionClick", false);
+                        }
+                    })
+
+                    var clickOffsetLeft = 0;
+                    var clickOffsetTop = 0;
+                    var OffsetMouseDown = false;
+
+                    $lastinputRegion.mousedown(function (e) {
+                        if ($lastinputRegion.hasClass("selected") == false) {
+                            return;
+                        }
+                        if (OffsetMouseDown == false) {
+                            var offsetLeft = $(this).offset().left;
+                            var offsetTop = $(this).offset().top;
+
+                            clickOffsetLeft = e.clientX - offsetLeft;
+                            clickOffsetTop = e.clientY - offsetTop;
+
+                            OffsetMouseDown = true;
+                        }
+
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    $('body').mousemove(function (e) {
+                        if (OffsetMouseDown == true) {
+                            var top = e.clientY - clickOffsetTop - contentRegionTop + ($('.middleRegion').get(0)).scrollTop;
+                            var left = e.clientX - clickOffsetLeft - contentRegionLeft;
+                            $lastinputRegion.css({
+                                top: top, left: left
+                            });
+                            $("#selectorSetting").find("#selectorTop").val(top);
+                            $("#selectorSetting").find("#selectorLeft").val(left);
+                        }
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    displaySelectorBorderInnerPosition($lastinputRegion);
+                }
+
+                break;
+            case "#filesBlock"://文件
+                //console.log("222222:" + moveTypeId);
+                var Label = "";
+                var Id = "";
+                var Width = 0;
+                var Height = 0;
+                var Top = 0;
+                var Left = 0;
+
+                if (!e && inputTextRegion) {
+                    Label = inputTextRegion.Label;
+                    Id = inputTextRegion.Id;
+                    Width = inputTextRegion.Width;
+                    Height = inputTextRegion.Height;
+                    Top = inputTextRegion.Top;
+                    Left = inputTextRegion.Left;
+                }
+
+                var x = e ? e.clientX : 0;
+                var y = e ? e.clientY : 0;
+
+                var contentRegionLeft = $(".contentRegion").offset().left;
+                var contentRegionTop = $(".contentRegion").offset().top;
+
+                //新建文本框控件
+                if ((e && (x - contentRegionLeft > 0 && y - contentRegionTop > 0)) || inputTextRegion) {
+                    var inputNewHtml = "<div id='FilesObjectIndex_" + filesObjectIndex + "'  class='inputRegion'><div class='inputBorder'><div class='inner'>文件:</div></div><div class='customizedFiles filesWrapper'><button class='blue' >添加</button></div><div class='closeUpLeft'><i class='fa fa-close'></i></div></div>";
+                    filesObjectIndex++;
+
+                    $(".contentRegion").append(inputNewHtml);
+
+                    var $lastinputRegion = $(".contentRegion").find(".inputRegion:last");
+                    $lastinputRegion.attr("inputRegionClick", false);
+
+                    //如果是初始化
+                    if (!e && inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find("button");
+                        $lastinputRegion.attr("id", inputTextRegion.Id);
+                        $inputTextInner.width(200);
+                        $inputTextInner.height(30);
+                        $lastinputRegion.find(".inputBorder .inner").text(Label);
+                    }
+
+
+                    if (e && !inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find("button");
+                        $lastinputRegion.css({ left: x - contentRegionLeft, top: y - contentRegionTop });
+                        $inputTextInner.width(200);
+                        $inputTextInner.height(30);
+                    } else if (inputTextRegion) {
+                        var $inputTextInner = $lastinputRegion.find("button");
+                        $lastinputRegion.css({ left: Left, top: Top });
+                        
+                    }
+
+                    $lastinputRegion.find("i").click(function (e) {
+                        $(this).parent().parent().remove();
+                    });
+
+                    //文本框双击，显示右侧修改面版
+                    $lastinputRegion.dblclick(function () {
+                        if ($(this).attr("inputRegionClick") == "false") {
+                            $("#filesBlock").trigger("click");
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                            displayRightRegionContentForFiles($(this));//右部区域展示
+                            $(this).attr("inputRegionClick", true).siblings().attr("inputRegionClick", false);
+                        } else {
+                            $(this).removeClass("selected").siblings().removeClass("selected");
+                            initInputTextSetting();
+                            $(this).attr("inputRegionClick", false).siblings().attr("inputRegionClick", false);
+                        }
+                    })
+
+                    var clickOffsetLeft = 0;
+                    var clickOffsetTop = 0;
+                    var OffsetMouseDown = false;
+
+                    $lastinputRegion.mousedown(function (e) {
+                        if ($lastinputRegion.hasClass("selected") == false) {
+                            return;
+                        }
+                        if (OffsetMouseDown == false) {
+                            var offsetLeft = $(this).offset().left;
+                            var offsetTop = $(this).offset().top;
+
+                            clickOffsetLeft = e.clientX - offsetLeft;
+                            clickOffsetTop = e.clientY - offsetTop;
+
+                            OffsetMouseDown = true;
+                        }
+
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    $('body').mousemove(function (e) {
+                        if (OffsetMouseDown == true) {
+                            var top = e.clientY - clickOffsetTop - contentRegionTop + ($('.middleRegion').get(0)).scrollTop;
+                            var left = e.clientX - clickOffsetLeft - contentRegionLeft;
+                            $lastinputRegion.css({
+                                top: top, left: left
+                            });
+                            $("#filesSetting").find("#filesTop").val(top);
+                            $("#filesSetting").find("#filesLeft").val(left);
+                        }
+                    }).mouseup(function (e) {
+                        if (OffsetMouseDown == true) {
+                            OffsetMouseDown = false;
+                        }
+                    })
+
+                    displayFilesBorderInnerPosition($lastinputRegion);
+                }
+
+                break;
+        }
+    }
+
+    function getForm() {
+        var res = $.httpGet({
+            url: '/WorkFlow/CustomizedForm/GetForm', param: { CustomizedFormId: CustomizedFormId }
+        });
+
+        if (res.code == 200) {
+            CustomizedForm = res.datas;
+            saveCfgProfileJson = CustomizedForm.FormCfg;
+        }
+    }
+
+    function saveForm() {
+
+        if (!!CustomizedFormId) CustomizedForm.CustomizedFormId = CustomizedFormId;
+        CustomizedForm.FormCfg = saveCfgProfileJson;
+
+        $.httpPostAsync({ url: '/WorkFlow/CustomizedForm/SaveForm', param: CustomizedForm }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+        })
+    }
+</script>

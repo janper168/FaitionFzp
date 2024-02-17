@@ -1,0 +1,119 @@
+/* Tab页样式配置 */
+
+.tab-wrapper {
+	position:relative;
+	display: inline-block;
+	width:100%;
+	height:40px;
+	line-height:40px;
+	/*font-size:18px;*/
+	color:#666666;
+	background-color:#eeeeee;
+	border-bottom:1px solid #eeeeee;
+	z-index:70;
+}
+
+span.tab-left-tap {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	vertical-align: middle;
+	background-color: #ffffff;
+	cursor: pointer;
+	box-shadow: 0px 0px 1px #999999 inset;
+	z-index: 95;
+}
+
+span.tab-right-tap {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	vertical-align: middle;
+	background-color: #ffffff;
+	cursor: pointer;
+	box-shadow: 0px 0px 1px #999999 inset;
+	z-index: 95;
+}
+
+span.tab-left-tap:hover {
+	background-color:rgb(120,220,220);
+}
+
+span.tab-right-tap:hover {
+	background-color:rgb(120,220,220);
+}
+
+span.tab-left-tap > i {
+	vertical-align:middle;
+	height:40px;
+	line-height:40px;
+}
+
+span.tab-right-tap > i {
+	vertical-align:middle;
+	height:40px;
+	line-height:40px;
+}
+
+span.tab-center-group {
+	position:absolute;
+	display:inline;
+	left:40px;
+	top:0px;
+	width:auto;
+	height:40px;
+	line-height:40px;	
+	border:0px solid red;
+	overflow-y:hidden;
+	z-index:80;
+}
+
+span.tab-item-to-frame {
+	position: relative;
+	height: 36px;
+	line-height: 36px;
+	float: left;
+	padding: 0px 4px;
+	margin: 3px 2px 0px 2px;
+	border-radius: 4px;
+	border: 1px solid #eeeeee;
+	background-color: #ffffff;
+	/*font-size: 14px;*/
+	cursor: pointer;
+	z-index: 80;
+}
+
+span.tab-item-to-frame:hover {
+	background-color:orange;
+	color:#ffffff;
+}
+
+	span.tab-item-to-frame.selected {
+		background-color: rgb(100,200,120);
+		/*background-color: orange;*/
+		color: #ffffee;
+	}
+
+span.tab-item-to-frame > i.fa-close {
+	position:absolute;
+	right:1px;
+	top:1px;
+	font-size:10px;
+	color:transparent;
+}
+
+span.tab-item-to-frame > i.fa-close:hover {
+	color:#ffffee;
+}
+
+i.tab-icon {
+	margin-right:2px;
+}

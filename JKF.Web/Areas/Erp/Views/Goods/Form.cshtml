@@ -1,0 +1,204 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Number">编号</label></div>
+            <input id="Number" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">名称</label></div>
+            <input id="Name" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+    </div>
+
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="BarCode">条码</label></div>
+            <input id="BarCode" type="text" data-required="" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="GoodsCategoryId">产品分类</label></div>
+            <input id="GoodsCategoryId" type="text" data-required="" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Spec">规格</label></div>
+            <input id="Spec" type="text" data-required="" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Unit">单位</label></div>
+            <input id="Unit" type="text" data-required="" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ShelfLifeDays">保质期天数</label></div>
+            <input id="ShelfLifeDays" type="text" data-required="" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ShelfLifeWarningDays">保质期预警天数</label></div>
+            <input id="ShelfLifeWarningDays" type="text" data-required="" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Actived">激活状态</label></div>
+            <input class="blue" type="radio" value="1" name="Actived" checked="checked">是
+            <input class="blue" type="radio" value="0" name="Actived">否
+            <input id="Actived" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="PurchasePrice">采购价格</label></div>
+            <input id="PurchasePrice" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="RetailPrice">零售价</label></div>
+            <input id="RetailPrice" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="LevelPrice1">等级一价格</label></div>
+            <input id="LevelPrice1" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="LevelPrice2">等级二价格</label></div>
+            <input id="LevelPrice2" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="LevelPrice3">等级三价格</label></div>
+            <input id="LevelPrice3" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="InventoryUpper">库存上限</label></div>
+            <input id="InventoryUpper" type="text" data-required="" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="InventoryLower">库存下限</label></div>
+            <input id="InventoryLower" type="text" data-required="" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnableInventoryWarning">启用库存告警</label></div>
+            <input class="blue" type="radio" value="1" name="EnableInventoryWarning">是
+            <input class="blue" type="radio" value="0" name="EnableInventoryWarning" checked="checked">否
+            <input id="EnableInventoryWarning" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Remark">备注</label></div>
+            <textarea id="Remark" class="default-input" data-type="text" style="width:250px;height:80px;"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var Erp_GoodsId = request('Erp_GoodsId');
+    var Erp_Goods = {};
+
+    var formValidator = null;
+
+    $("#Name").attr("data-check-exists-url", "/Erp/Goods/IsExistName?KeyValue=" + Erp_GoodsId);
+    $("#Number").attr("data-check-exists-url", "/Erp/Goods/IsExistNumber?KeyValue=" + Erp_GoodsId);
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        $.setSelect({
+            url: "/Erp/GoodsCategory/GetAll",
+            textCtrlId: "GoodsCategoryId",
+            ctrlId: "GoodsCategoryId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+
+        $("#Form").show();
+
+        if (!!Erp_GoodsId) {
+            getForm();
+        }
+
+        formValidator = $("#Form").formValidator()
+    });
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Erp/Goods/GetForm', param: { Erp_GoodsId: Erp_GoodsId }
+
+        });
+
+        if (res.code == 200) {
+            Erp_Goods = res.datas;
+
+            $.setFormData(Erp_Goods, $("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!Erp_GoodsId) Erp_Goods.Erp_GoodsId = Erp_GoodsId;
+        $.getFormData(Erp_Goods, $("#Form"));
+
+        $.httpPostAsync({ url: '/Erp/Goods/SaveForm', param: Erp_Goods }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

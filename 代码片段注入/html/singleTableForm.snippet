@@ -1,0 +1,144 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>singleTableForm</Title>
+    <Author>Microsoft Corporation</Author>
+    <Shortcut>singleTableForm</Shortcut>
+    <Description>单表form段</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+	  <Literal>
+        <ID>AreaName</ID>
+        <ToolTip>AreaName</ToolTip>
+        <Default>MyArea</Default>
+      </Literal>
+      <Literal>
+        <ID>TableName</ID>
+        <ToolTip>TableName</ToolTip>
+        <Default>MyTable</Default>
+      </Literal>
+      <Literal>
+        <ID>ChName</ID>
+        <ToolTip>ChName</ToolTip>
+        <Default>ChName</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="html"><![CDATA[@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        
+    </div>
+    <div class="form_row">
+        
+    </div>
+	<div class="form_row">
+        
+    </div>
+	<div class="form_row">
+        
+    </div>
+	<div class="form_row">
+        
+    </div>
+	<div class="form_row">
+        
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var $TableName$Id = request('$TableName$Id');
+    var $TableName$ = {};
+
+    var formValidator = null;
+
+    //$$("#EnCode").attr("data-check-exists-url", "/$AreaName$/$TableName$/IsExistEnCode?keyValue=" + $TableName$Id);
+    //$$("#Name").attr("data-check-exists-url", "/$AreaName$/$TableName$/IsExistName?KeyValue=" + $TableName$Id);
+
+    var jfkInit = (function ($$, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $$openIframe = $$(currentIframe);
+
+        var parentIframeId = $$openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $$("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $$openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $$Form = jkf.$$topBody.find("#" + FormId);
+        jkf.processAuthorizedForms($$("#Form"));
+        $$("#Form").show();
+
+        if (!!$TableName$Id) {
+            getForm();
+        }
+        
+        formValidator = $$("#Form").formValidator()
+    });
+
+
+    function getForm() {
+
+        var res = $$.httpGet({
+            url: '/$AreaName$/$TableName$/GetForm', param: { $TableName$Id: $TableName$Id }
+
+        });
+
+        if (res.code == 200) {
+            $TableName$ = res.datas;
+
+            $$.setFormData($TableName$, $$("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!$TableName$Id) $TableName$.$TableName$Id = $TableName$Id;
+        $$.getFormData($TableName$, $$("#Form"));
+
+        $$.httpPostAsync({ url: '/$AreaName$/$TableName$/SaveForm', param: $TableName$ }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>]]></Code>
+  </Snippet>
+</CodeSnippet>

@@ -1,0 +1,121 @@
+﻿@{
+    Layout = "_Form";
+}
+<style>
+
+</style>
+
+<div id="Form" class="form" style="display: none; overflow:auto;height:fit-content; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="GoodsId">产品</label></div>
+            <input id="GoodsId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Number">编码</label></div>
+            <input id="Number" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">名称</label></div>
+            <input id="Name" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Spec">规格</label></div>
+            <input id="Spec" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Unit">单位</label></div>
+            <input id="Unit" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="TotalQuantity">实际数量</label></div>
+            <input id="TotalQuantity" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+   
+</div>
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var formValidator = null;
+    var data = {};
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.addCheckGoodsForm = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        $.setSelect({
+            url: "/Erp/Goods/GetAll",
+            textCtrlId: "GoodsId",
+            ctrlId: "GoodsId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+        $("#GoodsId").change(function () {
+            var GoodsId = $(this).data("value");
+
+            var res = $.httpGet({
+                url: '/Erp/Goods/GetForm', param: { Erp_GoodsId: GoodsId }
+            });
+
+            if (res.code == 200) {
+                data = res.datas;
+                $("#Number").val(data.Number);
+                $("#Name").val(data.Name);
+                $("#Spec").val(data.Spec);
+                $("#Unit").val(data.Unit);
+                
+            }
+        });
+
+        $("#Form").show();
+
+        formValidator = $("#Form").formValidator()
+    });
+
+    function saveForm() {
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        $.getFormData(data, $("#Form"));
+
+        if (parentIframe != null) {
+            parentIframe.addNewProduction(data);
+            window.location.reload();
+        }
+    }
+</script>

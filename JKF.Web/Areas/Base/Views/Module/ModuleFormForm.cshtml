@@ -1,0 +1,127 @@
+﻿
+
+@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: block; height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnCode">编码</label></div>
+            <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">名称</label></div>
+            <input id="Name" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnabledMark">是否有效</label></div>
+            <input class="blue" type="radio" value="1" name="EnabledMark" checked="checked" />是
+            <input class="blue" type="radio" value="0" name="EnabledMark">否
+            <input id="EnabledMark" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var moduleFormId = request('moduleFormId');
+    var moduleForm = {};
+    var formValidator = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.moduleFormForm = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        //setTargetSelect();
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+        //console.log("form:" + $Form);
+
+        if (!!moduleFormId) {
+            var data = jkf.GetIFrameWindowData($Form);
+            //console.log(data);
+            moduleForm = data.moduleForm;
+            $.setFormData(moduleForm, $("#Form"));
+        }
+
+        //console.log("555:" + parentIframe.colButtonListData.length);
+        //console.log("666:" +　parentIframe.colButtonListData[0].ParentId);
+
+        formValidator = $("#Form").formValidator();
+
+    });
+
+
+
+    function setTargetSelect() {
+        //console.log("777:" + parentIframe.colButtonListData.length);
+        //console.log("888:" + moduleButtonId);
+        $.setTreeSelect({
+            url: null,
+            data: parentIframe.colColumnListData,
+            textCtrlId: "ParentId",
+            ctrlId: "ParentId_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "ModuleButtonId",
+            valueKey: "Name",
+            targetValue: 2,//下拉
+            targetKey: "Target",
+            hideDownLevelKeyValue: moduleButtonId,
+            width: 200,
+            height: 250
+        })
+    }
+
+    function saveForm(moduleFormList) {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        $.getFormData(moduleForm, $("#Form"));
+
+        //console.log("moduleForm:" + moduleForm);
+
+        if (!!moduleFormId) {
+            for (var i in moduleFormList) {
+                var data = moduleFormList[i];
+                if (data.ModuleFormId == moduleFormId) {
+                    moduleFormList[i] = moduleForm;
+                    break;
+                }
+            }
+        } else {
+
+            moduleForm.ModuleFormId = top.jkf.newGuid(); // 新增的自己添加一个id
+            moduleFormList.push(moduleForm);
+            //console.log(moduleFormList);
+        }
+
+
+        top.jkf.showTips("保存成功！", 1);
+        //console.log(parentIframe)
+        if (parentIframe != null) {
+            parentIframe.setModuleFormList(moduleFormList);
+            //setTargetSelect();
+        }
+        window.location.reload();
+    }
+</script>

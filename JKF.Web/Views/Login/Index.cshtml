@@ -1,0 +1,198 @@
+﻿@{
+
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>管理系统-登录页</title>
+    <link rel="stylesheet" type="text/css" href="~/css/common.css">
+    <link rel="stylesheet" type="text/css" href="~/css/fontawesome/css/font-awesome.min.css" />
+    <link href="~/css/layer.css" rel="stylesheet" />
+    <link href="~/css/validation.css" rel="stylesheet" />
+    <link href="~/css/form.css" rel="stylesheet" />
+    <link href="~/css/layer.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <style>
+        body, * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-image: linear-gradient(#2667dd,#00ffff 50%, #2667dd);
+            height: 100%;
+        }
+
+        #wrapper {
+            position: relative;
+            height: 100%;
+        }
+
+        #content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 340px;
+            width: 30%;
+            margin: -12.5% 0 0 -15%;
+            box-shadow: 0 0 15px #555;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        .title {
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: orange;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .login {
+            margin: 50px auto;
+        }
+
+            .login > div {
+                width: 80%;
+                margin: 10px auto;
+            }
+
+                .login > div > div {
+                    position: relative;
+                }
+
+                    .login > div > div > i {
+                        position: absolute;
+                        left: 5px;
+                        font-size: 20px;
+                        top: 10px;
+                        border:0px solid red;
+                    }
+
+                    .login > div > div > input {
+                        height: 40px;
+                        line-height: 40px;
+                        text-indent: 30px;
+                        font-size: 15px;
+                    }
+
+            .login .submit button {
+                font-size: 16px !important;
+            }
+
+            .login #errorInfo {
+                text-align: center;
+                color: red;
+            }
+    </style>
+    <script>
+        function request(d) { for (var c = location.search.slice(1).split("&"), a = 0; a < c.length; a++) { var b = c[a].split("="); if (b[0] == d) if ("undefined" == unescape(b[1])) break; else return unescape(b[1]) } return "" };
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="content">
+            <div class="title">管理系统 - 登录</div>
+            <div id="loginForm" class="login">
+                <div>
+                    <div class="loginAccount">
+                        <i class="fa fa-user"></i>
+                        <input id="userAccount" data-type="text" data-required="true" class="default-input label-input" type="text" placeholder="请输入账号">
+                    </div>
+                </div>
+                <div>
+                    <div class="loginPassword">
+                        <i class="fa fa-key"></i>
+                        <input id="userPassword" data-type="text" data-required="true" class="default-input label-input" type="password" placeholder="请输入密码">
+                    </div>
+                </div>
+                <div class="submit">
+                    <button id="loginBtn" class="btn full green height_40">登录</button>
+                </div>
+                <div id="errorInfo">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var error = request("error");
+        var formValidator = null;
+
+        var isLogining = false;
+        $(function () {
+            formValidator = $("#loginForm").formValidator();
+
+            $("#loginBtn").click(function () {
+
+                if (isLogining == false) {
+
+                    if (!formValidator.valid()) {
+                        return false;
+                    }
+
+                    isLogining = true;
+                    $(this).prop("disabled", true);
+                    var res = $.httpGet(
+                        {
+                            url: "/Login/CheckLogin",
+                            param: {
+                                userAccount: $("#userAccount").val(),
+                                userPassword: $("#userPassword").val()
+                            }
+                        });
+                    if (res.code == 200) {
+                        window.location.href = "/home/index";
+                    } else {
+                        top.jkf.showTips("登录失败:" + res.errMsg, 2);
+                    }
+                    isLogining = false;
+                    $(this).prop("disabled", false);
+                }
+                else {
+                    return;
+                }
+
+            })
+
+            $("#userAccount").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    $("#loginBtn").trigger("click");
+                }
+            });
+
+            $("#userPassword").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    $("#loginBtn").trigger("click");
+                }
+            })
+
+            switch (error) {
+                case "nologin":
+                case "loginTimeout":
+                    $("#errorInfo").html("出错了：登录超时,请重新登录！");
+                    break;
+                case "":
+                    break;
+                default:
+                    $("#errorInfo").html("出错了：未知错误,请重新登录！");
+                    break;
+            }
+
+        })
+    </script>
+    <script src="~/js/ajax.js"></script>
+    <script src="~/js/common.js"></script>
+    <script src="~/js/layer.js"></script>
+    <script src="~/js/form.js"></script>
+    <script src="~/js/validation.js"></script>
+</body>
+</html>

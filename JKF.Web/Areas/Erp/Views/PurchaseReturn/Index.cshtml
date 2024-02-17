@@ -1,0 +1,272 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+           <button id="btn_detail" class="btn green"><i class="fa fa-info"></i>详细</button> 
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>作废</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="Erp_PurchaseReturnOrderTable"></div>
+    </div>
+</div>
+<script>
+
+
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'Erp_PurchaseReturnOrderId', width: 200, showName: 'showName', hidden: true, align: 'center' },
+            { columnName: 'Number', width: 200, showName: '退货编号', hidden: false, align: 'left' },
+            { columnName: 'Number2', width: 200, showName: '采购编号', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["PurchaseOrder"]) {
+                        return rowData["PurchaseOrder"].Number;
+                    } else return "";
+                }
+            },
+            {
+                columnName: 'Suppiler', width: 200, showName: '供应商', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val) {
+                        return rowData["Suppiler"].Name;
+                    } else return "";
+                }
+            },
+            {
+                columnName: 'IsVoid', width: 100, showName: '是否作废', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 1) {
+                        return '<div style="color:white;background-color:red;width:fit-content;height:fit-content;padding:0px 5px;">是</div>';
+                    } else return '<div style="color:white;background-color:blue;width:fit-content;height:fit-content;padding:0px 5px;">否</div>';;
+                }
+            },
+            {
+                columnName: 'CreateUser', width: 200, showName: '创建人', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val) {
+                        return rowData["CreateUser"].RealName;
+                    } else return "";
+                }
+            },
+            {
+                columnName: 'CreateTime', width: 200, showName: '创建时间', hidden: false, align: 'left',sort:true,
+                formatter: function (val, rowData) {
+                    if (val) {
+                        return val.substring(0, 19).replace('T'," ");
+                    } els
+                }
+            },
+            {
+                columnName: 'TotalQuantity', width: 150, showName: '总量', hidden: false, align: 'left',
+                
+            },
+            {
+                columnName: 'TotalAmount', width: 150, showName: '总金额', hidden: false, align: 'left',
+
+            },
+            {
+                columnName: 'CollectionAmount', width: 150, showName: '收款款金额', hidden: false, align: 'left',
+
+            },
+            {
+                columnName: 'otherAmount', width: 150, showName: '其他金额', hidden: false, align: 'left',
+
+            },
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#Erp_PurchaseReturnOrderTable').jkfGrid({
+            remoteAddress: '/Erp/PurchaseReturn/GetErp_PurchaseReturnOrders',
+            columnHeaders: colHeaders,
+            mainId: 'Erp_PurchaseReturnOrderId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'CreateTime',
+            sortOrder: 'desc'
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+
+            $gridTable.openFrameWindow({
+                title: "新增-退货单",
+                width: '',
+                height: '',
+                level: 1,
+                url: '/Erp/PurchaseReturn/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_detail").click(function () {
+
+            var Erp_PurchaseReturnOrderId = $gridTable.getSelectRowValue("Erp_PurchaseReturnOrderId");
+            if (!Erp_PurchaseReturnOrderId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (Erp_PurchaseReturnOrderId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "查看--退货单信息",
+                width: 1200,
+                height: 700,
+                level: 1,
+                url: '/Erp/PurchaseReturn/DetailForm?Erp_PurchaseReturnOrderId=' + Erp_PurchaseReturnOrderId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                // buttonGroup: [
+                //     {
+                //         buttonId: "button_save",
+                //         buttonText: "保存",
+                //         buttonClickAction: function () {
+                //             var openWin = top.jkf.openIframe.contentWindow;
+                //             openWin.saveForm();
+
+                //         }
+                //     }
+                // ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+            var Erp_PurchaseReturnOrderId = $gridTable.getSelectRowValue("Erp_PurchaseReturnOrderId");
+            if (!Erp_PurchaseReturnOrderId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (Erp_PurchaseReturnOrderId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认作废？", function () {
+
+                $.httpPostAsync({
+                    url: '/Erp/PurchaseReturn/RemoveForm', param: { Erp_PurchaseReturnOrderId: Erp_PurchaseReturnOrderId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("作废成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        //top.jkf.processAuthorizedButtons(".buttonBar");
+
+
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>

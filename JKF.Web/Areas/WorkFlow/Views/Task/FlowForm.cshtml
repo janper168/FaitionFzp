@@ -1,0 +1,422 @@
+﻿@{
+    Layout = "_Form";
+}
+<link href="/css/tuxing.css?001" rel="stylesheet" />
+<style>
+    .contentWrapper {
+        width: 300%;
+        height: 500%;
+    }
+</style>
+<script src="/js/tuxing.js?007"></script>
+<div class="contentWrapper"></div>
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var TaskId = request('TaskId');
+    var TaskNodeProcesserId = request('TaskNodeProcesserId');
+    var Task = {};
+    var workFlowDesignId = request('WorkFlowDesignId');
+    var workFlowDesign = {};
+
+    var $gridTable = null;
+
+    var lineIndex = 0;
+    var nodeList = [];
+    var lineList = [];
+    var flowDesign = {};
+    var controlIndex = 0;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        objectCanMove = false;
+        
+        getForm();
+        
+
+
+    });
+
+
+    function getForm() {
+
+        if (!TaskId && TaskNodeProcesserId) {
+            var res = $.httpGet({
+                url: '/workFlow/Task/getTaskId', param: { TaskNodeProcesserId: TaskNodeProcesserId }
+            });
+            if (res.code == 200) {
+                TaskId = res.datas;
+            }
+        }
+
+        var res = $.httpGet({
+            url: '/WorkFlow/Task/GetTaskForm', param: { TaskId: TaskId }
+        });
+
+        if (res.code == 200) {
+            Task = res.datas;
+            loadJson();
+        }
+
+    }
+
+    function getNodeForm(nodeId) {
+        var res = $.httpGet({
+            url: '/Workflow/WorkFlowDesign/GetNodeForm', param: { nodeId: nodeId, workFlowDesignId: Task.WorkFlowDesignId }
+        });
+
+        if (res.code == 200) {
+            return res.datas;
+        }
+
+        return null;
+    }
+
+    function updateNodeText(nodeType, nodeId, nodeName) {
+        var innerClass = "fangxingInner";
+        if (nodeType == "shenpi") nodeType = "审批";
+        else if (nodeType == "zhihui") nodeType = "知会";
+        else if (nodeType == "childflow") nodeType = "子流程";
+        else if (nodeType == "condition") {
+            nodeType = "条件";
+            innerClass = "lingxingInner";
+        }
+
+        var htmlText = "<div class='jiedianText'>" + nodeType + ":" + nodeName + "</div>";
+        $("#" + nodeId).find(".jiedianText").remove();
+        $("#" + nodeId).find("." + innerClass).append(htmlText);
+    }
+
+    function getNodeColor(nodeId) {
+        var res = $.httpGet({
+            url: '/WorkFLow/task/GetTaskNodeForm', param: { nodeId: nodeId, taskId: TaskId }
+        });
+
+        if (res.code == 200) {
+            var tn = res.datas;
+            switch (tn.NodeResult) {
+                case 2:
+                case 3:
+                case 5:
+                    return "orange";
+                case 1:
+                    return "lightgray";
+                case 4:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                    return "lightblue";
+            }
+        }
+    }
+    function LineProcess() { 
+    
+    }
+    
+    function NodeProcessShenpi() { 
+    
+    }
+
+    function NodeProcessZhihui() {
+
+    }
+
+    function NodeProcessChildflow() {
+
+    }
+
+    function NodeProcessCondition() {
+
+    }
+
+    function loadJson() {
+        if (Task.WorkFlowDesign.FlowDesignJson) {
+            flowDesign = JSON.parse(Task.WorkFlowDesign.FlowDesignJson);
+            console.log("Task.WorkFlowDesign.FlowDesignJson:"+Task.WorkFlowDesign.FlowDesignJson);
+            var nodeIndex = 0;
+
+            //加载节点
+            for (var i in flowDesign.nodeList) {
+                var node = flowDesign.nodeList[i];
+
+                var id = node.id;
+                var offsetX = node.offsetX;
+                var offsetY = node.offsetY;
+                var width = node.width;
+                var height = node.height;
+                var type = node.type;
+
+                bgColor = getNodeColor(id);
+
+                nodeIndex = (id.indexOf("_") >= 1) ? parseInt(id.split('_')[1]) : 0;
+                if (nodeIndex > controlIndex) controlIndex = nodeIndex;
+
+                if (type == "start") {
+
+                    $(".contentWrapper").append("<div class='endonTuxing' id='startEndon'></div>");
+                    $(".contentWrapper").find("#startEndon").endonTuxing({
+                        width: width / 2,
+                        height: height / 2,
+                        offsetLeft: offsetX,
+                        offsetTop: offsetY,
+                        type: 'startEndon',
+                        bgColor:bgColor,
+                    });
+                }
+                else if (type == "end") {
+
+                    $(".contentWrapper").append("<div class='endonTuxing' id='endEndon'></div>");
+                    $(".contentWrapper").find("#endEndon").endonTuxing({
+                        width: width / 2,
+                        height: height / 2,
+                        offsetLeft: offsetX,
+                        offsetTop: offsetY,
+                        type: 'endEndon',
+                        bgColor: bgColor
+                    });
+                }
+                else if (type == "shenpi") {
+
+                    $(".contentWrapper").append("<div class='fangxing' type='shenpi' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        fangxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color:  bgColor,
+                            editFunc: NodeProcessShenpi,
+                            bgColor: bgColor
+                        });
+
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('shenpi', id, nodeName);
+                    }
+                }
+                else if (type == "zhihui") {
+
+                    $(".contentWrapper").append("<div class='fangxing' type='zhihui' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        fangxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: bgColor,
+                            editFunc: NodeProcessZhihui,
+                            bgColor: bgColor
+                        });
+
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('zhihui', id, nodeName);
+                    }
+                }
+                else if (type == "childflow") {
+
+                    $(".contentWrapper").append("<div class='fangxing' type='childflow' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        fangxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: bgColor,
+                            editFunc: NodeProcessChildflow
+                        });
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('childflow', id, nodeName);
+                       
+                    }
+                }
+                else if (type == "condition") {
+
+                    $(".contentWrapper").append("<div class='lingxing' type='condition' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        lingxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: bgColor,
+                            editFunc: NodeProcessCondition
+                        });
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('condition', id, nodeName);
+                    }
+                }
+            }
+            controlIndex++;
+
+            var lineIndex = 0;
+
+            for (var i in flowDesign.lineList) {
+                var line = flowDesign.lineList[i];
+
+                var id = line.id;
+
+                lineIndex = (id.indexOf("_") >= 1) ? parseInt(id.split('_')[1]) : 0;
+                if (lineIndex > currentLineCount) currentLineCount = lineIndex;
+
+                var startNodeId = line.startNodeId;
+                var endNodeId = line.endNodeId;
+                var startPosType = line.startPosType;
+                var endPosType = line.endPosType;
+
+                var $startNode = $("#" + startNodeId);
+                var $endNode = $("#" + endNodeId);
+
+                var lineHtml = "<div class='lineObject' id='" + id + "'></div>";
+                $(".contentWrapper").append(lineHtml);
+
+                var retStart = null;
+                for (var i in tuxings) {
+                    if (tuxings[i].id == startNodeId) {
+                        retStart = tuxings[i].ret;
+                        break;
+                    }
+                }
+
+                var retEnd = null;
+                for (var i in tuxings) {
+                    if (tuxings[i].id == endNodeId) {
+                        retEnd = tuxings[i].ret;
+                        break;
+                    }
+                }
+                var startPoint;
+                var endPoint;
+                var $startObject;
+                var $endObject;
+                var startObjectPointPos;
+                var endObjectPointPos;
+
+                var $pUp1 = $startNode.find("div.point.up");
+                var $pDown1 = $startNode.find("div.point.down");
+                var $pLeft1 = $startNode.find("div.point.left");
+                var $pRight1 = $startNode.find("div.point.right");
+
+                var $pUp2 = $endNode.find("div.point.up");
+                var $pDown2 = $endNode.find("div.point.down");
+                var $pLeft2 = $endNode.find("div.point.left");
+                var $pRight2 = $endNode.find("div.point.right");
+
+                if (startPosType == "down" && endPosType == "up") {
+
+                    var offsetLeft1 = parseInt($startNode.css('left'));
+                    var offsetTop1 = parseInt($startNode.css('top'));
+
+                    var width1 = $startNode.width()
+                    var height1 = $startNode.height();
+
+                    var offsetLeft2 = parseInt($endNode.css('left'));
+                    var offsetTop2 = parseInt($endNode.css('top'));
+
+                    var width2 = $endNode.width()
+                    var height2 = $endNode.height();
+
+                    startPoint = { x: width1 / 2 + offsetLeft1, y: height1 + offsetTop1 }; //down
+                    endPoint = { x: width2 / 2 + offsetLeft2, y: 0 + offsetTop2 };//up
+
+                    $startObject = $pDown1;//down
+                    $endObject = $pUp2;//up
+                } else if (startPosType == "left" && endPosType == "left") {
+                    var offsetLeft1 = parseInt($startNode.css('left'));
+                    var offsetTop1 = parseInt($startNode.css('top'));
+
+                    var width1 = $startNode.width()
+                    var height1 = $startNode.height();
+
+                    var offsetLeft2 = parseInt($endNode.css('left'));
+                    var offsetTop2 = parseInt($endNode.css('top'));
+
+                    var width2 = $endNode.width()
+                    var height2 = $endNode.height();
+
+                    startPoint = { x: 0 + offsetLeft1, y: height1 / 2 + offsetTop1 };
+                    endPoint = { x: 0 + offsetLeft2, y: height2 / 2 + offsetTop2 };
+
+                    $startObject = $pLeft1;
+                    $endObject = $pLeft2;
+                } else if (startPosType == "right" && endPosType == "right") {
+
+                    var offsetLeft1 = parseInt($startNode.css('left'));
+                    var offsetTop1 = parseInt($startNode.css('top'));
+
+                    var width1 = $startNode.width()
+                    var height1 = $startNode.height();
+
+                    var offsetLeft2 = parseInt($endNode.css('left'));
+                    var offsetTop2 = parseInt($endNode.css('top'));
+
+                    var width2 = $endNode.width()
+                    var height2 = $endNode.height();
+
+                    startPoint = { x: width1 + offsetLeft1, y: height1 / 2 + offsetTop1 };
+                    endPoint = { x: width2 + offsetLeft2, y: height2 / 2 + offsetTop2 };
+
+                    $startObject = $pRight1;
+                    $endObject = $pRight2;
+                }
+
+
+                var $lineObject = $(".contentWrapper").find("#" + id);
+
+                $lineObject.lineObject({
+                    startPoint: startPoint,
+                    endPoint: endPoint,
+                    startPointObject: $startObject,
+                    endPointObject: $endObject,
+                    startObjectPointPos: startPosType,
+                    endObjectPointPos: endPosType,
+                    startTuxingRet: retStart,
+                    endTuxingRet: retEnd,
+                    editFunc: LineProcess
+                })
+
+                $startObject.removeClass("clicked");
+                $endObject.removeClass("clicked");
+
+            }
+        }
+
+        currentLineCount++;
+    }
+
+</script>

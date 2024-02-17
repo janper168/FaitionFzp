@@ -1,0 +1,352 @@
+﻿@{
+    Layout = "_Form";
+}
+<style>
+    #productListTable{
+        border-collapse:collapse;
+        border:1px solid lightgray;
+    }
+
+        #productListTable tr, #productListTable td{
+            border-collapse: collapse;
+            border: 1px solid lightgray;
+        }
+
+        #productListTable td{
+            width:200px;
+            height:32px;
+        }
+</style>
+<div style="text-align:center;"><h5>采购退货单据</h5></div>
+<div id="Form" class="form" style="overflow:auto;height:fit-content; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Number">退货编号</label></div>
+            <input id="Number" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Number2">采购单号</label></div>
+            <input id="Number2" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row" >
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="SuppilerId">供应商</label></div>
+            <input id="SuppilerId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="WarehouseId">仓库</label></div>
+            <input id="WarehouseId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+       
+    </div>
+    <div class="form_row" style="height:100px;">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ProcessTime">处理时间</label></div>
+            <input id="ProcessTime" type="text" data-required="true" class="Wdate default-input" data-type="date" onclick="WdatePicker();" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Remark">备注</label></div>
+            <textarea id="Remark" class="default-input" data-type="text" style="width:300px;height:80px;"></textarea>
+        </div>
+    </div>
+</div>
+<div style="text-align:center;"><h5>产品信息</h5></div>
+<div style="margin-left:50px;"><button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增产品</button></div>
+<div style="margin-left:50px;">
+    <table id="productListTable">
+        <tr>
+            <td>名称</td>
+            <td>编号</td>
+            <td>规格</td>
+            <td>单位</td>
+            <td>采购数量</td>
+            <td>采购单价</td>
+            <td>退货单价</td>
+            <td>退货数量</td>
+            <td>退货金额</td>
+            <td>操作</td>
+        </tr>
+        <tr>
+            <td>合计</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>0</td>
+            <td>0</td>
+            <td></td>
+        </tr>
+
+    </table>
+</div>
+<div style="text-align:center;"><h5>账单信息</h5></div>
+<div id="Form2" class="form" style=" overflow:auto;height:fit-content; border: 0px solid red;">
+<div>
+    <label for="otherAmount">其他费用</label>
+        <input id="otherAmount" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" value="0" />
+    <label for="TotalAmount">总计金额</label>
+        <input id="TotalAmount" type="text" readonly="readonly" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" value="0" />
+    <label for="AccountId">结算账户</label>
+        <input id="AccountId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;"  />
+    <label for="CollectionAmount">实收金额</label>
+        <input id="CollectionAmount" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+    <label for="ArearsAmount">欠款费用</label>
+        <input id="ArearsAmount" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;"  />
+
+</div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var formValidator = null;
+    var formValidator2 = null;
+    var data = {};
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var res = $.httpGet({ url: '/Erp/PurchaseReturn/GetPurchaseReturnOrderNo', param: null });
+
+        if (res.code == 200) {
+            $("#Number").val(res.datas);
+        } else {
+
+        }
+    
+        $.setSelect({
+            url: "/Erp/Purchase/GetAll",
+            textCtrlId: "Number2",
+            ctrlId: "Number2_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        });
+
+        $('#Number2').bind("change", function (e) {
+            $.filterSelection("Number2", "Number2_select");
+        });
+        
+        $.setSelect({
+            url: "/Erp/Warehouse/GetAll",
+            textCtrlId: "WarehouseId",
+            ctrlId: "WarehouseId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        });
+
+        $.setSelect({
+            url: "/Erp/Account/GetAll",
+            textCtrlId: "AccountId",
+            ctrlId: "AccountId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        });
+
+        $.setSelect({
+            url: "/Erp/Suppiler/GetAll",
+            textCtrlId: "SuppilerId",
+            ctrlId: "SuppilerId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        });
+
+        $("#Number2").change(function (e) {
+            res = $.httpGet({
+                url: '/Erp/Purchase/GetForm', param: { Erp_PurchaseOrderId: $(this).data("value") }
+            });
+            if (res.code == 200) {
+
+                $("#SuppilerId").data("value", res.datas.SuppilerId) ;
+                $("#WarehouseId").data("value", res.datas.WarehouseId);
+                $("#SuppilerId").val($.getSelectValue("#SuppilerId_select", $("body"), res.datas.SuppilerId));
+                $("#WarehouseId").val($.getSelectValue("#WarehouseId_select", $("body"), res.datas.WarehouseId));
+                //$("#SuppilerId").trigger("change");
+                //$("#WarehouseId").trigger("change");
+            }
+        });
+
+
+        $("#btn_add").click(function (e) {
+
+            top.jkf.openFrame({
+                parentFrameId: $openIframe.attr("id"),
+                title: "添加产品信息",
+                width: 900,
+                height: 600,
+                level: 2,
+                url: '/Erp/PurchaseReturn/AddGoodsForm?PurchaseOrderId=' + $("#Number2").data("value"),
+                data: null,
+                hasMinButton: false,
+                hasMaxButton: true,
+                hasCloseButton: true,
+                isWazard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "确定",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.addGoodsForm.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ]
+            });
+        });
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        $("#otherAmount").keyup(function (e) {
+            $("#TotalAmount").val(parseFloat($("#productListTable").find("tr").last().find("td:eq(7)").text()) + parseFloat($(this).val()));
+        });
+
+        $("#CollectionAmount").keyup(function (e) {
+            $("#ArearsAmount").val(parseFloat($("#TotalAmount").val()) - parseFloat($(this).val()));
+        });
+   
+        formValidator = $("#Form").formValidator();
+        formValidator2 = $("#Form2").formValidator();
+
+    });
+
+    function getProduction() {
+
+        var production = [];
+        var $trs = $("#productListTable").find("tr");
+        for (i in $trs) {
+            if (i >= 1 && i < $trs.length - 1) { 
+                var GoodsId = $($trs.get(i)).attr("id");
+                var ReturnPrice = parseInt($($trs.get(i)).find("td:eq(6)").text());
+                var ReturnQuantity = parseInt($($trs.get(i)).find("td:eq(7)").text());
+                var TotalAmount = parseFloat($($trs.get(i)).find("td:eq(8)").text());
+                
+                var item = { GoodsId, ReturnPrice, ReturnQuantity, TotalAmount }
+                production.push(item);
+            }      
+        }
+        return production;
+    }
+
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!formValidator2.valid()) {
+            return false;
+        }
+        if ($("#productListTable").find("tr").length == 2) { 
+            top.jkf.showTips("请填写产品明细！", 3);
+            return false;
+        }
+ 
+        //data.Erp_PurchaseOrderId = Id;
+        $.getFormData(data, $("#Form"));
+
+        $.getFormData(data, $("#Form2"));
+
+        data.TotalQuantity = parseFloat( $("#productListTable").find("tr").last().find("td:eq(7)").text() );
+        data.PurchaseOrderId = $("#Number2").data("value");
+
+        var production = getProduction();
+        data.PurchaseReturnGoodsList = production;
+
+        data.PurchaseReturnAccount = { AccountId: $("#AccountId").data("value"), CollectionAmount: parseFloat($("#CollectionAmount").val()) };
+        $.httpPostAsync({ url: '/Erp/PurchaseReturn/SaveForm', param: { Erp_PurchaseReturnOrder : data} }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+        })
+    }
+
+    function calcTotal(){
+        var $trs =$("#productListTable").find("tr");
+        var $toBefored = $("#productListTable").find("tr").last();
+        var totalQuantity = 0;
+        var totalAmount = 0;
+        for (i in $trs){
+            if (i >= 1 && i < $trs.length - 1) { 
+                totalQuantity += parseFloat($($trs.get(i)).find("td:eq(7)").text());
+                totalAmount += parseFloat($($trs.get(i)).find("td:eq(8)").text());
+            }
+        }
+        $toBefored.find("td").eq(7).text(totalQuantity);
+        $toBefored.find("td").eq(8).text(totalAmount);
+        $("#TotalAmount").val(totalAmount);
+    }
+
+    function addNewProduction(data) {
+
+        if ($("#productListTable").find("tr#" + data.Erp_GoodsId).length == 1){
+            return;
+        }
+
+        var $toBefored = $("#productListTable").find("tr").last();
+        var trHtml = "<tr id='"+data.Erp_GoodsId+"'>" +
+            "<td>" + data.Name + "</td>" +
+            "<td>" + data.Number + "</td>" +
+            "<td>" + data.Spec + "</td>" +
+            "<td>" + data.Unit + "</td>" +
+            "<td>" + data.PurchaseQuantity + "</td>" +
+            "<td>" + data.PurchasePrice + "</td>" +
+            "<td>" + data.ReturnPrice + "</td>" +
+            "<td>" + data.ReturnQuantity + "</td>" +
+            "<td>" + data.TotalAmount + "</td>" +
+            "<td><button id='delItem'>删除<button></td>" +
+            +"</tr>";
+
+        $(trHtml).insertBefore($toBefored);
+        calcTotal();
+
+        $("#delItem").click(function (e) { 
+            $(this).parent().parent().remove();
+            calcTotal();
+        })
+    }
+
+</script>

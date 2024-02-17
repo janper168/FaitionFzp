@@ -1,0 +1,153 @@
+/*主框架页面样式配置*/
+.main-frame {
+	position:relative;
+	display:block;
+	float:left;
+	width:87%;
+	height:100%;
+	margin:0px 0px;
+	z-index:60;
+}
+
+.main-frame-header {
+	display:block;
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:50px;
+	overflow-x:hidden;
+	z-index:120;
+}
+
+span.softName {
+	line-height:50px;
+	color: #ffffff;
+	font-size: 22px;
+	height:50px;
+	margin-left:10px;
+}
+
+span.theme {
+	position: absolute;
+	top: 0px;
+	right: 160px;
+	line-height: 50px;
+	color: #ffffff;
+	font-size: 16px;
+	line-height: 50px;
+	height: 50px;
+	margin-right: 10px;
+	clear: both;
+	z-index: 130;
+}
+
+	span.theme > a {
+		text-decoration: none;
+		color: orange;
+		cursor: pointer;
+		font-size: 16px;
+	}
+
+	span.theme > a:hover {
+		opacity:0.6;
+	}
+
+		span.theme > a > img {
+			margin-bottom:-10px;
+		}
+
+
+span.user {
+	position:absolute;
+	top:0px;
+	right:0px;
+	line-height:50px;
+	color:#ffffff;
+	font-size:16px;
+	line-height:50px;
+	height:50px;
+	margin-right:10px;
+	clear:both;
+	z-index:130;
+}
+
+	span.user > a {
+		text-decoration:none;
+		color:orange;
+		cursor:pointer;
+		font-size:16px;
+	}
+
+div.userMenu {
+	position: fixed;
+	display: none;
+	height: auto;
+	width: 100px;
+	right: 0px;
+	top: 40px;
+	margin-right: 10px;
+	z-index: 150;
+}
+
+ul.userInfo {
+	list-style-type: none;
+	position: absolute;
+	line-height: 30px;
+	width: 100px;
+	font-size: 13px;
+	background-color: #fefefe;
+	border-radius: 2px;
+	box-shadow: 1px 1px 1px #eeeeee;
+	border: 0px solid #eeeeee;
+	z-index: 152;
+}
+
+	ul.userInfo > li {
+		height:28px;
+		color:gray;
+		font-weight:bold;
+		text-indent:5px;
+	}
+		ul.userInfo > li:hover {
+			background-color:skyblue;
+			cursor:pointer;
+
+		}
+
+div.triangle {
+	position: absolute;
+	right: 3px;
+	top: -8px;
+	width: 0px;
+	height: 0px;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-bottom: 12px solid #fefefe;
+	z-index: 151;
+}
+
+
+.main-frame-tab-wrapper {
+	position: absolute;
+	left: 0;
+	top: 50px;
+	display: inline-block;
+	width: 100%;
+	height: 40px;
+	line-height: 40px;
+	color: #666666;
+	background-color: #f7f7f7;
+	border-bottom: 1px solid #f7f7f7;
+	z-index: 70;
+}
+
+div.content-frame {
+	position: absolute;
+	left: 0;
+	top: 90px;
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 0px solid black;
+}

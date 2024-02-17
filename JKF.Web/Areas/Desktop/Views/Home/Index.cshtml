@@ -1,0 +1,162 @@
+﻿@{
+    Layout = "_Index";
+}
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <style>
+        select#yearSelect {
+            height: 50px;
+            font-size: 22px;
+            line-height: 50px;
+            color: #999;
+        }
+
+        .moneyBlock {
+            height: 33%;
+        }
+
+        .staticsBlocks {
+            width: 100%;
+            height: 18%;
+        }
+
+        .staticsBlock {
+            padding-top:20px;
+            float: left;
+            width: 15%;
+            height: 98%;
+            border: 1px solid lightgray;
+            background-color: #ffffff;
+            margin-right: 10px;
+            box-shadow: 0px 0px 0px green;
+            text-align: center;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            
+            color: lightgreen;
+            font-weight: bold;
+        }
+
+            .staticsBlock.hoverStyle {
+                border: 2px solid orange;
+            }
+
+        .staticsBlock i{
+            color:coral;
+        }
+            .staticsBlock div{
+                font-size: 20px;
+            }
+
+    </style>
+
+    <script src="~/js/highcharts.js"></script>
+
+</head>
+<body style="width:98%;height:95%;padding:10px;">
+    <h5 style="color:orange;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">欢迎使用凡统企业管理系统旗舰版</h5>
+
+    <div class="staticsBlocks">
+        <div class="staticsBlock" id="salesStaticsBlock">
+            <i class="fa fa-line-chart fa-3x"></i>
+            <div>销售图表</div>
+        </div>
+        <div class="staticsBlock" id="salesReturnStaticsBlock">
+            <i class="fa fa-bar-chart fa-3x"></i>
+            <div>销售退货图表</div>
+        </div>
+        <div class="staticsBlock" id="purchaseStaticsBlock">
+            <i class="fa fa-area-chart fa-3x"></i>
+            <div> 采购图表</div>
+        </div>
+        <div class="staticsBlock" id="purchaseReturnStaticsBlock">
+            <i class="fa fa-pie-chart fa-3x"></i>
+            <div>采购退货图表</div> 
+    </div>
+    </div>
+    <script>
+        var jfkInit = (function ($, jkf) {
+            $(".staticsBlock").hover(function (e) {
+                $(this).addClass("hoverStyle").siblings().removeClass("hoverStyle");
+            }, function (e) {
+                $(this).removeClass("hoverStyle")
+            })
+
+            $("#salesStaticsBlock").click(function (e) {
+                jkf.openFrame({
+                    parentFrameId: top.jkf.iFrameId,
+                    title: '销售图表',
+                    width: '',
+                    height:'',
+                    level: 1,
+                    url: "/erp/statics/salesChart",
+                    data: null,
+                    hasMinButton: false,
+                    hasMaxButton: false,
+                    hasCloseButton: true,
+                    isWazard: false,
+                    buttonGroup: [
+                    ],
+                })
+            
+            })
+            $("#salesReturnStaticsBlock").click(function (e) {
+                jkf.openFrame({
+                    parentFrameId: top.jkf.iFrameId,
+                    title: '销售退货图表',
+                    width: '',
+                    height: '',
+                    level: 1,
+                    url: "/erp/statics/salesReturnChart",
+                    data: null,
+                    hasMinButton: false,
+                    hasMaxButton: false,
+                    hasCloseButton: true,
+                    isWazard: false,
+                    buttonGroup: [
+                    ],
+                })
+
+            })
+            $("#purchaseStaticsBlock").click(function (e) {
+                jkf.openFrame({
+                    parentFrameId: top.jkf.iFrameId,
+                    title: '采购图表',
+                    width: '',
+                    height: '',
+                    level: 1,
+                    url: "/erp/statics/purchaseChart",
+                    data: null,
+                    hasMinButton: false,
+                    hasMaxButton: false,
+                    hasCloseButton: true,
+                    isWazard: false,
+                    buttonGroup: [
+                    ],
+                })
+
+            })
+            $("#purchaseReturnStaticsBlock").click(function (e) {
+                jkf.openFrame({
+                    parentFrameId: top.jkf.iFrameId,
+                    title: '采购退货图表',
+                    width: '',
+                    height: '',
+                    level: 1,
+                    url: "/erp/statics/purchaseReturnChart",
+                    data: null,
+                    hasMinButton: false,
+                    hasMaxButton: false,
+                    hasCloseButton: true,
+                    isWazard: false,
+                    buttonGroup: [
+                    ],
+                })
+
+            })
+
+        });
+    </script>
+</body>
+</html>

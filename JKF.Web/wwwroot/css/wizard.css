@@ -1,0 +1,59 @@
+﻿.wizard_group {
+ 
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    color: #111;
+    font-size: 15px;
+    z-index:50;
+}
+
+.wizard_step {
+    position:relative;
+    display:inline-block;
+    width:150px;
+    border-right:0px solid #eee;
+}
+
+    .wizard_step.active {
+        background-color: lightblue;
+    }
+
+
+
+.wizard_group .wizard_step .text { 
+    padding-left:20px;
+}
+.wizard_group .wizard_step .chervon {
+    border: 24.5px solid #fff;
+    border-left: 14px solid #ccc;
+    border-right: 0;
+    display: block;
+    position: absolute;
+    right: -14px;
+    top: 0;
+    z-index: 1;
+}
+    .wizard_group .wizard_step .chervon.active {
+    
+        border-color:lightblue;
+    }
+
+    .wizard_group .wizard_step .chervon:before {
+        border: 24.5px solid transparent;
+        border-left: 14px solid #fff;
+        border-right: 0;
+        content: "";
+        display: block;
+        position: absolute;
+        right: 1px;
+        top: -25px;
+        -webkit-transition: all .218s ease;
+        -moz-transition: all .218s ease;
+        -o-transition: all .218s ease;
+        transition: all .218s ease;
+    }
+
+       

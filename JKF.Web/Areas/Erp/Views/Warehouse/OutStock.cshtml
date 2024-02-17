@@ -1,0 +1,279 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn green"><i class="fa fa-plus"></i>出库</button>
+            <button id="btn_detail" class="btn blue"><i class="fa fa-info"></i>详情</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="Erp_StockOutOrderTable"></div>
+    </div>
+</div>
+<script>
+
+
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'Erp_StockOutOrderId', width: 200, showName: 'showName', hidden: true, align: 'center' },
+            { columnName: 'Number', width: 150, showName: '编号', hidden: false, align: 'left' },
+            { columnName: 'Warehouse', width: 150, showName: '仓库', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Warehouse"]) return rowData["Warehouse"].Name;
+                    else return "";
+                }
+            },
+            { columnName: 'Type', width: 150, showName: '类型', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == "Purchase") return "采购";
+                    else if (val == "VoidPurchase") return "采购作废";
+                    else if (val == "Sales") return "销售";
+                    else if (val == "VoidSales") return "销售作废";
+                    else if (val == "PurchaseReturn") return "采购退货";
+                    else if (val == "VoidPurchaseReturn") return "采购退货作废";
+                    else if (val == "SalesReturn") return "销售退货";
+                    else if (val == "VoidSalesReturn") return "销售退货作废";
+                    else if (val == "StockTransfer") return "调拨";
+                    else if (val == "VoidStockTransfer") return "调拨作废";
+                }
+            },
+            {
+                columnName: 'Completed', width: 150, showName: '是否完成', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 1) return '<div style="color: white; background-color: green; width: fit-content; height: fit-content; padding: 0px 5px; ">已完成</div>';
+                    else return '<div style="color: white; background-color: orange; width: fit-content; height: fit-content; padding: 0px 5px; ">待出库</div>';
+                }
+            },
+            {
+                columnName: 'IsVoid', width: 150, showName: '作废状态', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 1) return '<div style="color: white; background-color: green; width: fit-content; height: fit-content; padding: 0px 5px; ">是</div>';
+                    else return '<div style="color: white; background-color: orange; width: fit-content; height: fit-content; padding: 0px 5px; ">否</div>';
+                }
+            },
+            {
+         
+                columnName: 'CreateTime', width: 150, showName: '创建时间', hidden: false, align: 'left',sort:true,
+                formatter: function (val, rowData) {
+                    if (val) return val.substring(0,19).replace("T"," ");
+                    else return "";
+                }
+            },
+
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#Erp_StockOutOrderTable').jkfGrid({
+            remoteAddress: '/Erp/Warehouse/GetErp_StockOutOrders',
+            columnHeaders: colHeaders,
+            mainId: 'Erp_StockOutOrderId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'CreateTime',
+            sortOrder: 'desc'
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+            var Erp_StockOutOrderId = $gridTable.getSelectRowValue("Erp_StockOutOrderId");
+            if (!Erp_StockOutOrderId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (Erp_StockOutOrderId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+            //var type = $gridTable.getSelectRowValue("Type");
+
+            $gridTable.openFrameWindow({
+                title: "提交-出库单",
+                width: 1200,
+                height: 700,
+                level: 1,
+                url: '/Erp/Warehouse/OutStockPostForm?Erp_StockOutOrderId=' + Erp_StockOutOrderId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+
+            var Erp_StockOutOrderId = $gridTable.getSelectRowValue("Erp_StockOutOrderId");
+            if (!Erp_StockOutOrderId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (Erp_StockOutOrderId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认作废？", function () {
+
+                $.httpPostAsync({
+                    url: '/Erp/Warehouse/SetVoidStockOut', param: { Erp_StockOutOrderId: Erp_StockOutOrderId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("作废成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+        })
+
+        // $("#btn_remove").click(function () {
+        //     var Erp_WarehouseId = $gridTable.getSelectRowValue("Erp_WarehouseId");
+        //     if (!Erp_WarehouseId) {
+        //         top.jkf.showTips('没有选中任何行', 3);
+        //         return;
+        //     }
+
+        //     top.jkf.confirmFrame("是否确认删除？", function () {
+
+        //         $.httpPostAsync({
+        //             url: '/Erp/Warehouse/RemoveForm', param: { Erp_StockOutOrderId: Erp_StockOutOrderId }
+        //         }, function (res) {
+        //             if (res.code == 200) {
+        //                 top.jkf.showTips("删除成功！", 1);
+        //                 refreshData();
+        //             } else {
+        //                 top.jkf.showTips(res.errMsg, 2);
+        //             }
+
+        //         })
+        //     })
+
+        // })
+
+        //top.jkf.processAuthorizedButtons(".buttonBar");
+        $("#btn_detail").click(function () {
+            var Erp_StockOutOrderId = $gridTable.getSelectRowValue("Erp_StockOutOrderId");
+            if (!Erp_StockOutOrderId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if(Erp_StockOutOrderId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "查看-出库库单明细",
+                width: 1200,
+                height: 700,
+                level: 1,
+                url: '/Erp/Warehouse/OutStockDetailForm?Erp_StockOutOrderId=' + Erp_StockOutOrderId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+            })
+
+        })
+        
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>

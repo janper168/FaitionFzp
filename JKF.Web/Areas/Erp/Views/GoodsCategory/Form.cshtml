@@ -1,0 +1,105 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_item_half">
+        <div class="labelText"><label class="form_label" for="Name">名称</label></div>
+        <input id="Name" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:30px;" />
+    </div>
+    <div class="form_item_half">
+        <div class="labelText"><label class="form_label" for="Remark">备注</label></div>
+        <textarea id="Remark" class="default-input" data-type="text" style="width:250px;height:80px;"></textarea>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var Erp_GoodsCategoryId = request('Erp_GoodsCategoryId');
+    var Erp_GoodsCategory = {};
+
+    var formValidator = null;
+
+    $("#Name").attr("data-check-exists-url", "/Erp/GoodsCategory/IsExistName?KeyValue=" + Erp_GoodsCategoryId);
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+
+        $("#Form").show();
+
+        if (!!Erp_GoodsCategoryId) {
+            getForm();
+        }
+
+        formValidator = $("#Form").formValidator()
+    });
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Erp/GoodsCategory/GetForm', param: { Erp_GoodsCategoryId: Erp_GoodsCategoryId }
+
+        });
+
+        if (res.code == 200) {
+            Erp_GoodsCategory = res.datas;
+
+            $.setFormData(Erp_GoodsCategory, $("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!Erp_GoodsCategoryId) Erp_GoodsCategory.Erp_GoodsCategoryId = Erp_GoodsCategoryId;
+        $.getFormData(Erp_GoodsCategory, $("#Form"));
+
+        $.httpPostAsync({ url: '/Erp/GoodsCategory/SaveForm', param: Erp_GoodsCategory }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

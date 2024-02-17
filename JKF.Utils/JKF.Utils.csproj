@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extend\**" />
+    <Compile Remove="Json\**" />
+    <Compile Remove="Net\**" />
+    <Compile Remove="Security\Exception\**" />
+    <Compile Remove="Security\Extensions\**" />
+    <Compile Remove="Security\Internal\**" />
+    <Compile Remove="Security\Shared\**" />
+    <EmbeddedResource Remove="Extend\**" />
+    <EmbeddedResource Remove="Json\**" />
+    <EmbeddedResource Remove="Net\**" />
+    <EmbeddedResource Remove="Security\Exception\**" />
+    <EmbeddedResource Remove="Security\Extensions\**" />
+    <EmbeddedResource Remove="Security\Internal\**" />
+    <EmbeddedResource Remove="Security\Shared\**" />
+    <None Remove="Extend\**" />
+    <None Remove="Json\**" />
+    <None Remove="Net\**" />
+    <None Remove="Security\Exception\**" />
+    <None Remove="Security\Extensions\**" />
+    <None Remove="Security\Internal\**" />
+    <None Remove="Security\Shared\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extensions\Extensions.List.cs" />
+    <Compile Remove="Security\EncryptProvider.cs" />
+    <Compile Remove="Web\JsCssHelper.cs" />
+    <Compile Remove="Web\obj.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Core" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>

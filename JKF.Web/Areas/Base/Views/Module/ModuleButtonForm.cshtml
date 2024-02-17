@@ -1,0 +1,186 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+
+<div id="Form" class="form" style="display: block; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnCode">编码</label></div>
+            <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">名称</label></div>
+            <input id="Name" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Target">类型</label></div>
+            <input class="blue" type="radio" value="1" name="Target" checked="checked">普通
+            <input class="blue" type="radio" value="2" name="Target">下拉
+            <input id="Target" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">图标</label></div>
+            <input id="Icon" class="width_200 default-input" type="text" data-type="text" /><button id="Icon_select" style="margin-top:0px;" class="btn blue"><span style="color:#fff;">...</span></button>
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ParentId">上级</label></div>
+            <input id="ParentId" data-required="true" style="ime-mode:disabled" onkeypress="top.jkf.noPermitInput(event)" data-type="text_select" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnabledMark">是否有效</label></div>
+            <input class="blue" type="radio" value="1" name="EnabledMark" checked="checked" />是
+            <input class="blue" type="radio" value="0" name="EnabledMark">否
+            <input id="EnabledMark" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+    </div>
+    <div class="form_row">
+
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var moduleButtonId = request('moduleButtonId');
+    var moduleButton = {};
+
+    var formValidator = null;
+
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.moduleButtonForm = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,//"hidden",
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        $("#Icon_select").click(function () {
+            top.jkf.openFrame({
+                parentFrameId: $openIframe.attr("id"),
+                title: '选择图标',
+                width: 1000,
+                height: 600,
+                level: 2,
+                url: "/Utility/Icon",
+                data: null,
+                hasMinButton: false,
+                hasMaxButton: true,
+                hasCloseButton: true,
+                isWazard: false,
+                buttonGroup: null
+            })
+
+        });
+
+
+        setTargetSelect();
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+        //console.log("form:" + $Form);
+
+        if (!!moduleButtonId) {
+            var data = jkf.GetIFrameWindowData($Form);
+            //console.log(data);
+            moduleButton = data.moduleButton;
+            $.setFormData(moduleButton, $("#Form"));
+        }
+
+
+        //console.log("555:" + parentIframe.colButtonListData.length);
+        //console.log("666:" +　parentIframe.colButtonListData[0].ParentId);
+
+        formValidator = $("#Form").formValidator()
+
+
+    });
+
+
+    function selectIcon(icon) {
+        $("#Icon").val(icon);
+        $("#Icon").trigger("change");
+    }
+
+    function setTargetSelect() {
+        //console.log("777:" + parentIframe.colButtonListData.length);
+        //console.log("888:" + moduleButtonId);
+        $.setTreeSelect({
+            url: null,
+            data: parentIframe.colButtonListData,
+            textCtrlId: "ParentId",
+            ctrlId: "ParentId_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "ModuleButtonId",
+            valueKey: "Name",
+            targetValue: 2,//下拉
+            targetKey: "Target",
+            hideDownLevelKeyValue: moduleButtonId,
+            width: 200,
+            height: 250
+        })
+    }
+
+    function saveForm(moduleButtonList) {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        $.getFormData(moduleButton, $("#Form"));
+
+        //console.log("moduleButton:" + moduleButton);
+
+        if (!!moduleButtonId) {
+            for (var i in moduleButtonList) {
+                var data = moduleButtonList[i];
+                if (data.ModuleButtonId == moduleButtonId) {
+                    moduleButtonList[i] = moduleButton;
+                    break;
+                }
+            }
+        } else {
+
+            moduleButton.ModuleButtonId = top.jkf.newGuid(); // 新增的自己添加一个id
+            moduleButtonList.push(moduleButton);
+            //console.log(moduleButtonList);
+        }
+
+
+        top.jkf.showTips("保存成功！", 1);
+        //console.log(parentIframe)
+        if (parentIframe != null) {
+            parentIframe.setModuleButtonList(moduleButtonList);
+            //setTargetSelect();
+        }
+        window.location.reload();
+    }
+</script>

@@ -1,0 +1,437 @@
+﻿
+@{
+    Layout = "_Index";
+}
+
+
+<style>
+
+    .container_left {
+        display: block;
+        float: left;
+        width: 20%;
+        height: 98%;
+        padding: 3px;
+        margin: 3px;
+    }
+
+    .container_right {
+        display: block;
+        float: left;
+        width: 77.8%;
+        height: 98%;
+        padding: 3px;
+        padding-left: 0px !important;
+        margin: 3px;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 15px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-bottom: 0;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        position:relative;
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 86%;
+        border-bottom: 1px solid #ccc;
+    }
+    .moreButton {
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 40px;
+        height: 30px;
+        line-height: 30px;
+        display: inline-block;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+        .moreButton:hover {
+            background: #ccc;
+            cursor: pointer;
+        }
+
+    .moreButtonsBlock {
+        display: none;
+        text-align: center;
+        position: absolute;
+        top: 40px;
+        right: 10px;
+        box-shadow: 0px 0px 5px #ccc;
+        background-color: #fff;
+        width: 150px;
+        height: 100px;
+        z-index: 3000;
+    }
+
+        .moreButtonsBlock.select {
+            display: block;
+        }
+</style>
+
+<div class="container_left" id="companyContainer">
+    <div class="layerBar">公司列表</div>
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_150 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i></button>
+        </div>
+        @*<div class="buttonBar">
+                <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i></button>
+                <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i></button>
+                <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i></button>
+                <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i></button>
+            </div>*@
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="companyTable"></div>
+    </div>
+</div>
+<div class="container_right" id="departmentContainer">
+    <div class="layerBar">部门列表</div>
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search">查询</i></button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh">刷新</i></button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus">新增</i></button>
+            <button id="btn_edit" class="btn green"><i class="fa fa-edit">修改</i></button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove">删除</i></button>
+            <div class="moreButton">更多&nbsp;<i class="fa fa-caret-down"></i></div>
+            <div class="moreButtonsBlock">
+                <button id="btn_excelImportConfig" class="btn orange"><i class="fa fa-cogs"></i>导入配置</button>
+                <button id="btn_excelImport" class="btn yellow"><i class="fa fa-upload"></i>Excel导入配置</button>
+            </div>
+            <input id="ExcelUpload" type="file" style="display:none;" name="ExcelUpload" />
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="departmentTable"></div>
+    </div>
+</div>
+<div style="clear:both;"></div>
+<script>
+    var $gridTable_company = null;
+    var $gridTable_department = null;
+    var selectCompanyId = "";
+    var departmentNature = null;
+
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        $(".moreButton").click(function (e) {
+            $(".moreButtonsBlock").toggleClass('select');
+        });
+
+        var res = $.httpPost({ url: "/Base/DataItems/GetDataItemDetailsByItemCode?itemCode=DepartmentType" });
+        if (res.code == 200) {
+            departmentNature = res.datas
+        }
+
+        var colHeader_company = [
+            { columnName: 'CompanyId', width: 30, showName: 'CompanyId', hidden: true, align: 'center' },
+            { columnName: 'ParentId', width: 30, showName: 'ParentId', hidden: true, align: 'center' },
+            { columnName: 'FullName', width: 250, showName: '公司名称', align: 'left' },
+        ];
+
+        $gridTable_company = $('#companyTable').jkfGrid({
+            remoteAddress: '/Base/Company/GetCompanys',
+            columnHeaders: colHeader_company,
+            mainId: 'CompanyId',
+            treeMode: true,
+            treeModeParentId: 'ParentId',
+            treeModeLevelColumn: 'FullName',
+            showNumber: true,
+        });
+
+        var colHeader_department = [
+            { columnName: 'DepartmentId', width: 30, showName: 'DepartmentId', hidden: true, align: 'center' },
+            { columnName: 'ParentId', width: 30, showName: 'ParentId', hidden: true, align: 'center' },
+            { columnName: 'FullName', width: 200, showName: '部门名称', align: 'left' },
+            { columnName: 'EnCode', width: 150, showName: '编码', align: 'left' },
+            { columnName: 'ShortName', width: 150, showName: '简称', align: 'left' },
+            {
+                columnName: 'Nature', width: 120, showName: '部门性质', align: 'left',
+                formatter: function (colValue) {
+                    for (var i in departmentNature) {
+                        if (departmentNature[i].ItemValue == colValue) {
+                            return departmentNature[i].ItemName;
+                        }
+                    }
+                    return "未知";
+                },
+            },
+            { columnName: 'Manager', width: 100, showName: '负责人', align: 'left' },
+            { columnName: 'Description', width: 300, showName: '备注', align: 'left' }
+        ];
+
+        top.jkf.processAuthorizedColumns(colHeader_department, authorizedColumns);
+
+        $gridTable_department = $('#departmentTable').jkfGrid({
+            remoteAddress: '/Base/Department/GetDepartments',
+            columnHeaders: colHeader_department,
+            mainId: 'DepartmentId',
+            treeMode: true,
+            treeModeParentId: 'ParentId',
+            treeModeLevelColumn: 'FullName',
+            showNumber: true,
+        });
+
+
+
+        $gridTable_company.setTableLineDbclick(function ($tr) {
+            selectCompanyId = $tr.find("td[id*=CompanyId]").text();
+
+            refreshDepartmentData();
+        });
+
+        $("#companyContainer #btn_search").click(function () {
+            refreshCompanyData();
+        });
+
+        $("#companyContainer #keyWord").keypress(function (e) {
+            refreshCompanyData();
+        });
+
+
+        $("#departmentContainer #btn_search").click(function () {
+            refreshDepartmentData();
+        });
+        $("#departmentContainer #btn_refresh").click(function () {
+            if (selectCompanyId != "")
+                $gridTable_department.getRemoteData({ keyWord: "", companyId: selectCompanyId }, true);
+        });
+        $("#departmentContainer #keyWord").keypress(function (e) {
+            refreshDepartmentData();
+        });
+
+        $("#departmentContainer #btn_add").click(function () {
+
+            if (selectCompanyId == "") {
+                top.jkf.showTips("请双击选择公司", 3);
+                return;
+            }
+
+            var company = $gridTable_company.getSelectedRowData(selectCompanyId);
+
+            $gridTable_department.openFrameWindow({
+                title: "新增-部门，所属公司(" + company.FullName + ")",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Department/Form?companyId=' + selectCompanyId,
+                data: { authorizedForms: authorizedForms },
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.departmentIframe.contentWindow;
+                            openWin.saveForm();
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#departmentContainer #btn_edit").click(function () {
+            var departmentId = $gridTable_department.getSelectRowValue("DepartmentId");
+            if (!departmentId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            if (selectCompanyId == "") {
+                top.jkf.showTips("请双击选择公司", 3);
+                return;
+            }
+
+            var company = $gridTable_company.getSelectedRowData(selectCompanyId);
+
+            $gridTable_department.openFrameWindow({
+                title: "编辑-部门，所属公司(" + company.FullName + ")",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Department/Form?companyId=' + selectCompanyId + "&departmentId=" + departmentId,
+                data: { authorizedForms: authorizedForms },
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: false,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.departmentIframe.contentWindow;
+                            openWin.saveForm();
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#departmentContainer #btn_excelImportConfig").click(function (e) {
+            $(".moreButtonsBlock").toggleClass('select');
+            $gridTable_department.openFrameWindow({
+                title: "部门信息Excel导入配置",
+                width: 1300,
+                height: 700,
+                level: 1,
+                url: '/Base/Excel/ImportConfigIndex',
+                data: { moduleName: '部门管理' },
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+        });
+
+        $("#departmentContainer #btn_remove").click(function () {
+            var departmentId = $gridTable_department.getSelectRowValue("DepartmentId");
+            if (!departmentId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Department/RemoveForm', param: { departmentId: departmentId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshDepartmentData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        $gridTable_department.setTableLineDbclick(function ($line) {
+            $("#departmentContainer #btn_edit").trigger('click');
+        })
+
+        $("#departmentContainer #ExcelUpload").change(function () {
+            if ($(this).val() != "") {
+                fileLoad(this);
+            }
+        })
+
+        $("#departmentContainer #btn_excelImport").click(function (e) {
+            $(".moreButtonsBlock").toggleClass('select');
+            $("#ExcelUpload").trigger("click");
+        });
+
+
+        top.jkf.processAuthorizedButtons("#departmentContainer .buttonBar", authorizedButtons);
+
+        refreshCompanyData();
+
+
+
+    })
+
+    function refreshCompanyData() {
+        var keyWord = $("#companyContainer #keyWord").val().trim();
+        $gridTable_company.getRemoteData({ keyWord: keyWord }, true);
+    }
+
+    function refreshDepartmentData() {
+        if (selectCompanyId != "") {
+            var keyWord = $("#departmentContainer #keyWord").val().trim();
+            $gridTable_department.getRemoteData({ keyWord: keyWord, companyId: selectCompanyId }, true);
+        }
+    }
+    function fileLoad(ele) {
+
+        var formData = new FormData();
+
+        var name = $(ele).val();
+        var files = $(ele)[0].files[0];
+
+        formData.append("file", files);
+        formData.append("name", name);
+
+        formData.append("moduleName", '部门管理');
+        formData.append("moduleKey", 'DepartmentId');
+        formData.append("moduleType", "JKF.DB.Models.Department");
+        formData.append("serviceType", "JKF.DB.Operation.DepartmentService");
+        $.ajax({
+            url: "/Base/Excel/onPostUpload",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+
+            },
+            success: function (res) {
+                if (res.code == 200) {
+                    top.jkf.showTips("导入成功！", 1);
+                    window.location.reload();
+                } else {
+                    top.jkf.showTips("导入失败！", 2);
+                }
+            } ,
+            error: function (res) {
+                top.jkf.showTips("导入失败！", 2);
+            } 
+        });
+
+    }
+
+
+</script>

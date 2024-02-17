@@ -1,0 +1,39 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>formItemSelect</Title>
+    <Author>Microsoft Corporation</Author>
+    <Shortcut>formItemSelect</Shortcut>
+    <Description>表单项文本选择段</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>ItemName</ID>
+        <ToolTip>ItemName</ToolTip>
+        <Default>Item1</Default>
+      </Literal>
+      <Literal>
+        <ID>ChName</ID>
+        <ToolTip>ChName</ToolTip>
+        <Default>ChName</Default>
+      </Literal>
+	  <Literal>
+        <ID>type</ID>
+        <ToolTip>type</ToolTip>
+        <Default>text</Default>
+      </Literal>
+	  <Literal>
+        <ID>dataType</ID>
+        <ToolTip>dataType</ToolTip>
+        <Default>text_select</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="html"><![CDATA[<div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="$ItemName$"></label></div>
+            <input id="$ItemName$" type="$type$" data-required="$required$" class="default-input"  data-type="$dataType$" readonly="readonly" style="width:200px;height:40px;"/>
+        </div>]]></Code>
+  </Snippet>
+</CodeSnippet>

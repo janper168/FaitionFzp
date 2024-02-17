@@ -1,0 +1,148 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+
+<div id="Form" class="form" style="display: block; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ItemName">明细项</label></div>
+            <input id="ItemName" data-required="true" class="width_200 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ItemValue">明细值</label></div>
+            <input id="ItemValue" data-required="true" class="width_200 default-input" type="text" data-type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ParentId">上级</label></div>
+            <input id="ParentId" data-required="true" style="ime-mode:disabled" onkeypress="top.jkf.noPermitInput(event)" data-type="text_select" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="SortCode">排序</label></div>
+            <input id="SortCode" data-required="true" class="width_200 default-input" type="text" data-type="integer" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="IsDefault">是否默认</label></div>
+            <input class="blue" type="radio" value="0" name="IsDefault" checked="checked">否
+            <input class="blue" type="radio" value="1" name="IsDefault">是
+            <input id="IsDefault" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Description">备注</label></div>
+            <textarea id="Description" data-type="text" class="width_200 height_50 default-input"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var dataItemDetailId = request('dataItemDetailId');
+    var dataItemId = request('dataItemId');
+    var dataItemDetail = {};
+
+    var formValidator = null;
+
+
+    var jfkInit = (function ($, jkf) {
+
+        $("#ItemName").attr("data-check-exists-url", "/base/DataItems/IsExistDetailItemName?keyValue=" + dataItemDetailId);
+        //$("#ItemValue").attr("data-check-exists-url", "/base/DataItems/IsExistDetailItemValue?KeyValue=" + dataItemDetailId);
+
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.dataItemDetailIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,//"hidden",
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+        setTargetSelect();
+
+        if (!!dataItemDetailId) {
+
+
+            var data = jkf.GetIFrameWindowData($Form);
+            dataItemDetail = data.dataItemDetail;
+            $.setFormData(dataItemDetail, $("#Form"));
+        }
+
+        formValidator = $("#Form").formValidator()
+
+
+    });
+
+
+
+    function setTargetSelect() {
+
+        $.setTreeSelect({
+            url: "/Base/DataItems/GetDataItemDetails?dataItemId=" + dataItemId,
+            data: null,//parentIframe.colButtonListData,
+            textCtrlId: "ParentId",
+            ctrlId: "ParentId_select",
+            parentIdKey: "ParentId",
+            topParentIdValue: "0",
+            idKey: "DataItemDetailId",
+            valueKey: "ItemName",
+            //targetValue: 1,//目录
+            //targetKey: "Target",
+            hideDownLevelKeyValue: dataItemDetailId,
+            width: 200,
+            height: 250
+        })
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        $.getFormData(dataItemDetail, $("#Form"));
+
+        //alert(dataItemId);
+
+        $.httpPostAsync({
+            url: '/Base/DataItems/SaveDataItemDetailForm', param: { dataItemDetail: dataItemDetail, dataItemId: dataItemId }
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshDataItemDetailData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

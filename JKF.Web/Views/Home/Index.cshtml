@@ -1,0 +1,193 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>凡统管理系统-主页</title>
+    <link rel="stylesheet" type="text/css" href="~/css/common.css">
+    <link rel="stylesheet" type="text/css" href="~/css/menu.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/main-frame.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/tab.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/fontawesome/css/font-awesome.min.css" />
+    <link href="~/css/layer.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script>
+        function request(d) { for (var c = location.search.slice(1).split("&"), a = 0; a < c.length; a++) { var b = c[a].split("="); if (b[0] == d) if ("undefined" == unescape(b[1])) break; else return unescape(b[1]) } return "" };
+    </script>
+</head>
+<body onselectstart="return false;" style="overflow:hidden;">
+
+    <div id="myMenu" class="custom-menu-at-left bg-color-lightblue">
+        <div class="flex-menu-tap-wrapper bg-color-lightblue">
+            <div id="flexMenuTap" class="flex-menu-tap menu-right-align bg-color-lightblue" data-content-before="«" title="收缩"></div>
+        </div>
+        <ul id="mainMenu" class="custom-menu-group">
+        </ul>
+    </div>
+    <div id="mainframe" class="main-frame">
+        <div class="main-frame-header bg-color-lightblue">
+            <span class="softName">凡统管理系统</span><span class="theme"><a href="#" id="chooseTheme"><img width="80%" src="/images/skin.png" /></a></span><span class="user">您好，<a>[@ViewBag.RealName]</a></span>
+        </div>
+        <div class="main-frame-tab-wrapper">
+            <span class="tab-left-tap">
+                <i class="fa fa-chevron-left"></i>
+            </span>
+            <span class="tab-center-group">
+            </span>
+            <span class="tab-right-tap">
+                <i class="fa fa-chevron-right"></i>
+            </span>
+        </div>
+        <div id="contentframe" class="content-frame"></div>
+    </div>
+
+    <div class="userMenu">
+            <ul class="userInfo"><li id="self"><i class="fa fa-user"></i>&nbsp;修改密码</li><li id="logout"><i class="fa fa-toggle-up"></i>&nbsp;安全退出</li></ul>
+            <div class="triangle"></div>
+        </div>
+    
+    <script>
+        $.rootUrl = '@Url.Content("~")'.substr(0, '@Url.Content("~")'.length - 1);
+    </script>
+
+    <script src="~/js/common.js"></script>
+    <script src="~/js/jquery.fn.extend.js"></script>
+    <script src="~/js/ajax.js?01"></script>
+    <script src="~/js/menu.js"></script>
+    <script src="~/js/tab.js"></script>
+    <script src="~/js/layer.js?01"></script>
+    <script>
+
+        $(function () {
+
+
+            var res = $.httpGet({ url: "/Base/Module/GetMenuList" });
+
+            $("#flexMenuTap").setFlexMenuTap({ menuData: res.datas });
+
+            $("span.user > a").hover(function () {
+                $("div.userMenu").show();
+            }, function () {
+            }).click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            })
+
+            $("div.userMenu").hover(function () {
+
+            }, function () {
+                $(this).hide();
+            })
+
+
+
+            $("ul.userInfo > li#logout").click(function () {
+                top.jkf.confirmFrame("提示：是否确认退出？", function () {
+
+                    $.httpPostAsync({
+                        url: '/Login/OutLogin'
+                    }, function (res) {
+                        if (res.code == 200) {
+                            window.location.href = "/Login/Index";
+                        } else {
+                            top.jkf.showTips(res.errMsg, 2);
+                        }
+
+                    })
+                })
+            });
+
+            $("ul.userInfo > li#self").click(function () {
+                top.jkf.openFrame({
+                    parentFrameId: "homeFrame",
+                    title: "修改密码",
+                    width: 300,
+                    height: 250,
+                    level: 1,
+                    url: '/Utility/ChangePwdForm',
+                    data: null,
+                    hasMinButton: true,
+                    hasMaxButton: true,
+                    hasCloseButton: true,
+                    isWazard: false,
+                })
+            });
+
+            $("#mainframe").addOrShowTab('<span id="desktopHomeIndex" class="hide left" style="text-indent:10px"><i class="fa fa-desktop" data-url="/Desktop/Home/Index"></i>我的桌面</span>')
+
+            $("#chooseTheme").click(function (e) {
+
+                top.jkf.openFrame({
+                    parentFrameId: "homeFrame",
+                    title: "选择主题",
+                    width: 300,
+                    height: 200,
+                    level: 1,
+                    url: '/Utility/ChooseThemeForm',
+                    data:null,
+                    hasMinButton: true,
+                    hasMaxButton: true,
+                    hasCloseButton: true,
+                    isWazard: false,
+                    buttonGroup: [
+                        {
+                            buttonId: "button_confirm",
+                            buttonText: "确定",
+                            buttonClickAction: function () {
+                                var openWin = top.jkf.checkThemeIframe.contentWindow;
+                                openWin.getTheme();
+                            }
+                        }
+                    ]
+                })
+            });
+
+            $.httpPostAsync({
+                url: '/Login/getMyThemeConfig', param: null
+            }, function (res) {
+                if (res.code == 200) {
+                    //top.jkf.showTips("修改成功！", 2);
+                    var colorCssName = res.datas;
+                    applyThemeColorCss($("#myMenu"), colorCssName);
+                    applyThemeColorCss($(".flex-menu-tap-wrapper"), colorCssName);
+                    applyThemeColorCss($("#flexMenuTap"), colorCssName);
+                    applyThemeColorCss($(".main-frame-header"), colorCssName);
+                } else {
+                    top.jkf.showTips(res.errMsg, 2);
+                }
+
+            })
+        })
+        function setTheme(colorCssName) {
+            applyThemeColorCss($("#myMenu"), colorCssName);
+            applyThemeColorCss($(".flex-menu-tap-wrapper"), colorCssName);
+            applyThemeColorCss($("#flexMenuTap"), colorCssName);
+            applyThemeColorCss($(".main-frame-header"), colorCssName);
+
+            $.httpPostAsync({
+                url: '/Login/ChangeTheme', param: { colorCssName }
+            }, function (res) {
+                if (res.code == 200) {
+                    top.jkf.showTips("修改成功！", 1);
+                } else {
+                    top.jkf.showTips(res.errMsg, 2);
+                }
+
+            })
+        }
+        function applyThemeColorCss($element, colorCssName) {
+            for (var i in themeColorCssNameArray) {
+                $element.removeClass(themeColorCssNameArray[i]);
+            }
+            $element.addClass(colorCssName);
+        }
+    </script>
+</body>
+</html>
+
+
+

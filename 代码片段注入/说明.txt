@@ -1,0 +1,37 @@
+用管理员权限把代码片段文件放入相应的文件，以visual studio 2022为例，如果你的安装位置不对，请放入对应的安装路径
+
+cs：
+singleTableController.snippet    // 这个是单表功能的controller类的代码片段
+
+放到这个目录
+
+c:\Program Files\Microsoft Visual Studio\2022\Community\VC#\Snippets\2052\Visual C#
+--------------------------------------------------------------------------------------------------------
+
+Html：
+
+singleTableForm.snippet                   //单表表单
+singleTableIndex.snippet                  //单表列表
+formItem.snippet                               //单表文本框
+formItemArea.snippet                      //单表区域框（省、市、区、街道）
+formItemDate.snippet                      //日期
+formItemPic.snippet                         //图片上传
+formItemRegex.snippet                   //自定义正则表达式片段
+formItemSelect.snippet                   //下拉选择框
+formItemTextArea.snippet              //文本区域框
+
+把以上的文件这个目录
+
+c:\Program Files\Microsoft Visual Studio\2022\Community\Web\Snippets\Html\2052\Html
+-------------------------------------------------------------------------------------------------------------
+js：
+
+colHeader.snippet                        //列表头部的定义
+picTrigger.snippet                        //上传图片控件触发
+normalSelect.snippet                   //普通下拉框注入数据
+treeSelect.snippet                         //树形下拉框注入数据
+fileUpload.snippet                         //文件上传代码段
+                                 
+
+
+c:\Program Files\Microsoft Visual Studio\2022\Community\JS\2052\Snippets\General

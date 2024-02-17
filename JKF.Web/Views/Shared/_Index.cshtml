@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="~/favicon.ico">
+    <link href="~/css/fontawesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/css/common.css" rel="stylesheet" />
+    <link href="~/css/jkf_grid.css?01" rel="stylesheet" />
+    <link href="~/css/fontawesome/css/font-awesome.min.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/jquery.nicescroll.min.js"></script>
+    <script src="~/js/jquery.fn.extend.js"></script>
+    <script src="~/js/ajax.js?01"></script>
+    <script src="~/js/jkf_grid.js?07"></script>
+    <script src="~/js/authorize.js"></script>
+    <script src="~/lib/My97DatePicker/WdatePicker.js"></script>
+    <script>
+        function request(d) { for (var c = location.search.slice(1).split("&"), a = 0; a < c.length; a++) { var b = c[a].split("="); if (b[0] == d) if ("undefined" == unescape(b[1])) break; else return unescape(b[1]) } return "" };
+    </script>
+</head>
+<body>
+    <script>
+        var moduleId = "";
+        var authorizedButtons = null;
+        var authorizedColumns = null;
+        var authorizedForms = null;
+
+        $(function () {
+            var currentIframe = top.jkf.getIframeByElement(document.body);
+            var moduleId = $(currentIframe).attr('id').replace('iframe_', '');
+
+            res = $.httpGet({ url: "/base/module/GetAuthorizedObjects", param: { moduleId: moduleId } });
+            if (res.code == 200) {
+                authorizedButtons = res.datas.authorizedButtons;
+                authorizedColumns = res.datas.authorizedColumns;
+                authorizedForms = res.datas.authorizedForms;
+            } else {
+                top.jkf.showTips(res.errMsg);
+            }
+        });
+    </script>
+    @RenderBody()
+    <script>       
+        $(function () {
+            if (!!jfkInit) {
+                jfkInit(jQuery, top.jkf);
+            }
+        })
+    </script>
+</body>
+</html>
