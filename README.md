@@ -1,0 +1,1 @@
+# ft-full-master.git
