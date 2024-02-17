@@ -1,0 +1,518 @@
+﻿
+@{
+    Layout = "_Form";
+}
+<style>
+    .container_item {
+        display: block;
+        float: left;
+        width: 23.8%;
+        height: 96%;
+        padding: 3px;
+        margin: 3px 3px 3px 0px;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 15px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-bottom: 0;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    .treeContent {
+        display: block;
+        width: 100%;
+        height: 90%;
+        border: 1px solid #ccc;
+    }
+</style>
+<div class="container_item" id="modulesContainer">
+    <div class="layerBar">功能树</div>
+    <div class="treeContent">
+        <div id="modulesTree"></div>
+    </div>
+</div>
+<div class="container_item" id="moduleButtonsContainer">
+    <div class="layerBar">按钮列表</div>
+    <div class="treeContent">
+        <div id="moduleButtonsTree"></div>
+    </div>
+</div>
+<div class="container_item" id="moduleColumnsContainer">
+    <div class="layerBar">字段列表</div>
+    <div class="treeContent">
+        <div id="moduleColumnsTree"></div>
+    </div>
+</div>
+<div class="container_item" id="moduleFormsContainer">
+    <div class="layerBar">表单列表</div>
+    <div class="treeContent">
+        <div id="moduleFormsTree"></div>
+    </div>
+</div>
+<div style="clear:both;"></div>
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var objectId = request('objectId');
+    var objectType = request('objectType')
+
+    var modules = null;
+    var moduleButtons = null;
+    var moduleColumns = null;
+    var moduleForms = null;
+
+    var moduleIds = [];
+    var moduleButtonIds = [];
+    var moduleColumnIds = [];
+    var moduleFormIds = [];
+
+    var currentSelectedModuleId = "";
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+        if (!!objectId && !!objectType) {
+            getForm();
+        }
+
+    });
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/Authorize/GetModules'
+        });
+
+        if (res.code == 200) {
+
+            modules = res.datas.modules;
+            moduleButtons = res.datas.moduleButtons;
+            moduleColumns = res.datas.moduleColumns;
+            moduleForms = res.datas.moduleForms;
+
+            var res2 = $.httpGet({
+                url: '/Base/Authorize/GetAuthorizes',
+                param: { objectId: objectId, objectType: objectType }
+            });
+
+            if (res2.code = 200) {
+                moduleIds = res2.datas.moduleIds;
+                moduleButtonIds = res2.datas.moduleButtonIds;
+                moduleColumnIds = res2.datas.moduleColumnIds;
+                moduleFormIds = res2.datas.moduleFormIds;
+                if (!moduleIds) moduleIds = [];
+                if (!moduleButtonIds) moduleButtonIds = [];
+                if (!moduleColumnIds) moduleColumnIds = [];
+                if (!moduleFormIds) moduleFormIds = [];
+            } else {
+                top.jkf.showTips("数据出错", 2);
+                return;
+            }
+
+            $("#modulesTree").jkf_tree({
+                url: null,
+                param: null,
+                type: "post",
+                async: false,
+                datas: res.datas.modules,
+                treeParentIdKey: 'ParentId',
+                treeKeyKey: 'ModuleId',
+                treeValueKey: 'Name',
+                iconValueKey: 'Icon',
+                defaultIcon: '',
+                hasCheckBox: true,
+                checkEvent: moduleCheckEvent,
+                selectEvent: moduleSelectEvent,
+                initCheckBoxData: moduleIds,
+            });
+
+        }
+        else {
+            top.jkf.showTips("数据出错", 2);
+        }
+    }
+
+
+    function moduleCheckEvent(moduleId, checked, isSingle) {
+
+        var checkModuleIds = [];
+        if (moduleId != "0")
+            checkModuleIds.push(moduleId);
+        if (isSingle) {//只有根节点
+            for (var i in checkModuleIds) {
+                moduleCheck(checkModuleIds[i], checked);
+            }
+            return;
+        }
+
+        //处理孩子节点
+        pushSelectModuleIds(checkModuleIds, modules, moduleId);
+
+        for (var i in checkModuleIds) {
+            moduleCheck(checkModuleIds[i], checked);
+        }
+
+    }
+
+    function pushSelectModuleIds(checkModuleIds, modules, moduleId) {
+        for (var i in modules) {
+            if (modules[i].ParentId == moduleId) {
+                checkModuleIds.push(modules[i].ModuleId);
+                pushSelectModuleIds(checkModuleIds, modules, modules[i].ModuleId);
+            }
+        }
+    }
+
+
+    function moduleCheck(moduleId, checked) {
+        var deleteId = -1;
+        for (var i in moduleIds) {
+            if (moduleIds[i] == moduleId) {
+                deleteId = i;
+                break;
+            }
+        }
+        if (deleteId != -1) {
+            if (checked == false) //找到了，说明存在，把选中的删除
+                moduleIds.splice(deleteId, 1);
+        } else {
+            if (checked == true) //如果找不到，说明是没选中的，添加进去
+                moduleIds.push(moduleId);
+        }
+    }
+    function getModuleButtonIds(moduleButtonIds, buttons) {
+        var buttonIds = [];
+        for (var i in moduleButtonIds) {
+            var id = moduleButtonIds[i];
+            for (var j in buttons) {
+                var button = buttons[j];
+                if (button.ModuleButtonId == id) {
+                    buttonIds.push(id);
+                }
+            }
+        }
+        return buttonIds;
+    }
+
+    function moduleSelectEvent(moduleId, checked) {
+        currentSelectedModuleId = moduleId;
+        var buttons = getModuleButtons(moduleId, checked)
+        $("#moduleButtonsTree").jkf_tree({
+            url: null,
+            param: null,
+            type: "post",
+            async: false,
+            datas: buttons,
+            treeParentIdKey: 'ParentId',
+            treeKeyKey: 'ModuleButtonId',
+            treeValueKey: 'Name',
+            iconValueKey: 'Icon',
+            defaultIcon: '',
+            hasCheckBox: true,
+            checkEvent: moduleButtonCheckEvent,
+            selectEvent: null,
+            initCheckBoxData: getModuleButtonIds(moduleButtonIds, buttons)
+        });
+
+        $("#moduleColumnsTree").jkf_tree({
+            url: null,
+            param: null,
+            type: "post",
+            async: false,
+            datas: getModuleColumns(moduleId, checked),
+            treeParentIdKey: '',
+            treeKeyKey: 'ModuleColumnId',
+            treeValueKey: 'Name',
+            iconValueKey: '',
+            defaultIcon: 'fa-leaf',
+            hasCheckBox: true,
+            checkEvent: moduleColumnCheckEvent,
+            selectEvent: null,
+            initCheckBoxData: moduleColumnIds
+        });
+
+        $("#moduleFormsTree").jkf_tree({
+            url: null,
+            param: null,
+            type: "post",
+            async: false,
+            datas: getModuleForms(moduleId, checked),
+            treeParentIdKey: '',
+            treeKeyKey: 'ModuleFormId',
+            treeValueKey: 'Name',
+            iconValueKey: '',
+            defaultIcon: 'fa-leaf',
+            hasCheckBox: true,
+            checkEvent: moduleFormCheckEvent,
+            selectEvent: null,
+            initCheckBoxData: moduleFormIds
+        });
+    }
+
+
+    function moduleButtonCheckEvent(moduleButtonId, checked, isSingle) {
+
+        var checkModuleButtonIds = [];
+        if (moduleButtonId != "0")
+            checkModuleButtonIds.push(moduleButtonId);
+        if (isSingle) {//只有根节点
+            for (var i in checkModuleButtonIds) {
+                moduleButtonCheck(checkModuleButtonIds[i], checked);
+            }
+            return;
+        }
+
+        pushSelectModuleButtonIds(checkModuleButtonIds, moduleButtons, moduleButtonId);
+
+        for (var i in checkModuleButtonIds) {
+            moduleButtonCheck(checkModuleButtonIds[i], checked);
+        }
+
+    }
+
+    function pushSelectModuleButtonIds(checkModuleButtonIds, moduleButtons, moduleButtonId) {
+        //alert(currentSelectedModuleId);
+        for (var i in moduleButtons) {
+            if (moduleButtons[i].ParentId == moduleButtonId && moduleButtons[i].Module.ModuleId == currentSelectedModuleId) {
+                
+                checkModuleButtonIds.push(moduleButtons[i].ModuleButtonId);
+                pushSelectModuleButtonIds(checkModuleButtonIds, moduleButtons, moduleButtons[i].ModuleButtonId);
+            }
+        }
+    }
+
+
+    function getModuleButtons(moduleId, checked) {
+        if (checked == false) {
+            return [];
+        }
+        var selectModuleButtons = [];
+        for (var i in moduleButtons) {
+            if (moduleId == moduleButtons[i].Module.ModuleId) {
+                selectModuleButtons.push(moduleButtons[i]);
+            }
+        }
+        return selectModuleButtons;
+    }
+
+    function moduleButtonCheck(moduleButtonId, checked) {
+        var deleteId = -1;
+        for (var i in moduleButtonIds) {
+            if (moduleButtonIds[i] == moduleButtonId) {
+                deleteId = i;
+                break;
+            }
+        }
+        if (deleteId != -1) {
+            if (checked == false)
+                moduleButtonIds.splice(deleteId, 1);
+        } else {
+            if (checked == true)
+                moduleButtonIds.push(moduleButtonId);
+        }
+    }
+
+    function moduleColumnCheckEvent(moduleColumnId, checked, isSingle) {
+
+        var checkModuleColumnIds = [];
+        if (moduleColumnId != "0")
+            checkModuleColumnIds.push(moduleColumnId);
+        if (isSingle) {//只有根节点
+            for (var i in checkModuleColumnIds) {
+                moduleColumnCheck(checkModuleColumnIds[i], checked);
+            }
+            return;
+        }
+        //如果是根节点则全选或全不选
+        if (moduleColumnId == "0") {
+            pushSelectModuleColumnIds(checkModuleColumnIds, moduleColumns, moduleColumnId);
+        }
+
+        for (var i in checkModuleColumnIds) {
+            moduleColumnCheck(checkModuleColumnIds[i], checked);
+        }
+
+
+    }
+
+    function pushSelectModuleColumnIds(checkModuleColumnIds, moduleColumns, moduleColumnId) {
+        for (var i in moduleColumns) {
+            if (moduleColumns[i].Module.ModuleId == currentSelectedModuleId) {
+                checkModuleColumnIds.push(moduleColumns[i].ModuleColumnId);
+            //pushSelectModuleColumnIds(checkModuleColumnIds, moduleColumns, moduleColumns[i].ModuleColumnId);
+            }
+        }
+    }
+
+    function getModuleColumns(moduleId, checked) {
+        if (checked == false) {
+            return [];
+        }
+        var selectModuleColumns = [];
+        for (var i in moduleColumns) {
+            if (moduleId == moduleColumns[i].Module.ModuleId) {
+                selectModuleColumns.push(moduleColumns[i]);
+            }
+        }
+        return selectModuleColumns;
+    }
+
+    function moduleColumnCheck(moduleColumnId, checked) {
+        var deleteId = -1;
+        for (var i in moduleColumnIds) {
+            if (moduleColumnIds[i] == moduleColumnId) {
+                deleteId = i;
+                break;
+            }
+        }
+        if (deleteId != -1) {
+            if (checked == false)
+                moduleColumnIds.splice(deleteId, 1);
+        } else {
+            if (checked == true)
+                moduleColumnIds.push(moduleColumnId);
+        }
+    }
+
+    function moduleFormCheckEvent(moduleFormId, checked, isSingle) {
+
+        var checkModuleFormIds = [];
+        if (moduleFormId != "0")
+            checkModuleFormIds.push(moduleFormId);
+        if (isSingle) {//只有根节点
+            for (var i in checkModuleFormIds) {
+                moduleFormCheck(checkModuleFormIds[i], checked);
+            }
+            return;
+        }
+        if (moduleFormId == "0") {
+            pushSelectModuleFormIds(checkModuleFormIds, moduleForms, moduleFormId);
+        }
+        for (var i in checkModuleFormIds) {
+            moduleFormCheck(checkModuleFormIds[i], checked);
+        }
+
+
+    }
+
+    function pushSelectModuleFormIds(checkModuleFormIds, moduleForms, moduleFormId) {
+        for (var i in moduleForms) {
+            if (moduleForms[i].Module.ModuleId == currentSelectedModuleId) {
+                checkModuleFormIds.push(moduleForms[i].ModuleFormId);
+            //    pushSelectModuleFormIds(checkModuleFormIds, moduleForms, moduleForms[i].ModuleFormId);
+            }
+        }
+    }
+
+
+    function getModuleForms(moduleId, checked) {
+        if (checked == false) {
+            return [];
+        }
+        var selectModuleForms = [];
+        for (var i in moduleForms) {
+            if (moduleId == moduleForms[i].Module.ModuleId) {
+                selectModuleForms.push(moduleForms[i]);
+            }
+        }
+        return selectModuleForms;
+    }
+
+    function moduleFormCheck(moduleFormId, checked) {
+        var deleteId = -1;
+        for (var i in moduleFormIds) {
+            if (moduleFormIds[i] == moduleFormId) {
+                deleteId = i;
+                break;
+            }
+        }
+        if (deleteId != -1) {
+            if (checked == false)
+                moduleFormIds.splice(deleteId, 1);
+        } else {
+            if (checked == true)
+                moduleFormIds.push(moduleFormId);
+        }
+    }
+
+
+
+    function saveForm() {
+        //console.log(moduleIds);
+        //console.log(moduleButtonIds);
+        //console.log(moduleColumnIds);
+        //console.log(moduleFormIds);
+
+        var authorizeList = [];
+
+        for (var i in moduleIds) {
+            var model = {
+                AuthorizeId: top.jkf.newGuid(), ObjectType: objectType,
+                ObjectId: objectId, itemType: 1, itemId: moduleIds[i]
+            }
+            authorizeList.push(model);
+        }
+
+        for (var i in moduleButtonIds) {
+            var model = {
+                AuthorizeId: top.jkf.newGuid(), ObjectType: objectType,
+                ObjectId: objectId, itemType: 2, itemId: moduleButtonIds[i]
+            }
+            authorizeList.push(model);
+        }
+
+        for (var i in moduleColumnIds) {
+            var model = {
+                AuthorizeId: top.jkf.newGuid(), ObjectType: objectType,
+                ObjectId: objectId, itemType: 3, itemId: moduleColumnIds[i]
+            }
+            authorizeList.push(model);
+        }
+
+        for (var i in moduleFormIds) {
+            var model = {
+                AuthorizeId: top.jkf.newGuid(), ObjectType: objectType,
+                ObjectId: objectId, itemType: 4, itemId: moduleFormIds[i]
+            }
+            authorizeList.push(model);
+        }
+
+
+        $.httpPostAsync({
+            url: '/Base/Authorize/SaveAuthorizeForm', param: { objectType: objectType, objectId: objectId, authorizeList: authorizeList }
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                //if (parentIframe != null) {
+                //    parentIframe.refreshUserData();
+                //}
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

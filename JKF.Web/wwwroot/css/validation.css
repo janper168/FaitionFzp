@@ -1,0 +1,15 @@
+﻿.error {
+    height: 20px;
+    line-height: 20px;
+    color: red;
+    font-size: 15px;
+    position: absolute;
+    width: fit-content();
+    background-color: orange;
+    border: 1px solid #ccc;
+}
+
+.errorBorder {
+    border: 1px solid orange;
+    box-shadow:0 0 5px orange;
+}

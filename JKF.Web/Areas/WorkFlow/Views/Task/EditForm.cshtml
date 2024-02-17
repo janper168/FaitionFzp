@@ -1,0 +1,687 @@
+﻿@{
+    Layout = "_Form";
+}
+<style>
+    * {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        user-select: none;
+    }
+
+    #Form {
+        width: 99%;
+        height: 99%;
+        border: 1px solid gray;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px;
+        background-color: white;
+        overflow: auto;
+    }
+
+    #titleShow {
+        text-align: center;
+        width: 96%;
+        margin: 20px auto;
+        border: 0px dashed lightgray;
+        font-size: 30px;
+    }
+
+    #mainTableShow {
+        text-align: center;
+        width: 96%;
+        margin: 20px auto;
+        border: 0px solid gray;
+        font-size: 14px;
+    }
+
+        #mainTableShow table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid lightgray;
+            background-color: #f1f1f1;
+        }
+
+            #mainTableShow table tr, .mainTableShow table tr td {
+                border-collapse: collapse;
+                border: 1px solid lightgray;
+            }
+
+    .inputTextShow {
+        position: absolute;
+    }
+
+    .filesShow {
+        position: absolute;
+    }
+
+    .textAreaShow {
+        position: absolute;
+    }
+
+    .dateTimeShow {
+        position: absolute;
+    }
+
+    .selectorShow {
+        position: absolute;
+    }
+</style>
+<div id="Form">
+    <div class="content"></div>
+
+</div>
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var TaskId = request('TaskId');
+    var Task = {};
+    var FormContent = [];
+    var FormCfg = {};
+    var FormId = "";
+    var $openIframe = null;
+    var $Form = null;
+    var TaskNodeProcesserId = request('TaskNodeProcesserId');
+    var TaskNodeProcesser = {};
+    var isRead = false;
+
+
+    //var formValidator = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+
+        $Form = jkf.$topBody.find("#" + FormId);
+        var data = jkf.GetIFrameWindowData($Form);
+        //var authorizedForms = data.isRead;
+        //jkf.processAuthorizedForms($("#Form"), authorizedForms);
+        isRead = data ? data:false;
+        //alert(isRead);
+
+        $("#Form").show();
+
+        // if (!!TaskId) {
+        getForm();
+        //}
+
+        //标题
+        var formTitle = FormCfg.FormTitle;
+
+        //清空内容
+        var $content = $("#Form").find(".content");
+        $content.html("");
+
+        //添加标题
+        var formTitleHtml = "<div><div id='titleShow'>" + formTitle + "</div></div>";
+        $content.append(formTitleHtml);
+
+        //添加表格
+        var formMainTableHtml = "<div><div id='mainTableShow'><table></table></div></div>";
+        $content.append(formMainTableHtml);
+
+        var $mainTable = $content.find("#mainTableShow").find("table");
+        var mainTableContentHtml = "";
+
+        for (var i = 0; i < FormCfg.TableLineCount; i++) {
+            if (FormCfg.MainTableLinesHeight[i] !== 0) {
+                mainTableContentHtml += "<tr><td style='height:" + FormCfg.MainTableLinesHeight[i] + "px'></td></tr>"
+            }
+        }
+
+        $mainTable.append(mainTableContentHtml);
+
+        //添加文本框
+        var inputTextRegions = FormCfg.InputTextRegions;
+
+        for (var i = 0; i < inputTextRegions.length; i++) {
+            var Label = inputTextRegions[i].Label;
+            var Id = inputTextRegions[i].Id;
+            var Width = inputTextRegions[i].Width;
+            var Height = inputTextRegions[i].Height;
+            var Top = inputTextRegions[i].Top;
+            var Left = inputTextRegions[i].Left;
+            var RegexInputTextSelect = inputTextRegions[i].RegexInputTextSelect;
+            var RegexInputTextCustomized = inputTextRegions[i].RegexInputTextCustomized;
+
+            var inputTextRegionHtml = "<div class='inputTextShow'>" + Label + "&nbsp;&nbsp;<input type='text' /></div>";
+
+            $content.append(inputTextRegionHtml);
+            var $lastRegion = $content.find(".inputTextShow").eq(i);
+            var $lastRegionInputText = $lastRegion.find(":input[type=text]");
+
+            $lastRegionInputText.attr("id", Id);
+            $lastRegionInputText.width(Width);
+            $lastRegionInputText.height(Height);
+            $lastRegion.css("top", Top);
+            $lastRegion.css("left", Left);
+            $lastRegion.attr("RegexInputTextSelect", RegexInputTextSelect);
+            $lastRegion.attr("RegexInputTextCustomized", RegexInputTextCustomized);
+
+            if (isRead == true){
+                $lastRegionInputText.prop("readonly", true);
+            }
+
+        }
+
+        //添加文本域
+        var textAreaRegions = FormCfg.TextAreaRegions;
+
+        for (var i = 0; i < textAreaRegions.length; i++) {
+
+            var Label = textAreaRegions[i].Label;
+            var Id = textAreaRegions[i].Id;
+            var Width = textAreaRegions[i].Width;
+            var Height = textAreaRegions[i].Height;
+            var Top = textAreaRegions[i].Top;
+            var Left = textAreaRegions[i].Left;
+
+
+            var textAreaRegionHtml = "<div class='textAreaShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<textArea style='vertical-align:middle;'></textArea></div>";
+
+            $content.append(textAreaRegionHtml);
+            var $lastRegion = $content.find(".textAreaShow").eq(i);
+            var $lastRegionInputText = $lastRegion.find("textArea");
+
+            $lastRegionInputText.attr("id", Id);
+            $lastRegionInputText.width(Width);
+            $lastRegionInputText.height(Height);
+            $lastRegion.css("top", Top);
+            $lastRegion.css("left", Left);
+
+            var textArea = "";
+            for (var i in FormContent) {
+                if (FormContent[i].Id == Id) {
+                    textArea = FormContent[i].value;
+                    $lastRegionInputText.val(textArea)
+                    break;
+                }
+            }
+
+              if (isRead == true){
+                $lastRegionInputText.prop("readonly", true);
+            }
+        }
+
+        //添加日期时间
+        var dateTimeRegions = FormCfg.DateTimeRegions;
+
+        for (var i = 0; i < dateTimeRegions.length; i++) {
+
+            var Label = dateTimeRegions[i].Label;
+            var Id = dateTimeRegions[i].Id;
+            var Width = dateTimeRegions[i].Width;
+            var Height = dateTimeRegions[i].Height;
+            var Top = dateTimeRegions[i].Top;
+            var Left = dateTimeRegions[i].Left;
+
+
+            var dateTimeRegionHtml = "<div class='dateTimeShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<input data-required='true' class='Wdate  default-input' type='text' data-type='date' onclick='WdatePicker({dateFmt:\"yyyy-MM-dd HH:mm:ss\"}); ' /></div>";
+
+            $content.append(dateTimeRegionHtml);
+            var $lastRegion = $content.find(".dateTimeShow").eq(i);
+            var $lastRegionInputText = $lastRegion.find("input");
+
+            $lastRegionInputText.attr("id", Id);
+            $lastRegionInputText.width(Width);
+            $lastRegionInputText.height(Height);
+            $lastRegion.css("top", Top);
+            $lastRegion.css("left", Left);
+
+             if (isRead == true){
+                $lastRegionInputText.prop("readonly", true);
+            }
+
+        }
+
+        //添加选择框
+        var selectorRegions = FormCfg.SelectorRegions;
+
+        for (var i = 0; i < selectorRegions.length; i++) {
+
+            var Label = selectorRegions[i].Label;
+            var Id = selectorRegions[i].Id;
+            var Width = selectorRegions[i].Width;
+            var Height = selectorRegions[i].Height;
+            var Top = selectorRegions[i].Top;
+            var Left = selectorRegions[i].Left;
+            var ItemsDefine = selectorRegions[i].ItemsDefine;
+
+            var selectorRegionHtml = "<div class='selectorShow'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<select  class='default-input' ></select></div>";
+
+            $content.append(selectorRegionHtml);
+            var $lastRegion = $content.find(".selectorShow").eq(i);
+            var $lastRegionSelector = $lastRegion.find("select");
+
+            $lastRegionSelector.attr("id", Id);
+            $lastRegionSelector.width(Width);
+            $lastRegionSelector.height(Height);
+            $lastRegion.css("top", Top);
+            $lastRegion.css("left", Left);
+
+            if (!!ItemsDefine) {
+                var keyValues = ItemsDefine.split(';');
+                for (var i in keyValues) {
+                    var items = keyValues[i];
+                    var name = items.split(':')[1];
+                    var value = items.split(':')[0];
+                    $lastRegionSelector.append('<option value="' + value + '">' + name + '</option>');
+                }
+                $lastRegionSelector.attr("itemsDefine", ItemsDefine);
+            }
+            $lastRegionSelector.attr("itemsDefine", "");
+
+            if (isRead == true){
+                $lastRegionSelector.prop("readonly", true);
+            }
+        }
+
+        //添加文件
+        var filesRegions = FormCfg.FilesRegions;
+        //alert(filesRegions.length);
+        for (var i in filesRegions) {
+            //alert(i);
+
+            var Label = filesRegions[i].Label;
+            var Id = filesRegions[i].Id;
+            var Width = filesRegions[i].Width;
+            var Height = filesRegions[i].Height;
+            var Top = filesRegions[i].Top;
+            var Left = filesRegions[i].Left;
+
+            var filesRegionHtml = "<div class='filesShow' id='" + Id + "'><div style='display: inline;'>" + Label + "</div>&nbsp;&nbsp;<input id='fileUpload' type='file' style='display:none;' name='file_Upload' /><button id='selectBtn' class='blue' style='width:100px;height:30px;' >添加</button>&nbsp;<button id='viewBtn' class='blue' style='width:100px;height:30px;'>查看</button ></div>";
+
+            $content.append(filesRegionHtml);
+            var $lastRegion = $content.find("#"+Id);
+            var $lastRegionFiles = $lastRegion.find("button#selectBtn");
+            var $lastRegionFiles2 = $lastRegion.find("button#viewBtn");
+            var $fileUpload = $lastRegion.find("input#fileUpload");
+
+             if (isRead == true){
+                $lastRegionFiles.hide();
+             }
+           
+            $lastRegionFiles2.attr("parentId", Id);
+            $lastRegionFiles.attr("parentId", Id);
+
+            var bWidth = $('body').width();
+            var bHeight = $('body').height();
+
+            var vLeft = (bWidth - 400) / 2;
+            var vTop = (bHeight - 400) / 2;
+
+            var msakHtml = "<div id='maskShowBox' style='display:none;z-index:4000;position:fixed;left:0;top:0;width:100%;height:100%;background-color:lightblue;opacity:0.8;'>";
+            var viewHtml = "<div id='showBox' style='z-index:5000;position:fixed;display:none;width:400px;height:300px;border:1px solid gray;background-color:white;'><div style='position:relative;width:100%;height:100%;'><div style='z-index:5001;text-align:center;width:20px;height:20px;background-color:orange;border-radius:20px;position:absolute;right:-10px;top:-10px;'><i class='fa fa-close'></i></div></div><div>"
+            viewHtml = msakHtml + viewHtml;
+            if ($("#showBox").length == 1) {
+
+            } else if ($("#showBox").length == 0) {
+                $('body').append(viewHtml);
+            }
+            var files = "";
+            for (var i in FormContent) {
+                if (FormContent[i].Id == Id) {
+                    files = FormContent[i].value;
+                    break;
+                }
+            }
+
+            if (!!files) { 
+                $fileUpload.attr("files", files);
+                $fileUpload.attr("dir", TaskId + Id);
+                
+            } else
+            {
+                $fileUpload.attr("files", "");
+                $fileUpload.attr("dir", TaskId + Id);
+            }
+
+            $lastRegion.css("top", Top);
+            $lastRegion.css("left", Left);
+
+            $lastRegionFiles.click(function () {
+                var $input = $("#" + $(this).attr("parentId"));
+                var $fileUpload = $input.find("input#fileUpload");
+                $fileUpload.trigger('click');
+            })
+
+            $fileUpload.change(function () {
+                var files = $(this).attr("files");
+
+                if ($(this).val() != "") {
+                    var fileName = $(this).val().substring($(this).val().lastIndexOf('\\') + 1);
+                    if (files.indexOf(fileName) >= 0) return;// 文件不要重复上传
+                    fileLoad(this);
+                    $(this).val("");
+                }
+            });
+
+            $lastRegionFiles2.click(function () {
+                
+                var $input = $("#" + $(this).attr("parentId"));
+                var $fileUpload = $input.find("input#fileUpload");
+
+                $("#maskShowBox").show();
+                $("#showBox").show(500);            
+                $("#showBox").css({ left: vLeft, top: vTop });
+
+                var filesText = $fileUpload.attr("files");
+                var tblHtml = "<table id='filesTbl' style='z-index:6000;'></table>";
+                $("#showBox").find("table#filesTbl").remove();
+                $("#showBox").find("div:eq(0)").append(tblHtml);
+                var $tbl = $("#showBox").find("table");
+                var tblContent = "";
+                var linkArray = filesText.split(';');
+               
+                linkArray.splice(linkArray.length - 1, 1);
+              
+                for (var i in linkArray) {
+                    if (linkArray[i] == "") {
+                        continue;
+                    }
+                    var fileName = linkArray[i].substring(linkArray[i].lastIndexOf('/') + 1);
+                    var tblContent = "<tr><td style='z-index:6000;'><a style='font-size:16px;' target='_blank' href='" + linkArray[i] + "'>" + fileName + "</a><button><i class='fa fa-close'></i></button></td></tr>";
+                    $tbl.append(tblContent);
+                    $tbl.find("button").last().click(function (e) {
+                        $("#showBox").find("table#filesTbl").find($(this).parent().parent()).remove();
+                        filesText = filesText.replace($(this).prev("a").attr("href") + ";", "");
+                        $fileUpload.attr("files", filesText);
+                    });
+                }
+            })
+
+            $("#showBox").find("i").parent().click(function (e) {
+                $(this).parent().parent().hide(500);
+                $("#maskShowBox").hide();
+            })
+
+           
+        }
+
+        setForm();
+
+        //formValidator = $("#Form").formValidator()
+    });
+
+    function fileLoad(ele) {
+        var dir = $(ele).attr("dir");
+        //alert(dir)
+
+        var formData = new FormData();
+
+        var name = $(ele).val();
+        var files = $(ele)[0].files[0];
+
+        formData.append("file", files);
+        //formData.append("name", name);
+        formData.append("dir", dir)
+        $.ajax({
+            url: "/file/upload/OnPostUpload",
+            type: 'post',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            beforeSend: function () {
+            },
+            success: function (res) {
+                var fileUploadPath = res["url"];
+                top.jkf.showTips("上传文件成功！", 1);
+                var htmlFiles = $(ele).attr("files");
+                htmlFiles += fileUploadPath + ";"
+                $(ele).attr("files", htmlFiles);
+            }
+            ,
+            error: function (res) {
+                top.jkf.showTips("上传文件出错啦！", 2);
+            }
+        });
+
+    }
+
+    function setForm() {
+        for (var i in FormContent) {
+            var kv = FormContent[i];
+            $("#" + kv.Id).val(kv.value);
+        }
+    }
+
+    function getForm() {
+
+        if (!TaskId && TaskNodeProcesserId) {
+            var res = $.httpGet({
+                url: '/workFlow/Task/getTaskId', param: { TaskNodeProcesserId: TaskNodeProcesserId }
+            });
+            if (res.code == 200) {
+                TaskId = res.datas;
+            }
+        }
+
+        var res = $.httpGet({
+            url: '/WorkFlow/Task/GetTaskForm', param: { TaskId: TaskId }
+        });
+
+
+        // res = $.httpGet({
+        //     url: '/Workflow/Task/GetForm', param: { TaskId: TaskId }
+        // });
+
+        if (res.code == 200) {
+            Task = res.datas;
+            if (Task.FormContentJson != null) {
+                FormContent = JSON.parse(Task.FormContentJson);
+                //console.log("FormContent1:", FormContent);
+            } else {
+                FormContent = [];
+                //console.log("FormContent2:", FormContent);
+            }
+
+
+            if (!!Task.WorkFlowDesign.CustomizedForm) {
+                
+                FormCfg = JSON.parse(Task.WorkFlowDesign.CustomizedForm.FormCfg);
+
+            }
+
+            //$.setFormData(Task, $("#Form"));
+        }
+
+    }
+
+    function fillFormContent() {
+        //添加文本框
+        FormContent = [];
+        var inputTextRegions = FormCfg.InputTextRegions;
+
+        for (var i in inputTextRegions) {
+
+            var Id = inputTextRegions[i].Id;
+            var label = inputTextRegions[i].Label;
+            var RegexInputTextSelect = inputTextRegions[i].RegexInputTextSelect;
+            var RegexInputTextCustomized = inputTextRegions[i].RegexInputTextCustomized;
+            //alert("RegexInputTextSelect:" + RegexInputTextSelect);
+            //alert("RegexInputTextCustomized:" + RegexInputTextCustomized);
+            if (RegexInputTextSelect == "1") {
+                if ($("#" + Id).val() == "") {
+                    alert("该项[" + label + "]必填!");
+                    return false;
+                }
+            } else if (RegexInputTextSelect == "3") {
+                var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+                if (reg.test($("#" + Id).val()) ==false) {
+                    alert("该项[" + label + "]必须是邮箱格式!");
+                    return false;
+                }
+            } else if (RegexInputTextSelect == "2") {
+                var reg = /^[0-9]+$/;
+                if (reg.test($("#" + Id).val()) == false) {
+                    alert("该项[" + label + "]必须为数字!");
+                    return false;
+                }
+            } else if (RegexInputTextSelect == "4") {
+                var reg = /^[1][3,4,5,7,8,9][0-9]{9}$/;
+                if (reg.test($("#" + Id).val()) == false) {
+                    alert("该项[" + label + "]必须为手机号!");
+                    return false;
+                }
+            } else if (RegexInputTextSelect == "5") {
+                var reg = eval(RegexInputTextCustomized);
+                //alert(reg);
+                if (reg.test($("#" + Id).val()) == false) {
+                    alert("该项[" + label + "]必须输入符合的正则规则[" + RegexInputTextCustomized + "]!");
+                    return false;
+                }
+            }
+
+            FormContent.push({ Id, value: $("#" + Id).val() });
+           
+        }
+
+        var textAreaRegions = FormCfg.TextAreaRegions;
+
+        for (var i = 0; i < textAreaRegions.length; i++) {
+            var Id = textAreaRegions[i].Id;
+            var label = textAreaRegions[i].Label;
+            if($("#" + Id).val() == ""){
+                alert("该项[" + label + "]必须输入!");
+                return false;
+            }
+            FormContent.push({ Id, value: $("#" + Id).val() });
+        }
+
+        var dateTimeRegions = FormCfg.DateTimeRegions;
+
+        for (var i = 0; i < dateTimeRegions.length; i++) {
+            var Id = dateTimeRegions[i].Id;
+            var label = dateTimeRegions[i].Label;
+            if ($("#" + Id).val() == "") {
+                alert("该项[" + label + "]必须输入!");
+                return false;
+            }
+            FormContent.push({ Id, value: $("#" + Id).val() });
+        }
+
+        var selectorRegions = FormCfg.SelectorRegions;
+
+        for (var i = 0; i < selectorRegions.length; i++) {
+            var Id = selectorRegions[i].Id;
+            var label = selectorRegions[i].Label;
+            if ($("#" + Id).val() == "0") {
+                alert("该项[" + label + "]必须选择!");
+                return false;
+            }
+            FormContent.push({ Id, value: $("#" + Id).val() });
+        }
+
+        var filesRegions = FormCfg.FilesRegions;
+        //alert(filesRegions.length);
+        for (var i = 0; i < filesRegions.length; i++) {
+            var Id = filesRegions[i].Id;
+            var value = $("#" + Id).find("input#fileUpload").attr("files");
+            //alert("111:"+value);
+            //alert(Id + ":" + value);
+            FormContent.push({ Id, value: value });
+            
+        }
+
+        return true;
+
+    }
+
+    function saveForm() {
+
+        // if (!formValidator.valid()) {
+        //     return false;
+        // }
+
+        if (!!TaskId) Task.TaskId = TaskId;
+        // $.getFormData(Task, $("#Form"));
+
+        if (fillFormContent() == false) return;
+        Task.FormContentJson = JSON.stringify(FormContent);
+
+        $.httpPostAsync({ url: '/workflow/Task/SaveDraft', param: Task }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+
+    function submit() {
+
+        // if (!formValidator.valid()) {
+        //     return false;
+        // }
+
+        if (!!TaskId) Task.TaskId = TaskId;
+        //$.getFormData(Task, $("#Form"));
+        if (fillFormContent() == false) return;
+
+        Task.FormContentJson = JSON.stringify(FormContent);
+
+        $.httpPostAsync({ url: '/workflow/Task/Submit', param: Task }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("提交成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                //window.location.reload();
+                //top.jkf.closeMaskLayer(FormId);
+                var $maskLayer = top.jkf.$topBody.find("div[class=maskLayer]");
+                console.log("$maskLayer length:" + $maskLayer.length);
+                $maskLayer.remove();
+
+                $Form.remove();
+
+            } else {
+                top.jkf.showTips("提交失败！", 2);
+            }
+
+        })
+    }
+</script>

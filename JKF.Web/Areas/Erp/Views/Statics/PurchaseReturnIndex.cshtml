@@ -1,0 +1,298 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+    .CountContent{
+        display: block;
+        width: 100%;
+        height: 10%;
+        border-bottom: 1px solid #ccc;
+        
+    }
+
+        .CountContent > div.PurchaseReturnDiv {
+            float:left;
+            margin-left:0px;
+            font-size: 30px !important;
+            width:200px;
+            height:100%;
+            background-color:lightblue;
+        }
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 81%;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .selectdate{
+        width:100px;
+        height:30px;
+        border:1px solid lightgray;
+        
+    }
+</style>
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <button class="selectdate" id="todaySearch">今天</button><button class="selectdate" id="day7Search">近7天</button><button class="selectdate"  id="day30Search">近30天</button>
+            时间:从<input id="StartTime" class="Wdate height_30_important width_200 default-input" type="text" data-type="date" onclick="WdatePicker();" />至
+            <input id="EndTime" class="Wdate height_30_important width_200 default-input" type="text" data-type="date" onclick="WdatePicker();" />
+            <label class="form_label" for="GoodsCategoryId">产品分类</label>
+            <select id="GoodsCategoryId" class="default-input" style="width:200px;height:30px;"></select>
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+        </div>
+    </div>
+    <div class="CountContent">
+        <div class="PurchaseReturnDiv" >
+            <span style="font-size:20px;">退货次数：</span><span id="PurchaseReturnCount" style="color:orange;font-size:22px;"></span>
+        </div>
+        <div class="PurchaseReturnDiv">
+            <span style="font-size:20px;"> 退货总量：</span><span id="PurchaseReturnQuantity" style="color:orange;font-size:22px;"></span>
+        </div>
+        <div class="PurchaseReturnDiv" >
+            <span style="font-size:20px;">退货总额：</span><span id="PurchaseReturnAmount" style="color:orange;font-size:22px;"></span>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="PurchaseReturnGoodsTable"></div>
+    </div>
+</div>
+<script>
+
+
+    var $gridTable = null;
+    var queryModel = {};
+
+    var jfkInit = (function ($, jkf) { });
+
+    $(function () {
+
+        $("#PurchaseReturnCount").text("0");
+        $("#PurchaseReturnQuantity").text("0");
+        $("#PurchaseReturnAmount").text("0");
+        var res = $.httpGet({
+            url: '/Erp/GoodsCategory/GetAll'
+        });
+
+        if (res.code == 200) {
+            $("#GoodsCategoryId").append("<option value=''></option>");
+            for (var i in res.datas) {
+
+                var optionHtml = "<option value='" + res.datas[i].ItemValue + "'>" + res.datas[i].ItemName + "</option>";
+                $("#GoodsCategoryId").append(optionHtml);
+            }
+        }
+
+
+        var colHeaders = [
+            { columnName: 'Erp_PurchaseReturnGoodsId', width: 200, showName: 'showName', hidden: true, align: 'center' },
+            {
+                columnName: 'Number', width: 150, showName: '采购退货编号', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["PurchaseReturnOrder"]) return rowData["PurchaseReturnOrder"].Number;
+                }
+            },
+            {
+                columnName: 'Number', width: 150, showName: '采购编号', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["PurchaseReturnOrder"]["PurchaseOrder"]) return rowData["PurchaseReturnOrder"]["PurchaseOrder"].Number;
+                }
+            },
+            {
+                columnName: 'GoodsName', width: 150, showName: '商品名称', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Goods"]) return rowData["Goods"].Name;
+                }
+            },
+            {
+                columnName: 'GoodsNumber', width: 150, showName: '商品编码', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Goods"]) return rowData["Goods"].Number;
+                }
+            },
+            {
+                columnName: 'Spec', width: 150, showName: '规格', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Goods"]) return rowData["Goods"].Spec;
+                }
+            },
+            {
+                columnName: 'Unit', width: 150, showName: '单位', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Goods"]) return rowData["Goods"].Unit;
+                }
+            },
+            {
+                columnName: 'ReturnPrice', width: 150, showName: '退货单价', hidden: false, align: 'left'
+
+            },
+            {
+                columnName: 'ReturnQuantity', width: 150, showName: '退货数量', hidden: false, align: 'left'
+
+            },
+            {
+                columnName: 'TotalAmount', width: 150, showName: '退货金额', hidden: false, align: 'left'
+
+            },
+            {
+                columnName: 'Warehouse', width: 150, showName: '仓库', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["PurchaseReturnOrder"]["Warehouse"]) return rowData["PurchaseReturnOrder"]["Warehouse"].Name;
+                }
+            },
+            {
+                columnName: 'Suppiler', width: 150, showName: '供应商', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["PurchaseReturnOrder"]["Suppiler"]) return rowData["PurchaseReturnOrder"]["Suppiler"].Name;
+                }
+            },
+            {
+                columnName: 'CreateTime', width: 150, showName: '创建时间', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["PurchaseReturnOrder"]) return rowData["PurchaseReturnOrder"].ProcessTime.substring(0, 19).replace("T", " ");
+                }
+            },
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#PurchaseReturnGoodsTable').jkfGrid({
+            remoteAddress: '/Erp/statics/GetPurchaseReturnGoodss',
+            columnHeaders: colHeaders,
+            mainId: 'Erp_PurchaseReturnGoodsId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'GoodsId',
+            sortOrder: 'asc'
+        });
+        GetCount3();
+        $gridTable.getRemoteData(null, true);
+
+        $("#todaySearch").click(function(){
+            var date = new Date();
+            date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            $("#StartTime").val(date);
+            $("#EndTime").val(date);
+            fillQueryModel();
+            GetCount3();
+            $gridTable.getRemoteData({ queryModel: queryModel }, true);
+        })
+
+        $("#day7Search").click(function () {
+            var date = new Date();
+            var sDate = new Date(date);
+            sDate.setDate(date.getDate() - 7);
+            date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            sDate = sDate.getFullYear() + "-" + (sDate.getMonth() + 1) + "-" + sDate.getDate();
+            $("#StartTime").val(sDate);
+            $("#EndTime").val(date);
+            fillQueryModel();
+            GetCount3();
+            $gridTable.getRemoteData({ queryModel: queryModel }, true);
+        })
+
+        $("#day30Search").click(function () {
+            var date = new Date();
+            var sDate = new Date(date);
+            sDate.setDate(date.getDate() - 30);
+            date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            sDate = sDate.getFullYear() + "-" + (sDate.getMonth() + 1) + "-" + sDate.getDate();
+            $("#StartTime").val(sDate);
+            $("#EndTime").val(date);
+            fillQueryModel();
+            GetCount3();
+            $gridTable.getRemoteData({ queryModel: queryModel }, true);
+        })
+
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                fillQueryModel();
+                $("#PurchaseReturnCount").text("0");
+                $("#PurchaseReturnQuantity").text("0");
+                $("#PurchaseReturnAmount").text("0");
+                GetCount3();
+                $gridTable.getRemoteData({ queryModel: queryModel }, true);
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                fillQueryModel();
+                $("#PurchaseReturnCount").text("0");
+                $("#PurchaseReturnQuantity").text("0");
+                $("#PurchaseReturnAmount").text("0");
+                GetCount3();
+                $gridTable.getRemoteData({ queryModel: queryModel }, true);
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+        });
+
+        //top.jkf.processAuthorizedButtons(".buttonBar");
+
+    });
+    function GetCount3() {
+
+        var res = $.httpPost({
+            url: '/Erp/statics/SumPurchaseReturn', param: { queryModel: queryModel }
+        });
+        if (res.code == 200) {
+            $("#PurchaseReturnCount").text(res.datas.purchaseReturnCount);
+            $("#PurchaseReturnQuantity").text(res.datas.purchaseReturnNumber);
+            $("#PurchaseReturnAmount").text(res.datas.purchaseReturnAmount);
+        }
+    }
+
+    function fillQueryModel() {
+        queryModel.CategoryId = $('#GoodsCategoryId').find("option:selected").val();
+        queryModel.StartTime = $('#StartTime').val();
+        queryModel.EndTime = $('#EndTime').val();
+    }
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+
+        }
+    }
+
+</script>

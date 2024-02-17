@@ -1,0 +1,50 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>normalSelect</Title>
+    <Author>Microsoft Corporation</Author>
+    <Shortcut>normalSelect</Shortcut>
+    <Description>树选择框段</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>columnName</ID>
+        <ToolTip>columnName</ToolTip>
+        <Default>columnName</Default>
+      </Literal>
+      <Literal>
+        <ID>width</ID>
+        <ToolTip>width</ToolTip>
+        <Default>200</Default>
+      </Literal>
+	  <Literal>
+        <ID>showName</ID>
+        <ToolTip>showName</ToolTip>
+        <Default>showName</Default>
+      </Literal>
+	  <Literal>
+        <ID>hidden</ID>
+        <ToolTip>hidden</ToolTip>
+        <Default>false</Default>
+      </Literal>
+	  <Literal>
+        <ID>align</ID>
+        <ToolTip>align</ToolTip>
+        <Default>center</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="html"><![CDATA[$$.setSelect({
+            url: "/Base/DataItems/GetDataItemDetailsByItemCode?itemCode=PropertyType",
+            textCtrlId: "PropertyType",
+            ctrlId: "PropertyType_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+]]></Code>
+  </Snippet>
+</CodeSnippet>

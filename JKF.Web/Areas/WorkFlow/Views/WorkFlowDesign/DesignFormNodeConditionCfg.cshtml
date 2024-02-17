@@ -1,0 +1,546 @@
+﻿@{
+    Layout = "_Form";
+}
+<style>
+
+    .container_item0 {
+        display: block;
+        float: left;
+        width: 18%;
+        height: 96%;
+        padding: 3px;
+        margin: 3px 3px 3px 0px;
+    }
+
+    .container_item {
+        display: block;
+        float: left;
+        width: 26.3%;
+        height: 96%;
+        padding: 3px;
+        margin: 3px 3px 3px 0px;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 15px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-bottom: 0;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 90%;
+        border: 1px solid #ccc;
+        overflow:auto;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    table#conditionForm {
+        width: 99%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+        table#conditionForm td {
+            padding: 5px 0px 0px 0px;
+        }
+
+            table#conditionForm td.label {
+                width: 25%;
+                text-align: right;
+            }
+
+    .ConditionsTableLayer {
+        height: 82%;
+        border-bottom: 1px solid #ccc;
+    }
+
+    #formulaLayer{
+        width:99%;
+        height:99%;
+    }
+</style>
+<div class="container_item0" id="modulesContainer">
+    <div class="layerBar">表单配置</div>
+    <div class="tableContent">
+        
+    </div>
+</div>
+<div class="container_item" id="modulesContainer">
+    <div class="layerBar">过滤条件设置</div>
+    <div class="tableContent">
+        <table id="conditionForm">
+            <tr>
+                <td class="label">属性:</td>
+                <td>
+                    <select id="PropertyName" class="default-input">
+                    </select>
+                </td>
+            </tr>
+            <tr class="label" style="display:none;">
+                <td class="label">属性2:</td>
+                <td>
+                    <select id="PropertyName2" class="default-input">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">运算符:</td>
+                <td>
+                    <select id="Operator" class="default-input">
+                        <option value="0"></option>
+                        <option value="1">==</option>
+                        <option value="2">>=</option>
+                        <option value="3">></option>
+                        <option value="4"><=</option>
+                        <option value="5"><</option>
+                        <option value="5">!=</option>
+                        <option value="6">包含</option>
+                        <option value="7">包含于</option>
+                        <option value="8">时间差（小时）</option>
+                        <option value="9">时间差（天）</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">比较值:</td>
+                <td>
+                    <input type="text" id="OperatorValue" class="default-input" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label">比较值类型:</td>
+                <td>
+                    <select id="OperatorValueType" class="default-input">
+                        <option value="0"></option>
+                        <option value="1">文本</option>
+                        <option value="2">数字</option >
+                        <option value="3">属性</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">排序:</td>
+                <td>
+                    <input type="text" id="Sort" class="default-input" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:right;margin-right:5px;"><button id="saveConditionForm" class="btn blue">保存</button></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="container_item" id="moduleButtonsContainer">
+    <div class="layerBar">过滤条件列表</div>
+    <div class="toolLine">
+        <div class="buttonBar">
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i></button>
+            <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i></button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i></button>
+        </div>
+    </div>
+    <div class="ConditionsTableLayer">
+        <div class="jkf_grid_tbl" id="ConditionsTable"></div>
+    </div>
+</div>
+<div class="container_item" id="moduleColumnsContainer">
+    <div class="layerBar">过滤条件公式设置</div>
+    <div class="tableContent">
+        <div id="formulaLayer">
+            <textarea id="Formula" style="max-width:99% ;max-height:49% ;min-width:99% ;min-height:49%;width:99% ;height:49%  "></textarea>
+            <input type="checkbox" id="EnabledMark" class="blue" />是否有效
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var nodeId = request('nodeId');
+    var workFlowDesignId = request('workFlowDesignId');
+    var conditionRuleId = request('conditionRuleId');
+    var workFlowNodeId = request('workFlowNodeId');
+    var conditionRule = {};
+    var RulesJson = "";
+    var workFlowDesign = {};
+    var FormCfg = "";
+    var FormCfgObj = {};
+    var currentConditionId = "";
+    var Conditions = [];
+
+    var formValidator = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.flowDesignFormConditionCfgIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        $("#OperatorValueType").change(function () {
+            if ($(this).val() > "2") {
+                $("#PropertyName2").parent().parent().show();
+            } else {
+                $("#PropertyName2").parent().parent().hide();
+            }
+        });
+
+        var colHeaders = [
+            { columnName: 'ConditionId', width: 30, showName: 'ConditionId', hidden: true, align: 'center' },
+            { columnName: 'Sort', width: 50, showName: '序号', align: 'left', sort: true },
+            { columnName: 'ConditionText', width: 250, showName: '条件', align: 'left' },
+            { columnName: 'PropertyName', width: 300, showName: '属性', align: 'left', hidden: true },
+            { columnName: 'PropertyName2', width: 300, showName: '属性2', align: 'left', hidden: true },
+            { columnName: 'Operator', width: 300, showName: '操作符', align: 'left', hidden: true },
+            { columnName: 'OperatorValue', width: 300, showName: '比较值', align: 'left', hidden: true },
+            { columnName: 'OperatorValueType', width: 300, showName: '比较值类型', align: 'left', hidden: true }
+
+        ];
+
+        $gridTable = $('#ConditionsTable').jkfGrid({
+            remoteAddress: null,
+            columnHeaders: colHeaders,
+            mainId: 'ConditionId',
+            showNumber: false,
+            sortField: "Sort",
+            sortOrder: "asc",
+            hasCheckBox: true,
+        });
+
+        $("#btn_add").click(function () {
+            $("#PropertyName").val("1");
+            $("#PropertyName2").val("1");
+            $("#OperatorValue").val("");
+            $("#Operator").val("0");
+            $("#OperatorValueType").val("0");
+            $("#Sort").val("");
+        });
+
+        $("#btn_edit").click(function () {
+
+            var conditionId = $gridTable.getSelectRowValue("ConditionId");
+            if (!conditionId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (conditionId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            var selectRowData = $gridTable.getSelectedRowData(conditionId);
+            $("#PropertyName").val(selectRowData.PropertyName);
+            $("#PropertyName2").val(selectRowData.PropertyName2);
+            $("#Operator").val(selectRowData.Operator);
+            $("#OperatorValue").val(selectRowData.OperatorValue);
+            $("#OperatorValueType").val(selectRowData.OperatorValueType);
+            $("#Sort").val(selectRowData.Sort);
+            currentConditionId = conditionId;
+
+        });
+
+        $("#btn_remove").click(function () {
+            var conditionId = $gridTable.getSelectRowValue("ConditionId");
+            if (!conditionId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            var ids = conditionId.split(',');
+
+            for (var i in ids) {
+                deleteId(ids[i]);
+            }
+
+        });
+
+        $("#EnabledMark").change(function () {
+            if ($(this).prop("checked")) {
+                $(this).val(1);
+            } else {
+                $(this).val(0);
+            }
+        })
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        $("#Form").show();
+        getForm();
+
+        //从表单配置里面获取属性
+        var i = 0;
+        for (var j in FormCfgObj.InputTextRegions) {
+            var val = (parseInt(i) + 1);
+            var inputText = FormCfgObj.InputTextRegions[j];
+            $("#PropertyName").append("<option value='" + val + "'>" + inputText.Id + "</option>");
+            $("#PropertyName2").append("<option value='" + val + "'>" + inputText.Id + "</option>");
+            i++;
+        }
+        for (var j in FormCfgObj.TextAreaRegions) {
+            var val = (parseInt(i) + 1);
+            var textArea = FormCfgObj.TextAreaRegions[j];
+            $("#PropertyName").append("<option value='" + val + "'>" + textArea.Id + "</option>");
+            $("#PropertyName2").append("<option value='" + val + "'>" + textArea.Id + "</option>");
+            i++;
+        }
+        for (var j in FormCfgObj.DateTimeRegions) {
+            var val = (parseInt(i) + 1);
+            var dateTime = FormCfgObj.DateTimeRegions[j];
+            $("#PropertyName").append("<option value='" + val + "'>" + dateTime.Id + "</option>");
+            $("#PropertyName2").append("<option value='" + val + "'>" + dateTime.Id + "</option>");
+            i++;
+        }
+        for (var j in FormCfgObj.SelectorRegions) {
+            var val = (parseInt(i) + 1);
+            var selector = FormCfgObj.SelectorRegions[j];
+            $("#PropertyName").append("<option value='" + val + "'>" + selector.Id + "</option>");
+            $("#PropertyName2").append("<option value='" + val + "'>" + selector.Id + "</option>");
+            i++;
+        }
+
+        $("#saveConditionForm").click(function () {
+            var ConditionId = '';
+            if (!currentConditionId) {
+                ConditionId = jkf.newGuid();
+            } else {
+                ConditionId = currentConditionId;
+            }
+            var PropertyName = $("#PropertyName").val();
+            var PropertyName2 = $("#PropertyName2").val();
+            var Operator = $("#Operator").val();
+
+            var OperatorInt = parseInt(Operator);
+
+            var OperatorValue = $("#OperatorValue").val();
+            var OperatorValueType = $("#OperatorValueType").val();
+            var OperatorValueTypeInt = parseInt(OperatorValueType);
+
+            var PropertyNameText = $("#PropertyName").find("option:selected").text();
+            var PropertyNameText2 = $("#PropertyName2").find("option:selected").text();
+            var OperatorText = $("#Operator").find("option:selected").text();
+
+            var ConditionText = "";
+            if (OperatorInt > 0 && OperatorInt <= 5) {
+                ConditionText += PropertyNameText;
+                ConditionText += " " + OperatorText + " ";
+                if (OperatorValueType == "1") {
+                    ConditionText += "\"" + OperatorValue + "\"";
+                } else if (OperatorValueType == "2") {
+                    ConditionText += OperatorValue;
+                } else {
+                    ConditionText += OperatorValue;
+                }
+            }
+            else if (OperatorInt == 6) {
+                ConditionText = PropertyNameText;
+
+                if (OperatorValueType == "1") {
+                    ConditionText += ".Contains(\"" + OperatorValue + "\")";
+                } else if (OperatorValueType == "2") {
+                    ConditionText += ".Contains(" + OperatorValue + ")";
+                } else {
+                    ConditionText += ".Contains(" + OperatorValue + ")";
+                }
+            }
+            else if (OperatorInt == 7) {
+
+                if (OperatorValueType == "1") {
+                    ConditionText = "\"" + OperatorValue + "\"";
+                } else {
+                    ConditionText = OperatorValue;
+                }
+                ConditionText += ".Contains(" + PropertyNameText + ")";
+            } else if (OperatorInt == 8) {
+                ConditionText = '((TimeSpan)(DateTime.Parse(' + PropertyNameText2 + ') - DateTime.Parse(' + PropertyNameText + '))).TotalHours > ' + OperatorValue;
+            } else if (OperatorInt == 9) { 
+                ConditionText = '((TimeSpan)(DateTime.Parse(' + PropertyNameText2 + ') - DateTime.Parse(' + PropertyNameText + '))).TotalDays > ' + OperatorValue;
+            }
+
+            var Condition = {
+                ConditionId: ConditionId,
+                PropertyName: PropertyName,
+                PropertyName2: PropertyName2,
+                Operator: Operator,
+                OperatorValue: OperatorValue,
+                OperatorValueType: OperatorValueType,
+                ConditionText: ConditionText,
+                Sort: $("#Sort").val()
+
+            }
+
+            if (isNaN($("#Sort").val())) {
+                jkf.showTips("序号必须为正整数", 2);
+            }
+
+            var isExist = false;
+            var existId = -1;
+            for (var i in Conditions) {
+                if (Conditions[i].ConditionId == ConditionId) {
+                    existId = i;
+                    isExist = true;
+                    break;
+                }
+            }
+
+            if (!isExist) {
+                for (var j in Conditions) {
+                    if (Conditions[j].Sort == $("#Sort").val()) {
+                        jkf.showTips("序号不能相同", 2);
+                        return;
+                    }
+                    if (Conditions[j].ConditionText == ConditionText) {
+                        jkf.showTips("条件不能相同", 2);
+                        return;
+                    }
+                }
+                Conditions.push(Condition);
+            } else {
+                for (var j in Conditions) {
+                    if (j != existId) {
+                        if (Conditions[j].Sort == $("#Sort").val()) {
+                            jkf.showTips("序号不能相同", 2);
+                            return;
+                        }
+                        if (Conditions[j].ConditionText == ConditionText) {
+                            jkf.showTips("条件不能相同", 2);
+                            return;
+                        }
+                    }
+
+                }
+                Conditions[existId] = Condition;
+            }
+            $gridTable.setAndFlushData(Conditions);
+        })
+
+
+    });
+
+    function deleteId(conditionId) {
+        var deleteId = -1;
+        for (var i in Conditions) {
+            if (Conditions[i].ConditionId == conditionId) {
+
+                deleteId = i;
+                break;
+            }
+        }
+        if (deleteId >= 0) {
+            Conditions.splice(deleteId, 1);
+        }
+
+        $gridTable.setAndFlushData(Conditions);
+    }
+
+    function getForm() {
+        var res = $.httpGet({
+            url: '/Workflow/WorkFlowDesign/GetConditionRule', param: { workFlowNodeId: workFlowNodeId }
+        });
+
+        if (res.code == 200) {
+            conditionRule = res.datas;
+            RulesJson = conditionRule.RulesJson;
+            if (RulesJson != null) { 
+                Rules = JSON.parse(RulesJson);
+                Conditions = Rules.Conditions;
+                $gridTable.setAndFlushData(Conditions);
+                $("#Formula").val(Rules.Formula);
+                $("#EnabledMark").val(Rules.EnabledMark);
+                $("#EnabledMark").prop("checked", Rules.EnabledMark == 1);
+            }
+        }
+
+        res = $.httpGet({
+            url: '/Workflow/WorkFlowDesign/GetForm', param: { WorkFlowDesignId: workFlowDesignId }
+        });
+
+        if (res.code == 200) {
+            workFlowDesign = res.datas;
+            FormCfg = workFlowDesign.CustomizedForm.FormCfg;
+            $('.container_item0').find('.tableContent').html(FormCfg);
+            console.log("FormCfg:" + FormCfg);
+            FormCfgObj = JSON.parse(FormCfg);
+        }
+    }
+
+    function saveForm() {
+
+        Rules= {};
+
+        Rules.Conditions = Conditions;
+        Rules.Formula = $("#Formula").val();
+        Rules.EnabledMark = $("#EnabledMark").val();
+
+        RulesJson = JSON.stringify(Rules);
+
+        if (conditionRule == null) conditionRule = {};
+        conditionRule.WorkFlowNodeId = workFlowNodeId;
+        conditionRule.RulesJson = RulesJson;
+
+        $.httpPostAsync({
+            url: '/Workflow/WorkFlowDesign/SaveConditionRule', param: conditionRule
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                conditionRuleId = res.datas;
+                if (parentIframe != null) {
+                    parentIframe.UpdateConditionRuleId(conditionRuleId);
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+        })
+    }
+
+   
+</script>

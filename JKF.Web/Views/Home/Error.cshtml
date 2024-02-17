@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "错误页";
+    Layout = null;
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<h1 class="text-danger red">出错了!</h1>
+<h2 class="text-danger red">请求路径：@ViewBag.ExceptionPath</h2>
+<div class="text-danger red" id="errDesc">
+    错误信息：<br />
+    @ViewBag.ExceptionMessage
+    <hr />
+    调用堆栈：<br />
+    @ViewBag.StackTrace
+</div>
+<script>
+        function request(d) { for (var c = location.search.slice(1).split("&"), a = 0; a < c.length; a++) { var b = c[a].split("="); if (b[0] == d) if ("undefined" == unescape(b[1])) break; else return unescape(b[1]) } return "" };
+</script>
+<script>
+   
+</script>
+

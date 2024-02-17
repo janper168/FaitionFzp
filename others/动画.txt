@@ -1,0 +1,46 @@
+css 旋转动画
+
+@keyframes rotate{
+%0{
+ transform:rotate(0deg)
+}
+100%{
+ transform:rotate(360deg)
+}
+}
+
+animation:rotate 1.5s linear 0.2s infinite
+
+@keyframes music{
+0%{
+ transform:translate3d(80%,0,0)
+}
+100%{
+ transform:translate3d(-80%,0,0)
+}
+}
+animation:music 4s linear 0.2s infinite
+
+
+swiper :
+@touchstart
+@touctend
+
+touchStart(res){
+ res.changedTouches[0].pageY
+}
+
+touchEnd(res){
+res.changedTouches[0].pageY
+}
+
+父组件调用子组件的方法
+
+加属性
+ref="player"
+
+this.$refs.player[index].play()
+
+OnReady()
+
+this.videoContext.seek(0)

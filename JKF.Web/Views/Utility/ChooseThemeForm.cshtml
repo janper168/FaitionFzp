@@ -1,0 +1,54 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+
+<div id="Form" class="form" style="display: block; overflow:auto;height: 90%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="themeColor">主题颜色：</label></div>
+            <input class="blue" type="radio" value="bg-color-lightblue" name="themeColor" checked="checked">浅蓝<br />
+            <input class="blue" type="radio" value="bg-color-darkblue" name="themeColor">深蓝<br />
+            <input class="blue" type="radio" value="bg-color-lightgreen" name="themeColor">浅绿<br />
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+   
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.checkThemeIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+    });
+
+
+
+    function getTheme() {
+       
+        colorCssName = $(":radio[name=themeColor]:checked").val();
+        parent.setTheme(colorCssName);
+ 
+    }
+</script>

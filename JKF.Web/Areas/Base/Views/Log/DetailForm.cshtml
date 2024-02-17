@@ -1,0 +1,141 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="Category">日志类型</label></div>
+            <input id="Category" data-required="true" class="width_300 default-input" type="text" data-type="text"  />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="OperateAccount">操作者</label></div>
+            <input id="OperateAccount" data-required="true" class="width_300 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="OperateTime">操作时间</label></div>
+            <input id="OperateTime" data-required="true" class="width_300 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="OperateType">操作类型</label></div>
+            <input id="OperateType" data-required="true" class="width_300 default-input" type="text" data-type="text" data-vale="" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="IPAddress">IP地址</label></div>
+            <input id="IPAddress" data-type="text" class="width_300 default-input" type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Module">模块</label></div>
+            <input id="Module" class="width_300 default-input" type="text" data-type="regex" data-regex="^[a-zA-Z0-9_-]+@@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$" data-errorMsg="必须为邮箱！" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Result">操作结果</label></div>
+            <input id="Result" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+    </div>
+   
+    <div class="form_row">      
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="ResultDetail">结果详情</label></div>
+            <textarea id="ResultDetail" class="height_100 width_800 default-input" data-type="text"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var logId = request('logId');
+
+    var jfkInit = (function ($, jkf) {
+
+       
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+        //var data = jkf.GetIFrameWindowData($Form);
+        
+        //var  = data.authorizedForms;
+        //jkf.prauthorizedFormsocessAuthorizedForms($("#Form"), authorizedForms);
+        
+        $("#Form").show();
+
+        if (!!logId) {
+            getForm();
+        }
+
+
+    });
+    var log = {};
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/Log/GetForm', param: { logId: logId }
+
+        });
+
+        if (res.code == 200) {
+            log = res.datas;
+
+            if (log.CategoryId == 1){
+                $('#Category').val("登录");
+            }else if (log.CategoryId == 2){
+                $('#Category').val("访问");
+            }else if (log.CategoryId == 3){
+                $('#Category').val("操作");
+            }else if (log.CategoryId == 4){
+                $('#Category').val("异常");
+            }
+
+            $('#OperateAccount').val(log.OperateAccount);
+            $('#OperateTime').val(log.OperateTime.substring(0,19).replace('T',' '));
+            $('#OperateType').val(log.OperateType);
+            $('#IPAddress').val(log.IPAddress);
+            $('#Module').val(log.Module);
+            $('#Result').val(log.ExecuteResult == 1?"成功":"失败");
+            $('#ResultDetail').text(log.ExecuteResultJson);
+        }
+
+    }
+
+   
+</script>

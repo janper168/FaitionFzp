@@ -1,0 +1,129 @@
+﻿@{
+    Layout = "_Form";
+}
+<style>
+    html,body{
+        width: 100%;
+        height: 100%;
+    }
+
+    #container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-bottom: 1px solid #ccc;
+    }
+
+</style>
+<div id="container">
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="TaskNodeLogTable"></div>
+    </div>
+</div>
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var TaskId =request('TaskId');
+    var TaskNodeProcesserId = request('TaskNodeProcesserId');
+    var Task = {};
+    var $gridTable = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var colHeaders = [
+            { columnName: 'TaskNodeLogId', width: 500, showName: '任务', hidden: true, align: 'left' },
+            { columnName: 'TaskNodeName', width: 500, showName: '节点', hidden: false, align: 'left' },
+            {
+                columnName: 'Processer', width: 150, showName: '处理人', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["TaskNodeProcesser"]) {
+                        return rowData["TaskNodeProcesser"].Processer.RealName;
+                    } else {
+                        return "";
+                    }
+                }
+            },
+            {
+                columnName: 'ProcessResult', width: 100, showName: '意见', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    switch (val) {
+                        case 1:
+                            return '<div style="color:white;background-color:green;width:fit-content;height:fit-content;">同意</div>';
+                        case 2:
+                            return '<div style="color:white;background-color:red;width:fit-content;height:fit-content;">不同意</div>';
+                        case 3:
+                            return '<div style="color:white;background-color:orange;width:fit-content;height:fit-content;">已阅</div>';
+                        default:
+                            return '<div style="color:white;background-color:gray;width:fit-content;height:fit-content;">未知</div>';
+                    }
+                }
+            },
+            {
+                columnName: 'ProcessTime', width: 150, showName: '处理时间', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val) return val.replace('T', " ").substring(0, 19);
+                }
+            },
+            {
+                columnName: 'ProcessComment', width: 300, showName: '评论 ', hidden: false, align: 'left',
+            }
+        ]
+
+        if (!TaskId && TaskNodeProcesserId) {
+            var res = $.httpGet({
+                url: '/workFlow/Task/getTaskId', param: { TaskNodeProcesserId: TaskNodeProcesserId }
+            });
+            if (res.code == 200) {
+                TaskId = res.datas;
+            }
+        }
+
+        $gridTable = $('#TaskNodeLogTable').jkfGrid({
+            remoteAddress: '/WorkFLow/Task/GetTaskNodeLog?TaskId='+TaskId,
+            columnHeaders: colHeaders,
+            mainId: 'TaskNodeLogId',
+            showNumber: true,
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        
+
+    });
+
+    
+</script>

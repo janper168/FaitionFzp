@@ -1,0 +1,50 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>formItemPic</Title>
+    <Author>Microsoft Corporation</Author>
+    <Shortcut>formItemPic</Shortcut>
+    <Description>表单项图片段</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>columnName</ID>
+        <ToolTip>columnName</ToolTip>
+        <Default>columnName</Default>
+      </Literal>
+      <Literal>
+        <ID>width</ID>
+        <ToolTip>width</ToolTip>
+        <Default>200</Default>
+      </Literal>
+	  <Literal>
+        <ID>showName</ID>
+        <ToolTip>showName</ToolTip>
+        <Default>showName</Default>
+      </Literal>
+	  <Literal>
+        <ID>hidden</ID>
+        <ToolTip>hidden</ToolTip>
+        <Default>false</Default>
+      </Literal>
+	  <Literal>
+        <ID>align</ID>
+        <ToolTip>align</ToolTip>
+        <Default>center</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="html"><![CDATA[
+		<div class="form_item_half" >
+            <div class="labelText"><label class="form_label" for="CoverPic">封面图片</label></div>
+            <div id="CoverPicWrapper" style="position:relative;width:200px;line-height:200px;border:1px solid #ccc;background-color:#eee;"><img style="vertical-align:middle;max-width:200px;max-height:200px;" id="CoverPic_image" /><div id="CoverPic_select" style="width:35px;height:20px;line-height:20px;position:absolute;left:0;top:0;background:lightblue;color:#fff;">选择</div></div>
+            <input id="CoverPic" data-required="true" class="width_200 default-input" type="hidden" data-type="image" data-vale="" />
+            <input id="CoverPic_Upload" type="file" style="display:none;" name="CoverPic_Upload" />
+        </div>
+
+
+]]></Code>
+  </Snippet>
+</CodeSnippet>

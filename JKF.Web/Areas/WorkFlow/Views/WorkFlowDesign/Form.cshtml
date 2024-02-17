@@ -1,0 +1,126 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="Name">流程名称</label></div>
+            <input id="Name" type="text" data-required="true" class="default-input" data-type="text" style="width:800px;height:34px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="CustomizedFormId">关联表单</label></div>
+            <input id="CustomizedFormId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:800px;height:34px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="Description">备注</label></div>
+            <textarea id="Description" class="default-input" data-type="text" style="width:800px;height:150px;"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var workFlowDesignId = request('WorkFlowDesignId');
+    var workFlowDesign = {};
+
+    var formValidator = null;
+
+    $("#Name").attr("data-check-exists-url", "/WorkFlow/workFlowDesign/IsExistName?keyValue=" + workFlowDesignId);
+    //$("#Name").attr("data-check-exists-url", "/WorkFlow/Customized/IsExistName?KeyValue=" + CustomizedId);
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        $.setSelect({
+            url: "/WorkFlow/CustomizedForm/GetAll",
+            textCtrlId: "CustomizedFormId",
+            ctrlId: "CustomizedFormId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+        $("#Form").show();
+
+        if (!!workFlowDesignId) {
+            getForm();
+        }
+
+        formValidator = $("#Form").formValidator()
+    });
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/WorkFlow/workFlowDesign/GetForm', param: { workFlowDesignId: workFlowDesignId }
+
+        });
+
+        if (res.code == 200) {
+            workFlowDesign = res.datas;
+
+            $.setFormData(workFlowDesign, $("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!workFlowDesignId) workFlowDesign.workFlowDesignId = workFlowDesignId;
+        $.getFormData(workFlowDesign, $("#Form"));
+        
+        workFlowDesign.CustomizedForm = null;
+
+        $.httpPostAsync({ url: '/WorkFlow/workFlowDesign/SaveForm', param: workFlowDesign }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+        })
+    }
+</script>

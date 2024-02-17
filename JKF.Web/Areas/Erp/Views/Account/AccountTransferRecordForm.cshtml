@@ -1,0 +1,159 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="OutAccountId">转出账户</label></div>
+            <input id="OutAccountId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="InAccountId">转入账户</label></div>
+            <input id="InAccountId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ChargeAmount">手续费</label></div>
+            <input id="ChargeAmount" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="TotalAmount">转账金额</label></div>
+            <input id="TotalAmount" type="text" data-required="true" class="default-input" data-type="integer" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ProcessorId">处理人</label></div>
+            <input id="ProcessorId" type="text" data-required="true" class="default-input" data-type="text_select" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ChargePayer">手续支付方</label></div>
+            <input class="blue" type="radio" value="1" name="ChargePayer" />转出方
+            <input class="blue" type="radio" value="2" name="ChargePayer" checked="checked" />转入方
+            <input id="ChargePayer" class="width_200 default-input" type="hidden" data-type="radio" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="OutTime">转出时间</label></div>
+            <input id="OutTime" type="text" data-required="true" class="Wdate default-input" data-type="date" onclick="WdatePicker();" style="width:200px;height:30px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="InTime">转入时间</label></div>
+            <input id="InTime" type="text" data-required="true" class="Wdate default-input" data-type="date" onclick="WdatePicker();" style="width:200px;height:30px;" />
+        </div>
+    </div>
+    <div class="form_row" style="height:100px;">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Remark">备注</label></div>
+            <textarea id="Remark" class="height_50 width_250 default-input" data-type="text"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+
+    var formValidator = null;
+
+    AccountTransferRecord = {};
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+        $.setSelect({
+            url: "/Erp/Account/GetAll",
+            textCtrlId: "OutAccountId",
+            ctrlId: "OutAccountId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+        $.setSelect({
+            url: "/Erp/Account/GetAll",
+            textCtrlId: "InAccountId",
+            ctrlId: "InAccountId_select",
+            idKey: "ItemValue",
+            valueKey: "ItemName",
+            width: 200,
+            height: 250
+        })
+
+        $.setSelect({
+            url: "/Base/User/GetAllUsers",
+            textCtrlId: "ProcessorId",
+            ctrlId: "ProcessorId_select",
+            idKey: "UserId",
+            valueKey: "UserName",
+            width: 200,
+            height: 250
+        })
+
+        $("#Form").show();
+
+
+        formValidator = $("#Form").formValidator()
+    });
+
+
+
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+        if ($("#OutAccountId").data("value") == $("#InAccountId").data("value")) {
+            top.jkf.showTips("转出方和转入方不能一样！", 3);
+            return false;
+        }
+
+        $.getFormData(AccountTransferRecord, $("#Form"));
+
+        $.httpPostAsync({ url: '/Erp/Account/SaveAccountTransferRecordForm', param: AccountTransferRecord }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

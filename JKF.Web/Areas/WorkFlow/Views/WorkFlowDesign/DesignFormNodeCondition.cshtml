@@ -1,0 +1,151 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row" style="height:60px;">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="NodeName">节点名称</label></div>
+            <input id="NodeName" type="text" data-required="true" class="default-input" data-type="text" style="width:200px;height:34px;" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="ConditionRuleId">条件规则</label></div>
+            <input id="ConditionRuleId" type="hidden" data-required="false" class="default-input" data-type="text" style="width:200px;height:34px;" />
+            <button id="configureBtn" class="btn blue" title="配置条件规则">配置条件规则</button>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var nodeId = request('nodeId');
+    var workFlowDesignId = request('workFlowDesignId');
+    var node = {};
+    //var conditionRuleId = "";
+    var workFlowNodeId = "";
+
+    //alert(nodeId);
+    //alert(workFlowDesignId);
+
+    var formValidator = null;
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.flowDesignFormNodeIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        //var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        //var $Form = jkf.$topBody.find("#" + FormId);
+        //jkf.processAuthorizedForms($("#Form"));
+
+
+        $("#Form").show();
+        getForm();
+
+
+        $("#configureBtn").click(function (e) {
+
+            top.jkf.openFrame({
+                parentFrameId: $openIframe.attr("id"),
+                title: "流程节点（条件）设置：" + nodeId,
+                width: 1200,
+                height: 700,
+                level: 3,
+                url: '/WorkFlow/WorkFlowDesign/DesignFormNodeConditionCfg?workFlowNodeId=' + workFlowNodeId + "&workFlowDesignId=" + workFlowDesignId,
+                data: null,
+                hasMinButton: false,
+                hasMaxButton: true,
+                hasCloseButton: true,
+                isWazard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.flowDesignFormConditionCfgIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ]
+            });
+
+        });
+
+        formValidator = $("#Form").formValidator();
+
+    });
+
+    function getForm() {
+        var res = $.httpGet({
+            url: '/Workflow/WorkFlowDesign/GetNodeForm', param: { nodeId: nodeId, workFlowDesignId: workFlowDesignId }
+        });
+
+        if (res.code == 200) {
+            node = res.datas;
+            if (node != null) { 
+                $.setFormData(node, $("#Form"));
+                
+                workFlowNodeId = node.WorkFlowNodeId;
+            }
+                
+        }
+
+    }
+
+    function UpdateConditionRuleId(id){
+        $("#ConditionRuleId").val(id)  
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+        if (node == null) node = {};
+        node.WorkFlowDesignId = workFlowDesignId;
+        node.NodeId = nodeId;
+        node.NodeType = "condition";
+
+        $.getFormData(node, $("#Form"));
+
+        $.httpPostAsync({
+            url: '/Workflow/WorkFlowDesign/SaveFormNode', param: node
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.updateNodeText(node.NodeType, node.NodeId, node.NodeName);
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+        })
+    }
+
+    
+</script>

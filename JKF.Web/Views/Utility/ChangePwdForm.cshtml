@@ -1,0 +1,62 @@
+﻿
+@{
+    Layout = "_Form";
+}
+<style>
+    *{
+        margin:0px;
+        padding:0px;
+    }
+    input{
+        width:200px;
+        height:30px;
+        border:1px solid lightgray;
+    }
+
+
+</style>
+<div style="margin-left:10px;"><div>密码：</div><input type="password" id="password1" /></div>
+<div style="margin-left:10px;"><div>重复密码：</div><input type="password" id="password2" /></div>
+<div style="text-align:center;margin-top:10px;">
+    <button id="submit" class="blue" style="padding:5px;">提交</button></div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+   
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.checkThemeIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+       
+        $("#submit").click(function (e) { 
+            var p1 = $("#password1").val()
+            var p2 = $("#password2").val();
+            if (!p1 || !p2) { 
+                alert("请填写密码！");
+                return;
+            }
+            if (p1 != p2) {
+                alert("密码必须一致！");
+            }
+
+            var res = $.httpGet(
+                {
+                    url: "/Login/ChangePwd",
+                    param: {          
+                        userPassword: p1
+                    }
+                });
+            if (res.code == 200) {
+                top.jkf.showTips("修改成功！" , 1);
+            } else {
+                top.jkf.showTips("修改失败:" + res.errMsg, 2);
+            }
+        })
+
+    });
+
+
+    
+</script>

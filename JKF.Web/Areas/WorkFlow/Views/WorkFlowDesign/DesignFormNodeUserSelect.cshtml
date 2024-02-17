@@ -1,0 +1,218 @@
+﻿@{
+    Layout = "_Form";
+}
+<style >
+    .container_item {
+        display: block;
+        float: left;
+        width: 98%;
+        height: 96%;
+        padding: 3px;
+        margin: 3px 3px 3px 0px;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 15px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-bottom: 0;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    .treeContent {
+        display: block;
+        width: 100%;
+        height: 90%;
+        border: 1px solid #ccc;
+    }
+</style>
+
+
+@* <div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+    </div>
+    <div class="form_row">
+    </div>
+    <div class="form_row">
+    </div>
+    <div class="form_row">
+    </div>
+    <div class="form_row">
+    </div>
+    <div class="form_row">
+    </div>
+</div> *@
+<div class="container_item" id="modulesContainer">
+    <div class="layerBar">选择用户</div>
+    <div class="treeContent">
+        <div id="usersTree"></div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var workFlowDesignId = request('workFlowDesignId');
+    var nodeId = request('nodeId');
+    var WorkFlowDesign = {};
+
+    var usersSelect = [];
+
+    var formValidator = null;
+    var datas = [];
+    var initDatas = [];
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.flowDesignFormNodeUserIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+        initDatas = jkf.GetIFrameWindowData($Form);
+
+        //var authorizedForms = data.authorizedForms;
+        //jkf.processAuthorizedForms($("#Form"), authorizedForms);
+        $("#Form").show();
+
+        var res = $.httpGet({
+            url: '/workflow/workflowdesign/GetUsersTree'
+        });
+
+        if (res.code == 200) {
+            datas = res.datas;
+        }
+
+        $("#usersTree").jkf_tree({
+            url: null,
+            param: null,
+            type: "get",
+            async: false,
+            datas: datas,
+            treeParentIdKey: 'ParentId',
+            treeKeyKey: 'UserId',
+            treeValueKey: 'UserName',
+            iconValueKey: 'Icon',
+            defaultIcon: '',
+            hasCheckBox: true,
+            checkEvent: userCheckEvent,
+            //selectEvent: moduleSelectEvent,
+            initCheckBoxData: initDatas,
+        });
+
+
+    });
+
+
+    function userCheckEvent(userId, checked, isSingle) {
+
+        var checkUserIds = [];
+        if (userId != "0")
+            checkUserIds.push(userId);
+        if (isSingle) {//只有根节点
+            for (var i in checkUserIds) {
+                userCheck(checkUserIds[i], checked);
+            }
+            return;
+        }
+
+        //处理孩子节点
+        pushSelectUserIds(checkUserIds, datas, userId);
+
+        for (var i in checkUserIds) {
+            userCheck(checkUserIds[i], checked);
+        }
+
+    }
+
+    function pushSelectUserIds(checkUserIds, datas, userId) {
+        for (var i in datas) {
+            if (datas[i].ParentId == userId) {
+                checkUserIds.push(datas[i].UserId);
+                pushSelectUserIds(checkUserIds, datas, datas[i].UserId);
+            }
+        }
+    }
+
+
+    function userCheck(userId, checked) {
+        var deleteId = -1;
+        for (var i in initDatas) {
+            if (initDatas[i] == userId) {
+                deleteId = i;
+                break;
+            }
+        }
+        if (deleteId != -1) {
+            if (checked == false) //找到了，说明存在，把选中的删除
+                initDatas.splice(deleteId, 1);
+        } else {
+            if (checked == true) //如果找不到，说明是没选中的，添加进去
+                initDatas.push(userId);
+        }
+    }
+
+
+    function getForm() {
+
+        // var res = $.httpGet({
+        //     url: '/WorkFlow/WorkFlowDesign/GetForm', param: { WorkFlowDesignId: WorkFlowDesignId }
+
+        // });
+
+        // if (res.code == 200) {
+        //     WorkFlowDesign = res.datas;
+
+        //     $.setFormData(WorkFlowDesign, $("#Form"));
+        // }
+
+    }
+
+    function saveForm() {
+
+        // if (!formValidator.valid()) {
+        //     return false;
+        // }
+
+        // if (!!WorkFlowDesignId) WorkFlowDesign.WorkFlowDesignId = WorkFlowDesignId;
+        // $.getFormData(WorkFlowDesign, $("#Form"));
+
+        // $.httpPostAsync({ url: '/WorkFlow/WorkFlowDesign/SaveForm', param: WorkFlowDesign }, function (res) {
+        //     if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.updateSelectUserDatas(initDatas);
+                }
+        //         window.location.reload();
+        //     } else {
+        //         top.jkf.showTips("保存失败！", 2);
+        //     }
+
+        // })
+    }
+</script>

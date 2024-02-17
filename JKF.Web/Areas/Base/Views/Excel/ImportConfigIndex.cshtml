@@ -1,0 +1,309 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+            <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+            <button id="btn_download" class="btn orange"><i class="fa fa-download"></i>下载导入模板</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="ModuleExcelImportConfigTable"></div>
+    </div>
+</div>
+<script>
+
+
+    var parentIframe = null;
+    var currentIframe = null;
+    var moduleName = "";
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        currentIframe = top.jkf.getIframeByElement(document.body);
+        top.jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = top.jkf.$topBody.find("#" + FormId);
+        var data = top.jkf.GetIFrameWindowData($Form);
+        moduleName = data.moduleName;
+        //alert(moduleName);
+        var colHeaders = [
+            { columnName: 'ModuleExcelImportConfigId', width: 30, showName: 'ModuleExcelImportConfigId', hidden: true, align: 'center' },
+            { columnName: 'PropertyName', width: 150, showName: '属性名称', align: 'left', sort: true },
+            { columnName: 'DisplayName', width: 150, showName: '显示名称', align: 'left', sort: true },
+            { columnName: 'SortCode', width: 80, showName: '排序', align: 'left', sort: true },
+            {
+                columnName: 'IsPhysics', width: 100, showName: '物理主键', align: 'left', sort: true,
+                formatter: function (val, rowData) {
+                    if (val == 0) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:#999;color:white;'>否</div>";
+                    } else if (val == 1) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:orange;color:white;'>是</div>";
+                    }
+                }
+            },
+            {
+                columnName: 'IsParentId', width: 100, showName: '父级属性', align: 'left', sort: true,
+                formatter: function (val, rowData) {
+                    if (val == 0) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:#999;color:white;'>否</div>";
+                    } else if (val == 1) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:orange;color:white;'>是</div>";
+                    } 
+                }
+            },          
+            {
+                columnName: 'IsRefer', width: 100, showName: '引用属性', align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 0) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:#999;color:white;'>否</div>";
+                    } else if (val == 1) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:orange;color:white;'>是</div>";
+                    }
+                }
+            },
+            {
+                columnName: 'IsDataItem', width: 100, showName: '字典引用', align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 0) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:#999;color:white;'>否</div>";
+                    } else if (val == 1) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:orange;color:white;'>是</div>";
+                    }
+                }
+            },
+            {
+                columnName: 'IsArea', width: 100, showName: '区域引用', align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 0) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:#999;color:white;'>否</div>";
+                    } else if (val == 1) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:orange;color:white;'>是</div>";
+                    }
+                }
+            },
+            {
+                columnName: 'IsValid', width: 100, showName: '是否有效', align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 0) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:#999;color:white;'>否</div>";
+                    } else if (val == 1) {
+                        return "<div style='width:20px;height:18px;line-height:18px;padding:2px 3px;background-color:orange;color:white;'>是</div>";
+                    }
+                }
+            },
+            { columnName: 'RefEntityName', width: 250, showName: '引用实体', align: 'left' },
+            { columnName: 'RefPropertyName', width: 250, showName: '引用属性', align: 'left' },
+            { columnName: 'RefEntityServiceName', width: 250, showName: '引用服务', align: 'left' },
+           
+
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders, authorizedColumns);
+
+        $gridTable = $('#ModuleExcelImportConfigTable').jkfGrid({
+            remoteAddress: '/Base/Excel/GetModuleExcelImportConfigs',
+            columnHeaders: colHeaders,
+            mainId: 'ModuleExcelImportConfigId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 30,
+            hasCheckBox: true,
+            sortField: 'SortCode',
+            sortOrder: 'asc'
+        });
+
+        $gridTable.getRemoteData({ keyWord: null, moduleName: moduleName }, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord, moduleName: moduleName });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord,moduleName:ModuleName });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+            $gridTable.openFrameWindow({
+                title: "新增-导入字段配置信息",
+                width: 1300,
+                height: 700,
+                level: 2,
+                url: '/Base/Excel/ImportConfigForm',
+                data: { moduleName: moduleName },
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: $openIframe.attr("id"),
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.ImportConfigFormIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_edit").click(function () {
+
+            var moduleExcelImportConfigId = $gridTable.getSelectRowValue("ModuleExcelImportConfigId");
+            if (!moduleExcelImportConfigId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (moduleExcelImportConfigId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "编辑-导入字段配置信息",
+                width: 1300,
+                height: 700,
+                level: 2,
+                url: '/Base/Excel/ImportConfigForm?moduleExcelImportConfigId=' + moduleExcelImportConfigId,
+                data: { moduleName: moduleName },
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: $openIframe.attr("id"),
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.ImportConfigFormIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+            var ModuleExcelImportConfigId = $gridTable.getSelectRowValue("ModuleExcelImportConfigId");
+            if (!ModuleExcelImportConfigId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Excel/RemoveModuleExcelImportForm', param: { moduleExcelImportConfigId: ModuleExcelImportConfigId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+       
+        $("#btn_download").click(function () {
+
+            window.open("/base/excel/downloadImportExcelTemplate?moduleName=" + moduleName, 'newwindow');
+
+        });
+        
+
+        //top.jkf.processAuthorizedButtons(".buttonBar", authorizedButtons);
+
+
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord,moduleName });
+        }
+    }
+
+</script>

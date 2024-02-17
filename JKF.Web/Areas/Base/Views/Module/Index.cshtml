@@ -1,0 +1,264 @@
+﻿@{
+    Layout = "_Index";
+}
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        /*border-top: 1px solid red;*/
+        /*border-bottom: 1px solid #ccc;*/
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+            <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="moduleTable"></div>
+    </div>
+</div>
+<script>
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'ModuleId', width: 30, showName: 'ModuleId', hidden: true, align: 'center' },
+            { columnName: 'ParentId', width: 30, showName: 'ParentId', hidden: true, align: 'center' },
+            { columnName: 'EnCode', width: 250, showName: '编码', align: 'left' },
+            { columnName: 'Name', width: 200, showName: '名称', align: 'left' },
+            { columnName: 'UrlAddress', width: 300, showName: '地址', align: 'left' },
+            { columnName: 'Icon', width: 150, showName: '文字图标', align: 'left' },
+            {
+                columnName: 'Target', width: 150, showName: '菜单类型',
+                formatter: function (colValue) {
+                    if (colValue == 1) {
+                        return "目录";
+                    } else if (colValue == 2) {
+                        return "子节点"
+                    }
+                },
+                align: 'left'
+            },
+            { columnName: 'Sort', width: 100, showName: '排序', align: 'left' },
+            {
+                columnName: 'EnabledMark', width: 100, showName: '是否有效', align: 'left',
+                formatter: function (colValue) {
+                    if (colValue == 1) {
+                        return "<i class='fa fa-check'></i>";
+                    } else if (colValue == 0) {
+                        return "<i class='fa fa-close'></i>";
+                    }
+                },
+            },
+
+            { columnName: 'Description', width: 300, showName: '描述', align: 'left' }
+        ]
+
+        //alert($("#moduleTable").width());
+        //alert($("#moduleTable").height());
+
+        $gridTable = $('#moduleTable').jkfGrid({
+            remoteAddress: '/Base/Module/GetModules',
+            columnHeaders: colHeaders,
+            mainId: 'ModuleId',
+            treeMode: true,
+            treeModeParentId: 'ParentId',
+            treeModeLevelColumn: 'Name',
+            showNumber: true
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $("#btn_add").click(function () {
+            $gridTable.openFrameWindow({
+                title: "新增-功能模块定义",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Module/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_prev",
+                        buttonText: "上一步",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.prev();
+                        }
+                    },
+                    {
+                        buttonId: "button_next",
+                        buttonText: "下一步",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.next();
+
+                        }
+                    },
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_edit").click(function () {
+
+            var moduleId = $gridTable.getSelectRowValue("ModuleId");
+            if (!moduleId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "编辑--功能模块定义",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/Module/Form?moduleId=' + moduleId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_prev",
+                        buttonText: "上一步",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.prev();
+                        }
+                    },
+                    {
+                        buttonId: "button_next",
+                        buttonText: "下一步",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.next();
+
+                        }
+                    },
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+            var moduleId = $gridTable.getSelectRowValue("ModuleId");
+            if (!moduleId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/Module/RemoveForm', param: { moduleId: moduleId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshTreeData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+        $gridTable.setTableLineDbclick(function ($line) {
+            $("#btn_edit").trigger('click');
+        })
+
+
+    });
+
+    function refreshTreeData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>

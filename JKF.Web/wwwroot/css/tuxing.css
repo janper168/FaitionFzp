@@ -1,0 +1,279 @@
+﻿.lingxing {
+    position: absolute;
+    display: block;
+    border: 0px solid blue;
+    z-index:1;
+}
+
+.endonTuxing {
+    position: absolute;
+    display: block;
+    border: 0px solid blue;
+    z-index: 1;
+}
+
+.fangxing {
+    position: absolute;
+    display: block;
+    border: 0px solid transparent;
+    z-index: 1;
+}
+
+.lingxing.deleteMode, .endonTuxing.deleteMode, .fangxing.deleteMode {
+    border: 2px solid red;
+    box-shadow: 0 0 3px red;
+}
+
+.lineObject {
+    position: absolute;
+    display: block;
+    border: 0px solid blue;
+}
+
+    .lineObject.deleteMode {
+    
+    }
+
+    .lingxingInner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: block;
+        border: 0px solid blue;
+    }
+
+.endonInner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: block;
+    border: 0px solid blue;
+}
+
+.fangxingInner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: block;
+    border: 0px solid blue;
+}
+
+div.point {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 8px;
+    background-color: gray;
+    display: block;
+}
+
+
+    div.point:hover {
+        background-color: red;
+    }
+
+    div.point.clicked {
+        background-color: orange;
+    }
+
+
+div.a2B {
+    position: relative;
+    width:100%;
+    height:100%;
+}
+
+div.a2BInner {
+    position:absolute;
+}
+
+    div.a2B.leftAndLeft {
+        position: relative;
+        border: 3px solid black;
+        border-right: 0px solid black;
+        z-index: -999;
+    }
+
+div.a2B.rightAndRight {
+    position: relative;
+    border: 3px solid black;
+    border-left: 0px solid black;
+    z-index: -999;
+}
+
+div.a2B.leftAndLeft.deleteMode {
+    border: 3px solid red;
+    border-right: 0px solid black;
+}
+
+div.a2B.rightAndRight.deleteMode {
+    border: 3px solid red;
+    border-left: 0px solid black;
+}
+
+div.a2B.rightAndBottom {
+    position: relative;
+}
+
+div.a2BInner.rightAndBottom1 {
+    border-left: 3px solid black;
+    border-bottom: 3px solid black;
+}
+
+div.a2BInner.rightAndBottom2 {
+    border-right: 3px solid black;
+}
+
+div.a2B.leftAndBottom {
+    position: relative;
+}
+
+div.a2BInner.leftAndBottom1 {
+    border-right: 3px solid black;
+    border-bottom: 3px solid black;
+}
+
+div.a2BInner.leftAndBottom2 {
+    border-left: 3px solid black;
+}
+
+div.a2BInner.rightAndBottom1.deleteMode {
+    border-left: 3px solid red;
+    border-bottom: 3px solid red;
+}
+
+div.a2BInner.rightAndBottom2.deleteMode {
+    border-right: 3px solid red;
+}
+
+div.a2BInner.leftAndBottom1.deleteMode {
+    border-right: 3px solid red;
+    border-bottom: 3px solid red;
+}
+
+div.a2BInner.leftAndBottom2.deleteMode {
+    border-left: 3px solid red;
+}
+
+div.rightBottomArrow {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 15px solid red;
+    right: -10px;
+    bottom: 0px;
+}
+
+div.leftBottomArrow {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 15px solid red;
+    left: -10px;
+    bottom: 0px;
+}
+
+div.a2B .leftAndLeftArrow {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 15px solid red;
+    top: -10px;
+}
+
+    div.a2B .leftAndLeftArrow.left {
+        left: 85px;
+    }
+
+    div.a2B .leftAndLeftArrow.right {
+        right: 0px;
+    }
+
+div.a2B .rightAndRightArrow {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 15px solid red;
+    top: -10px;
+}
+
+    div.a2B .rightAndRightArrow.right {
+        right: 85px;
+    }
+
+    div.a2B .rightAndRightArrow.left {
+        left: 0px;
+    }
+
+div.hideBlock {
+    position: absolute;
+    border: 0px solid red;
+    height: 10px;
+    z-index: -888;
+    background-color: white;
+}
+
+
+div.controls {
+    position:fixed;
+    left :10px;
+    top:10px;
+    width:350px;
+    height:80px;
+    border-radius:10px;
+    box-shadow:0 0 5px lightGray;
+    border:1px solid lightGray;
+    z-index:100;
+    
+}
+
+div.control {
+    margin-top:10px;
+    width : 60px;
+    height: 60px;
+    border-radius :80px;
+    box-shadow:0 0 5px lightgray;
+    float:left;
+    margin:10px;
+    line-height:60px;
+    text-align:center;
+}
+    div.control.shenpi {
+        background-color:lightblue;
+    }
+
+    div.control.zhihui {
+        background-color: #00ff00;
+    }
+
+    div.control.childflow {
+        background-color: orange;
+    }
+
+    div.control.condition {
+        background-color: #00ffff;
+    }
+
+div.dragObject {
+    position:absolute;
+    display:none;
+    width:100px;
+    height:40px;
+    border:1px dashed blue;
+}
+
+div.jiedianText {
+    position: absolute;
+    font-size: 12px;
+    left: 2px;
+    top: 40px;
+    padding: 4px;
+}

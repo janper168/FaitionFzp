@@ -1,0 +1,70 @@
+﻿<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Highcharts 教程 | 菜鸟教程(runoob.com)</title>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+    <div id="container" style="width: 550px; height: 400px; margin: 0 auto"></div>
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var chart = {
+                type: 'column'
+            };
+            var title = {
+                text: '年度销售报表'
+            };
+            var subtitle = {
+                text: '统计销售总量'
+            };
+            var xAxis = {
+                categories: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                crosshair: true
+            };
+            var yAxis = {
+                min: 0,
+                title: {
+                    text: '销售总量'
+                }
+            };
+            var tooltip = {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y} 件</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            };
+            var plotOptions = {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            };
+            var credits = {
+                enabled: false
+            };
+
+            var series = [{
+                name: '销售总量',
+                data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
+                color:'lightblue'
+            }];
+
+            var json = {};
+            json.chart = chart;
+            json.title = title;
+            json.subtitle = subtitle;
+            json.tooltip = tooltip;
+            json.xAxis = xAxis;
+            json.yAxis = yAxis;
+            json.series = series;
+            json.plotOptions = plotOptions;
+            json.credits = credits;
+            $('#container').highcharts(json);
+
+        });
+    </script>
+</body>
+</html>

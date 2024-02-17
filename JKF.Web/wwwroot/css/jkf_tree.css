@@ -1,0 +1,36 @@
+﻿div.treeContent div.item {
+    line-height:20px;
+    height:20px;
+}
+
+div.treeContent i.fold-click {
+    line-height:20px;
+    padding-left:2px;
+    cursor:pointer;
+}
+
+
+
+div.treeContent span.treeItem {
+    line-height:20px;
+    height:20px;
+    cursor:pointer;
+}
+
+    div.treeContent span.treeItem input[type="checkbox"]{
+        margin-bottom:-2px;
+    }
+
+/*div.treeContent span.itemName.selected {
+    background-color:darkblue !important;
+    color:#fff !important;
+}*/
+
+span.itemName.selected {
+    background-color: darkblue !important;
+    color: #fff !important;
+}
+
+div.treeContent {
+    overflow:auto;
+}

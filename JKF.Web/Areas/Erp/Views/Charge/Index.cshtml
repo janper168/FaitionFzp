@@ -1,0 +1,292 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>作废</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="ChargeOrderTable"></div>
+    </div>
+</div>
+<script>
+
+
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'Erp_ChargeOrderId', width: 200, showName: 'showName', hidden: true, align: 'center' },
+            {
+                columnName: 'Type', width: 100, showName: '类型', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == "1") {
+                        return "收入";
+                    } else if (val == "2") {
+                        return "支出";
+                    } else return "";
+                }
+            },
+            { columnName: 'Number', width: 150, showName: '单号', hidden: false, align: 'left' },
+            {
+                columnName: 'IsVoid', width: 100, showName: '是否作废', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val == 1) {
+                        return '<div style="color:white;background-color:red;width:fit-content;height:fit-content;padding:0px 5px;">是</div>';
+                    } else return '<div style="color:white;background-color:blue;width:fit-content;height:fit-content;padding:0px 5px;">否</div>';;
+
+                }
+            },
+            {
+                columnName: 'Suppiler', width: 200, showName: '供应商', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Suppiler"]) {
+                        return rowData["Suppiler"].Name;
+                    } else {
+                        return "";
+                    }
+                }
+            },
+            {
+                columnName: 'Customer', width: 200, showName: '客户', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Customer"]) {
+                        return rowData["Customer"].Name;
+                    } else {
+                        return "";
+                    }
+                }
+            },
+            {
+                columnName: 'Processor', width: 150, showName: '处理人', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Processor"]) {
+                        return rowData["Processor"].RealName;
+                    } else {
+                        return "";
+                    }
+                }
+            },
+            {
+                columnName: 'ChargeItem', width: 150, showName: '收支项目', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["ChargeItem"]) {
+                        return rowData["ChargeItem"].Name;
+                    } else {
+                        return "";
+                    }
+                }
+            },
+            {
+                columnName: 'Account', width: 150, showName: '账号', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (rowData["Account"]) {
+                        return rowData["Account"].Name;
+                    } else {
+                        return "";
+                    }
+                }
+            },
+            { columnName: 'TotalAmount', width: 130, showName: '金额', hidden: false, align: 'left', },
+            { columnName: 'ChargeAmount', width: 130, showName: '实际金额', hidden: false, align: 'left' },
+            {
+                columnName: 'CreateTime', width: 150, showName: '日期', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val) {
+                        return val.replace("T", " ").substring(0, 19);
+                    } else return "";
+                }
+            },
+            { columnName: 'Remark', width: 400, showName: '备注', hidden: false, align: 'left' },
+
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#ChargeOrderTable').jkfGrid({
+            remoteAddress: '/Erp/Charge/GetChargeOrders',
+            columnHeaders: colHeaders,
+            mainId: 'Erp_ChargeOrderId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'CreateTime',
+            sortOrder: 'desc'
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+            $gridTable.openFrameWindow({
+                title: "新增-日常收支",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Erp/Charge/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        // $("#btn_edit").click(function () {
+
+        //     var Erp_ChargeOrderId = $gridTable.getSelectRowValue("Erp_ChargeOrderId");
+        //     if (!Erp_ChargeOrderId) {
+        //         top.jkf.showTips('没有选中任何行', 3);
+        //         return;
+        //     }
+        //     if (Erp_ChargeOrderId.indexOf(',') > 0) {
+        //         top.jkf.showTips('只能选择一行编辑', 3);
+        //         return;
+        //     }
+
+        //     $gridTable.openFrameWindow({
+        //         title: "编辑--日常收支",
+        //         width: 900,
+        //         height: 600,
+        //         level: 1,
+        //         url: '/Erp/Charge/Form?Erp_ChargeOrderId=' + Erp_ChargeOrderId,
+        //         data: null,
+        //         hasMaxButton: true,
+        //         hasMinButton: true,
+        //         hasCloseButton: true,
+        //         parentFrameId: top.jkf.iFrameId,
+        //         isWizard: true,
+        //         buttonGroup: [
+        //             {
+        //                 buttonId: "button_save",
+        //                 buttonText: "保存",
+        //                 buttonClickAction: function () {
+        //                     var openWin = top.jkf.openIframe.contentWindow;
+        //                     openWin.saveForm();
+
+        //                 }
+        //             }
+        //         ],
+        //     })
+
+        // })
+
+        $("#btn_remove").click(function () {
+            var Erp_ChargeOrderId = $gridTable.getSelectRowValue("Erp_ChargeOrderId");
+            if (!Erp_ChargeOrderId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认作废？", function () {
+
+                $.httpPostAsync({
+                    url: '/Erp/Charge/SetVoid', param: { Erp_ChargeOrderId: Erp_ChargeOrderId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("作废成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        //top.jkf.processAuthorizedButtons(".buttonBar");
+
+
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>

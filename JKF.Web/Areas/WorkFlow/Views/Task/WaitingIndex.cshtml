@@ -1,0 +1,383 @@
+﻿@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_form" class="btn blue"><i class="fa fa-info"></i>表单</button>
+            <button id="btn_detail" class="btn green"><i class="fa fa-info"></i>详细</button>
+            <button id="btn_flow" class="btn red"><i class="fa fa-info"></i>流程</button>
+            <button id="btn_submit" class="btn orange"><i class="fa fa-arrow-up"></i>审核</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="TaskNodeProcesserTable"></div>
+    </div>
+</div>
+<script>
+
+
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'TaskNodeProcesserId', width: 200, showName: 'showName', hidden: true, align: 'center' },
+            { columnName: 'TaskNodeName', width: 500, showName: '待处理任务', hidden: false, align: 'left' },          
+            {
+                columnName: 'CerateTime', width: 150, showName: '创建时间', hidden: false, align: 'left',
+                formatter: function (val, rowData) {
+                    if (val) return val.replace('T', " ").substring(0, 19);
+                }
+            }
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#TaskNodeProcesserTable').jkfGrid({
+            remoteAddress: '/WorkFLow/Task/GetWaitingTasks',
+            columnHeaders: colHeaders,
+            mainId: 'TaskNodeProcesserId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'CerateTime',
+            sortOrder: 'desc'
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+            $gridTable.openFrameWindow({
+                title: "新增-流程任务",
+                width: '',
+                height: '',
+                level: 1,
+                url: '/WorkFlow/Task/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_edit").click(function () {
+
+            var TaskId = $gridTable.getSelectRowValue("TaskId");
+            if (!TaskId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (TaskId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+            var TaskStatus = $gridTable.getSelectRowValue("TaskStatus");
+            if (TaskStatus.indexOf("未提交") < 0) {
+                top.jkf.showTips('流程已在处理或已完结，无法修改流程', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "编辑--流程任务",
+                width: '',
+                height: '',
+                level: 1,
+                url: '/WorkFlow/Task/Form?TaskId=' + TaskId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_submit").click(function () {
+
+            var TaskNodeProcesserId = $gridTable.getSelectRowValue("TaskNodeProcesserId");
+            if (!TaskNodeProcesserId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (TaskNodeProcesserId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+            // var TaskStatus = $gridTable.getSelectRowValue("TaskStatus");
+            // if (TaskStatus.indexOf("未提交") < 0) {
+            //     top.jkf.showTips('流程已在处理或已完结，无法修改流程', 3);
+            //     return;
+            // }
+
+            $gridTable.openFrameWindow({
+                title: "流程处理--审核表单",
+                width: '',
+                height: '',
+                level: 1,
+                url: '/WorkFlow/Task/CheckForm?TaskNodeProcesserId=' + TaskNodeProcesserId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_submit",
+                        buttonText: "提交",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.submit();
+
+                        }
+                    },
+                    // {
+                    //     buttonId: "button_save",
+                    //     buttonText: "保存",
+                    //     buttonClickAction: function () {
+                    //         var openWin = top.jkf.openIframe.contentWindow;
+                    //         openWin.saveForm();
+
+                    //     }
+                    // }
+                ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+            var TaskId = $gridTable.getSelectRowValue("TaskId");
+            if (!TaskId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/workFlow/Task/RemoveForm', param: { TaskId: TaskId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        //top.jkf.processAuthorizedButtons(".buttonBar");
+
+        $("#btn_detail").click(function () {
+            var TaskNodeProcesserId = $gridTable.getSelectRowValue("TaskNodeProcesserId");
+            if (!TaskNodeProcesserId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            if (TaskNodeProcesserId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "流程日志--详细日志",
+                width: 1300,
+                height: 600,
+                level: 1,
+                url: '/WorkFlow/Task/detailsForm?TaskNodeProcesserId=' + TaskNodeProcesserId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+            })
+        })
+
+        $("#btn_flow").click(function () {
+            var TaskNodeProcesserId = $gridTable.getSelectRowValue("TaskNodeProcesserId");
+            if (!TaskNodeProcesserId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            if (TaskNodeProcesserId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "流程图—状态图",
+                width: '',
+                height: '',
+                level: 1,
+                url: '/WorkFlow/Task/flowForm?TaskNodeProcesserId=' + TaskNodeProcesserId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+            })
+        })
+
+        $("#btn_form").click(function () {
+
+            var TaskNodeProcesserId = $gridTable.getSelectRowValue("TaskNodeProcesserId");
+            if (!TaskNodeProcesserId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (TaskNodeProcesserId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+            // var TaskStatus = $gridTable.getSelectRowValue("TaskStatus");
+            // if (TaskStatus.indexOf("未提交") < 0) {
+            //     top.jkf.showTips('流程已在处理或已完结，无法修改流程', 3);
+            //     return;
+            // }
+
+            $gridTable.openFrameWindow({
+                title: "流程--查看表单",
+                width: '',
+                height: '',
+                level: 1,
+                url: '/WorkFlow/Task/EditForm?TaskNodeProcesserId=' + TaskNodeProcesserId,
+                data: true,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                // buttonGroup: [
+                //     {
+                //         buttonId: "button_submit",
+                //         buttonText: "提交",
+                //         buttonClickAction: function () {
+                //             var openWin = top.jkf.openIframe.contentWindow;
+                //             openWin.submit();
+
+                //         }
+                //     },
+                //     {
+                //         buttonId: "button_save",
+                //         buttonText: "保存",
+                //         buttonClickAction: function () {
+                //             var openWin = top.jkf.openIframe.contentWindow;
+                //             openWin.saveForm();
+
+                //         }
+                //     }
+                // ],
+            })
+
+        })
+
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>

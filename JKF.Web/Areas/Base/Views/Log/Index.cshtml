@@ -1,0 +1,298 @@
+﻿@{
+    Layout = "_Index";
+}
+<style>
+    .container_left {
+        display: block;
+        float: left;
+        width: 10%;
+        height: 98%;
+        margin: 3px;
+        border: 1px solid #ccc;
+    }
+
+    .container_right {
+        float: left;
+        display: block;
+        width: 88%;
+        height: 98%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 13px;
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    #categoryList div {
+        width: 98%;
+        height: 30px;
+        line-height: 30px;
+        text-indent: 3px;
+        cursor:pointer;
+    }
+
+        #categoryList div.select {
+            border-left: 3px solid #555;
+            background-color: skyblue;
+        }
+
+</style>
+
+<div class="container_left">
+    <div class="layerBar">日志类型</div>
+    <div id="categoryList">
+    </div>
+</div>
+
+<div class="container_right">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            时间：
+            从<input id="StartTime" class="Wdate height_30_important width_200 default-input" type="text" data-type="date" onclick="WdatePicker();" />至
+            <input id="EndTime" class="Wdate height_30_important width_200 default-input" type="text" data-type="date" onclick="WdatePicker();" />
+            <input type="checkbox" class="blue" id="onlyme" /><label for="onlyme">只看自己</label>
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_info" class="btn blue"><i class="fa fa-info"></i>详情</button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="myTable"></div>
+    </div>
+</div>
+<script>
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    var categoryList = 
+    [
+        {id:1,name:"登录日志"},
+        {id:2,name:"访问日志" },
+        {id:3,name:"操作日志"},
+        {id:4,name:"异常日志"},
+    ];
+    var queryModel = 
+    {
+        CategoryId:0,
+        StartTime:"",
+        EndTime:"",
+        OperateUserId :"",
+        OperateAccoun:"",
+        OperateType:"",
+        Module :"",
+        keyword :""
+    };
+
+    var currentSelectCategoryValue = 0;
+
+    function initCatetoryList() {
+        if (categoryList.length > 0) {
+            for (var i in categoryList) {
+                var item = categoryList[i];
+                var htmlText = "<div val='" + item.id + "'>" + item.name + "</div>";
+                $('#categoryList').append(htmlText);
+            }
+            $('#categoryList').find("div").click(function (e) {
+                $(this).addClass("select").siblings().removeClass("select");
+                currentSelectCategoryValue = $(this).attr('val');
+                changeList();
+            })
+        }
+
+    }
+
+    function fillQueryModel() {
+        queryModel.CategoryId = currentSelectCategoryValue;
+        queryModel.StartTime = $('#StartTime').val();
+        queryModel.EndTime = $('#EndTime').val();
+        var onlyMe = $("#onlyme").prop("checked");
+        if (onlyMe == true){
+            queryModel.OperateUserId="1";//标志，约定只看自己的日志
+        }else{
+            queryModel.OperateUserId="";
+        }
+        queryModel.keyword = $("#keyWord").val();
+    }
+
+    function changeList() {
+        if ($gridTable != null) {
+            fillQueryModel();
+            $gridTable.getRemoteData({ queryModel: queryModel }, true);
+        }
+    }
+
+    $(function () {
+
+        initCatetoryList();
+
+        var colHeaders = [
+            { columnName: 'LogId', width: 30, showName: 'LogId', hidden: true, align: 'center' },
+            { columnName: 'OperateTime', width: 180, showName: '操作时间', align: 'left', sort: true,
+                formatter: function (colValue) {
+                    return !colValue ? "" : colValue.substr(0, 19).replace('T',' ');
+                },
+            },
+            { columnName: 'OperateType', width: 100, showName: '操作类型', align: 'left', sort: true },
+            { columnName: 'OperateAccount', width: 180, showName: '操作者', align: 'left', sort: true },
+            { columnName: 'IPAddress', width: 120, showName: 'IP地址', align: 'left', sort: true },
+            { columnName: 'ExecuteResult', width: 100, showName: '操作结果', align: 'left', sort: true,
+                formatter: function (val, rowData) {
+                    if (val == 1) {
+                        return "<div style='width:30px;height:18px;line-height:18px;padding:2px 3px;background-color:green;color:white;'>成功</div>";
+                    } else {
+                        return "<div style='width:30px;height:18px;line-height:18px;padding:2px 3px;background-color:red;color:white;'>失败</div>";
+                    }
+                }
+            },
+            {
+                columnName: 'Module', width: 300, showName: '模块', align: 'left', sort: true
+            }
+        ]
+        //top.jkf.processAuthorizedColumns(colHeaders, authorizedColumns);
+
+        $gridTable = $('#myTable').jkfGrid({
+            remoteAddress: '/Base/Log/GetLogList',
+            columnHeaders: colHeaders,
+            mainId: 'LogId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'OperateTime',
+            sortOrder: 'desc'
+        });
+
+        //$gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                fillQueryModel();
+                $gridTable.getRemoteData({ queryModel: queryModel }, true);
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                fillQueryModel();
+                $gridTable.getRemoteData({ queryModel: queryModel }, true);
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_info").trigger("click");
+
+        });
+
+        $("#btn_info").click(function () {
+            var logId = $gridTable.getSelectRowValue("LogId");
+            if (!logId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (logId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+            $gridTable.openFrameWindow({
+                title: "日志详情",
+                width: '1000',
+                height: '800',
+                level: 1,
+                url: '/Base/Log/DetailForm?logId=' + logId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: false,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+               
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+
+            $gridTable.openFrameWindow({
+                title: "删除日志",
+                width: '500',
+                height: '200',
+                level: 1,
+                url: '/Base/Log/RemoveLogsForm?categoryId=' + currentSelectCategoryValue,
+                data: null,
+                hasMaxButton: false,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "删除",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+
+        //top.jkf.processAuthorizedButtons(".buttonBar", authorizedButtons);
+
+        $('#categoryList').find("div").first().trigger("click");
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            fillQueryModel();
+            $gridTable.getRemoteData({ queryModel: queryModel }, true);
+        }
+    }
+
+</script>
+
+

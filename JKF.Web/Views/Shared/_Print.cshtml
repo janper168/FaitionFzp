@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/ajax.js"></script>
+    <title>@ViewBag.Title</title>
+    <script>
+        function request(d) { for (var c = location.search.slice(1).split("&"), a = 0; a < c.length; a++) { var b = c[a].split("="); if (b[0] == d) if ("undefined" == unescape(b[1])) break; else return unescape(b[1]) } return "" };
+    </script>
+</head>
+<body>
+    <button type="button" onclick="doPrint()">打印</button>
+    <hr/>
+    <!--startprint-->
+    <!--注意要加上html里star和end的这两个标记-->
+    @RenderBody()
+    <!--endprint-->
+
+    <script type="text/javascript">
+        function doPrint() {
+            //获取整个打印前页面，作用是打印后恢复。
+            bdhtml = window.document.body.innerHTML;
+            sprnstr = "<!--startprint-->"; //标记打印区域开始
+            eprnstr = "<!--endprint-->";//标记打印区域结束
+            //获取要打印的区域, 从标记开始处向下获取。
+            prnhtml = bdhtml.substr(bdhtml.indexOf(sprnstr) + 17);//17表示光标右移17个单位
+            //删除结束标记后面的内容。
+            prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));
+            //将页面显示要打印的内容。
+            window.document.body.innerHTML = prnhtml;
+            //打印整个页面
+            window.print(prnhtml);
+            //恢复打印前的页面
+            window.document.body.innerHTML = bdhtml;
+
+        }
+    </script>
+</body>
+</html>
+
+

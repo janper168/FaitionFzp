@@ -1,0 +1,19 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "错误页";
+    Layout = null;
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<h1 class="text-danger">错误.</h1>
+<h2 class="text-danger">请求时有错误发生.</h2>
+<div class="text-danger" id="errDesc"></div>
+<script>
+        function request(d) { for (var c = location.search.slice(1).split("&"), a = 0; a < c.length; a++) { var b = c[a].split("="); if (b[0] == d) if ("undefined" == unescape(b[1])) break; else return unescape(b[1]) } return "" };
+</script>
+<script>
+    var error = request("error");
+    top.window.location.href = "/Login/Index?error=" + error;
+</script>
+

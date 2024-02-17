@@ -1,0 +1,75 @@
+<CodeSnippet Format="1.1.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>fileUpload</Title>
+    <Author>Microsoft Corporation</Author>
+    <Shortcut>fileUpload</Shortcut>
+    <Description>文件上传段</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>columnName</ID>
+        <ToolTip>columnName</ToolTip>
+        <Default>columnName</Default>
+      </Literal>
+      <Literal>
+        <ID>width</ID>
+        <ToolTip>width</ToolTip>
+        <Default>200</Default>
+      </Literal>
+	  <Literal>
+        <ID>showName</ID>
+        <ToolTip>showName</ToolTip>
+        <Default>showName</Default>
+      </Literal>
+	  <Literal>
+        <ID>hidden</ID>
+        <ToolTip>hidden</ToolTip>
+        <Default>false</Default>
+      </Literal>
+	  <Literal>
+        <ID>align</ID>
+        <ToolTip>align</ToolTip>
+        <Default>center</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="html"><![CDATA[
+	function fileLoad(ele) {
+
+        var formData = new FormData();
+
+        var name = $$(ele).val();
+        var files = $$(ele)[0].files[0];
+ 
+        formData.append("file", files);
+        formData.append("name", name);
+        $$.ajax({
+            url: "/biz/video/onPostUpload",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                
+                //alert("我还没开始发送呢");
+            },
+            success: function (res) {
+                //alert(res.datas);
+                $$("#CoverPic_image").attr("src", res.datas);
+                $$("#CoverPic").val(res.datas);
+                $$("#CoverPic").trigger("change");
+            }
+            ,
+            error: function (res) {
+
+                top.jkf.showTips("删除图片出错啦！",2);
+            }
+        });
+       
+    }
+]]></Code>
+  </Snippet>
+</CodeSnippet>

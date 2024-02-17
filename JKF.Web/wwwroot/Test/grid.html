@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html><html>
+<head>
+    <meta charset="utf-8" />
+    <title>自己实现表格控件</title>
+    <script src="../lib/jquery/dist/jquery.min.js"></script>
+    <script src="../js/jquery.nicescroll.min.js"></script>
+    <link href="../css/common.css" rel="stylesheet" />
+    <style>
+
+        body, * {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            font-size: 13px;
+            font-family: '微软雅黑'
+        }
+
+        .jkf_grid_tbl {
+            box-sizing:content-box;
+            background-color: #fefefe;
+            margin: 0 auto;
+            width: 99.6%;
+            height: 100%;
+            position: relative;
+            border-left: 1px solid lightGray;
+            border-right: 1px solid lightGray;
+        }
+
+            .jkf_grid_tbl > #gridTable {
+                width: 100%;
+                height: auto;
+                overflow: auto;
+            }
+
+        #gridTable > table#mainTbl {
+            table-layout: fixed;
+            word-break: break-all;
+            width: max-content; /*宽度为单元格的最大长度*/
+            height: auto;
+            border: 0px solid lightGray;
+            border-collapse: collapse;
+            background-color: #fafafa;
+        }
+
+        .jkf_grid_tbl > #pager {
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            height: 36px;
+            line-height: 36px;
+            background-color: #f1f1f1;
+            border-top:1px solid #ccc;
+        }
+
+        table#mainTbl td, table#mainTbl th {
+            border-bottom: 0.3px solid #ccc;
+            height: 26px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-indent: 5px;
+        }
+
+        table#mainTbl th {
+            border-right: 0.3px solid #ccc;
+            min-width:10px;
+        }
+       
+
+        table#mainTbl thead tr {
+            background-image: repeating-linear-gradient(#ddd, #fff 40%, #ddd);
+            user-select: none;
+        }
+
+            table#mainTbl thead tr th:hover {
+                font-size: 15px;
+                background-image: repeating-linear-gradient(lightblue, #fff 40%, lightblue);
+            }
+
+        #moveTbl.moving {
+            box-shadow: #888888 0px 0px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="moveTbl" style="width:500px;height:500px;position:absolute;">  
+        <div class="jkf_grid_tbl" id="gridTbl">
+            <div id="gridTable">
+            </div>
+            <div id="pager"></div>
+        </div>
+    </div>
+
+
+    <script>
+
+
+        $(function () {
+
+            var coloHeaders = [
+                { columnName: 'Id', width: 30, showName: 'Id', hidden: false, align: 'center' },
+                { columnName: 'Title', width: 200, showName: '书名', align: 'left' },
+                { columnName: 'Author', width: 200, showName: '作者', align: 'left' },
+                { columnName: 'CreateDate', width: 200, showName: '日期', align: 'left' },
+                { columnName: 'Description', width: 300, showName: '描述', align: 'left' }
+            ]
+            var datas =
+                [
+                    { Id: "1", Title: "了凡四训", Author: "袁了凡", CreateDate: "1800-09-09", Description: "诲人不倦" },
+                    { Id: "2", Title: "智慧教育", Author: "释净空", CreateDate: "1900-09-09", Description: "诲人不倦" },
+                    { Id: "3", Title: "道德教育", Author: "释净空", CreateDate: "1900-09-09", Description: "诲人不倦" },
+                    { Id: "4", Title: "生命教育", Author: "释净空", CreateDate: "1900-09-09", Description: "诲人不倦" },
+                    { Id: "5", Title: "人生教育", Author: "释净空", CreateDate: "1900-09-09", Description: "诲人不倦" }
+
+                ]
+
+            var hiddenColumn = [];
+            var showColumn = [];
+
+            var mainTableId = "mainTbl";
+            $("#gridTable").append("<table></table>");
+            $("#gridTable > table").attr("id", mainTableId);
+
+            $("#" + mainTableId).append("<thead></thead>");
+            var $thead = $("#" + mainTableId).find("thead");
+            $thead.append("<tr></tr>");
+            var $tr = $thead.find("tr").eq(0);
+            $tr.attr("id", "thead_tr_id_0");
+
+            for (var id in coloHeaders) {
+
+                var colItem = coloHeaders[id];
+
+                $tr.append("<th></th>");
+                var columnId = "thead_tr_th_id_0_" + colItem["columnName"];
+                var $columnH = $tr.find("th").eq(id);
+                $columnH.attr("id", columnId);
+                $columnH.show();
+
+                if (!!colItem["hidden"] && colItem["hidden"] === true) {
+                    hiddenColumn.push(colItem["ColumnName"]);
+                    $columnH.hide();
+                } else {
+                    showColumn.push(colItem["ColumnName"]);
+                }
+
+                $columnH.append(colItem["showName"]);
+
+                $columnH.css("width", colItem["width"]);
+                $columnH.css("text-align", colItem["align"])
+
+            }
+
+            $("#" + mainTableId).append("<tbody></tbody>");
+
+            var $tbody = $("#" + mainTableId).find("tbody");
+
+            for (var row in datas) {
+                data = datas[row];
+
+                var rowId = "tr_id_" + row;
+                $tbody.append("<tr></tr>");
+                var $row = $tbody.find("tr").eq(row);
+                $row.attr("id", rowId);
+
+                for (var id in coloHeaders) {
+
+                    var colItem = coloHeaders[id];
+
+                    $row.append("<td></td>");
+                    var columnId = "tr_td_id_" + row + "_" + colItem["columnName"];
+                    var $column = $row.find("td").eq(id);
+                    $column.attr("id", columnId);
+                    $column.show();
+                    if (!!colItem["hidden"] && colItem["hidden"] === true) {
+                        $column.hide();
+                    }
+
+                    $column.append(data[colItem["columnName"]]);
+                    $column.css("width", colItem["width"]);
+                    $column.css("text-align", colItem["align"])
+
+                }
+            }
+
+            resizeEvent();
+
+            var originalDistanceTop = 0;
+            var originalDistanceLeft = 0;
+
+            var mouseDownTop = 0;
+            var mouseDownLeft = 0;
+
+            var mousePosLeft = 0;
+            var mousePosTop = 0;
+
+            var isDown = false;
+            $("#mainTbl thead tr th").mousedown(function (e) {
+
+                var $this = $(this);
+
+                mouseDownLeft = parseFloat($("#moveTbl").css("left"));
+                mouseDownTop = parseFloat($("#moveTbl").css("top"));
+
+                mousePosLeft = e.originalEvent.pageX;
+                mousePosTop = e.originalEvent.pageY;
+
+                originalDistanceLeft = mousePosLeft - mouseDownLeft;
+                originalDistanceTop = mousePosTop - mouseDownTop;
+
+                isDown = true;
+                $this.css("cursor", "move");
+                $("#moveTbl").addClass("moving");
+
+                $(document).mousemove(function (e) {
+                    if (isDown) {
+                        var tmpLeft = e.originalEvent.pageX;
+                        var tmpTop = e.originalEvent.pageY;
+
+                        $("#moveTbl").css("left", tmpLeft - originalDistanceLeft);
+                        $("#moveTbl").css("top", tmpTop - originalDistanceTop);
+                    }
+
+                }).mouseup(function () {
+                    isDown = false;
+                    $this.css("cursor", "auto");
+                    $("#moveTbl").removeClass("moving");
+                });
+
+            });
+
+            var isMouseDown = false;
+            var currentTh = null;
+            $('#mainTbl th').bind({
+                mousedown: function (e) {
+                    var $th = $(this);
+                    var left = $th.offset().left; //元素距左
+                    var rightPos = left + $th.outerWidth();
+                    if (rightPos - 4 <= e.pageX && e.pageX <= rightPos) {
+                        isMouseDown = true;
+                        currentTh = $th;
+                        $('#mainTbl th').css('cursor', 'col-resize');
+
+                        //创建遮罩层，防止mouseup事件被其它元素阻止冒泡，导致mouseup事件无法被body捕获，导致拖动不能停止
+                        var bodyWidth = $('body').width();
+                        var bodyHeight = $('body').height();
+                        $('body').append('<div id="mask" style="opacity:0;top:0px;left:0px;cursor:ew-resize;background-color:green;position:absolute;z-index:9999;width:' + bodyWidth + 'px;height:' + bodyHeight + 'px;"></div>');
+                    }
+                }
+
+            });
+
+            $('body').bind({
+                mousemove: function (e) {
+                    //移动到column右边缘提示
+                    $('#mainTbl th').each(function (index, eleDom) {
+                        var ele = $(eleDom);
+                        var left = ele.offset().left; //元素距左
+                        var rightPos = left + ele.outerWidth();
+                        if (rightPos - 4 <= e.pageX && e.pageX <= rightPos) { //移到列右边缘
+                            ele.css('cursor', 'col-resize');
+                        } else {
+                            if (!isMouseDown) { //不是鼠标按下的时候取消特殊鼠标样式
+                                ele.css("cursor", "auto");
+                            }
+                        }
+                    });
+
+                    //改变大小
+                    if (currentTh != null) {
+                        if (isMouseDown) { //鼠标按下了，开始移动
+                            var left = currentTh.offset().left;
+                            var paddingBorderLen = currentTh.outerWidth() - currentTh.width();
+                            currentTh.width((e.pageX - left - paddingBorderLen) + 'px');
+                        }
+                    }
+                },
+                mouseup: function (e) {
+                    isMouseDown = false;
+                    currentTh = null;
+                    $('#mainTbl th').css('cursor', 'auto');
+                    $('#mask').remove();
+                }
+            });
+
+            setTimeout(function () {
+                $(".jkf_grid_tbl>#gridTable").niceScroll({
+                    'cursorcolor': '#999999',
+                    'cursorborder': 'none',
+                    'smoothscroll': 'true',
+                    'autohidemode': true,
+                    'horizrailenabled': true,
+                    'enablemousewheel': true,
+                    'oneaxismousemode': "auto",
+                });
+            }, 200);
+
+            function resizeEvent() {
+                
+                var tblWidth = $("table#mainTbl").width();
+                var containerWidth = $(".jkf_grid_tbl").width();
+                if (tblWidth < containerWidth) {
+                    var colItem = coloHeaders[coloHeaders.length - 1];
+                    var colName = colItem.columnName;
+                    var lastColWidth = $("#thead_tr_th_id_0_" + colName).width();
+
+                    $("#thead_tr_th_id_0_" + colName).width(lastColWidth + containerWidth - tblWidth - 2);
+                }
+            }
+
+            $(window).resize(function () {
+                resizeEvent();
+            })
+
+ 
+        });
+
+        
+    </script>
+</body> 
+
+
+</html>

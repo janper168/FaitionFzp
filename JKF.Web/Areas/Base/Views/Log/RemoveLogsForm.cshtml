@@ -1,0 +1,78 @@
+﻿
+@{
+    Layout = "_Form";
+}
+
+
+<div id="Form" class="form" style="display: block; overflow:auto;height: 90%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_full">
+            <div class="labelText"><label class="form_label" for="keepTime">保留日志时间：</label></div>
+            <input class="blue" type="radio" value="7" name="keepTime" checked="checked">最近一周<br />
+            <input class="blue" type="radio" value="1" name="keepTime">最近一个月<br />
+            <input class="blue" type="radio" value="3" name="keepTime">最近三个月<br />
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+   
+    var categoryId = request('categoryId');
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+    });
+
+    function saveForm() {
+
+        var keepTime = $('input[name=keepTime]').val();
+
+
+        $.httpPostAsync({
+            url: '/Base/log/RemoveLog', param: { keepTime: keepTime, categoryId: categoryId }}, function(res) {
+            if (res.code == 200) {
+                top.jkf.showTips("删除成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("删除失败！", 2);
+            }
+
+        })
+    }
+
+    
+</script>

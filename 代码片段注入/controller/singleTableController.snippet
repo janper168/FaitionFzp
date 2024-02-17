@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>singleTableController</Title>
+			<Shortcut>singleTableController</Shortcut>
+			<Description>单表controller片段
+语言版本:  C# 3.0 或更高版本</Description>
+			<Author>Microsoft Corporation</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>AreaName</ID>
+					<ToolTip>区域名</ToolTip>
+					<Default>Base</Default>
+				</Literal>
+				<Literal>
+					<ID>ControllerName</ID>
+					<ToolTip>控制器名</ToolTip>
+					<Default>Test</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="csharp">
+				<![CDATA[
+	using JKF.BLL;
+    using JKF.Commons;
+    using JKF.DB.Models;
+    using JKF.Web.Controllers;
+    using Microsoft.AspNetCore.Mvc;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+namespace JKF.Web.Areas.$AreaName$.Controllers
+{
+	[Area("$AreaName$")]
+    public class $ControllerName$Controller : BaseController
+    {
+        private $ControllerName$BLL _$ControllerName$BLL = new $ControllerName$BLL();
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Form()
+        {
+            return View();
+        }
+
+        public IActionResult Get$ControllerName$s(Pagination pagination, Sort sort,string keyWord)
+        {
+            return this.ExecuteAction(() =>
+            {
+                keyWord = keyWord ?? "";
+
+                var all$ControllerName$s = _$ControllerName$BLL.GetEntities(pagination, sort, a =>                    
+                     true
+                     ).ToList();
+
+                var jsonData =  new { pagination, sort, datas = all$ControllerName$s  };
+                return JsonSuccess(jsonData);
+            }); 
+        }
+
+        public IActionResult GetForm(string $ControllerName$Id)
+        {
+            return this.ExecuteAction(() =>
+            {
+                var $ControllerName$ = _$ControllerName$BLL.GetEntity($ControllerName$Id);
+                return JsonSuccess($ControllerName$);
+            });
+        }
+
+        public IActionResult SaveForm($ControllerName$ $ControllerName$)
+        {
+            return this.ExecuteAction(() =>
+            {
+                if (string.IsNullOrEmpty($ControllerName$.$ControllerName$Id))
+                {
+                    _$ControllerName$BLL.AddEntity($ControllerName$);
+                }
+                else
+                {
+                    _$ControllerName$BLL.UpdateEntity($ControllerName$);
+                }
+                return JsonSuccess(null);
+            });
+               
+        }
+
+        public IActionResult RemoveForm(string $ControllerName$Id)
+        {
+
+            return this.ExecuteAction(() =>
+            {
+                if (!string.IsNullOrEmpty($ControllerName$Id))
+                {
+                    string[] arr = $ControllerName$Id.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    List<$ControllerName$> $ControllerName$s = new List<$ControllerName$>();
+                    if (arr.Length <= 0)
+                    {
+                        return JsonSuccess(null);
+                    }
+
+                    foreach (var id in arr)
+                    {
+                        $ControllerName$s.Add(new $ControllerName$ { $ControllerName$Id = id });
+                    }
+                    _$ControllerName$BLL.RemoveEntities($ControllerName$s);
+                    return JsonSuccess(null);
+
+                }
+                return JsonSuccess(null);
+            });
+        }
+        }
+    }]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

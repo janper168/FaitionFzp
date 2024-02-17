@@ -1,0 +1,443 @@
+//1.controller模板
+
+namespace JKF.Web.Areas.YYY.Controllers
+{
+    [Area("YYY")]
+    public class XXXController : BaseController
+    {
+        private XXXBLL _XXXBLL = new XXXBLL();
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Form()
+        {
+            return View();
+        }
+
+        [InterfaceDefine("/Base/User/GetXXXs", "JKF.DB.Models.XXX")]
+        public IActionResult GetXXXs(Pagination pagination, Sort sort,string keyWord)
+        {
+            return this.ExecuteAction(() =>
+            {
+
+                keyWord = keyWord ?? "";
+
+                var allXXXs = _XXXBLL.GetXXXs(pagination, sort, a =>
+                    (a.DeleteMark == 0 && a.EnabledMark == 1) && (
+                     a.EnCode.Contains(keyWord) ||
+                     a.Name.Contains(keyWord) ||
+                     a.Description.Contains(keyWord)
+                     )).ToList();
+
+
+                var jsonData =  new { pagination, sort, datas = allXXXs  };
+                return JsonSuccess(jsonData);
+            });
+ 
+        }
+
+
+
+        public IActionResult GetForm(string XXXId)
+        {
+            return this.ExecuteAction(() =>
+            {
+                var XXX = _XXXBLL.GetXXX(XXXId);
+                return JsonSuccess(XXX);
+            });
+
+ 
+        }
+
+        public IActionResult SaveForm(XXX XXX)
+        {
+            return this.ExecuteAction(() =>
+            {
+                if (string.IsNullOrEmpty(XXX.XXXId))
+                {
+                    _XXXBLL.AddXXX(XXX);
+                }
+                else
+                {
+                    _XXXBLL.UpdateXXX(XXX);
+                }
+                return JsonSuccess(null);
+            });
+               
+        }
+
+        public IActionResult RemoveForm(string XXXId)
+        {
+
+            return this.ExecuteAction(() =>
+            {
+                if (!string.IsNullOrEmpty(XXXId))
+                {
+                    string[] arr = XXXId.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    List<XXX> XXXs = new List<XXX>();
+                    if (arr.Length <= 0)
+                    {
+                        return JsonSuccess(null);
+                    }
+
+                    foreach (var id in arr)
+                    {
+                        XXXs.Add(new XXX { XXXId = id });
+                    }
+                    _XXXBLL.RemoveXXXs(XXXs);
+                    return JsonSuccess(null);
+
+                }
+                return JsonSuccess(null);
+            });
+
+        }
+
+    }
+}
+
+//2.Index.cshtml模板
+@{
+    Layout = "_Index";
+}
+
+<style>
+    .container {
+        display: block;
+        width: 99%;
+        height: 99%;
+        padding: 3px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    .tableContent {
+        display: block;
+        width: 100%;
+        height: 91%;
+        border-bottom: 1px solid #ccc;
+    }
+</style>
+
+<div class="container">
+    <div class="toolLine">
+        <div class="searchBar">
+            <input id="keyWord" class="width_200 default-input rounded" type="text" placeholder="请输入关键字">
+            <button id="btn_search" class="btn blue rounded"><i class="fa fa-search"></i>查询</button>
+        </div>
+        <div class="buttonBar">
+            <button id="btn_refresh" class="btn"><i class="fa fa-refresh"></i>刷新</button>
+            <button id="btn_add" class="btn blue"><i class="fa fa-plus"></i>新增</button>
+            <button id="btn_edit" class="btn green"><i class="fa fa-edit"></i>修改</button>
+            <button id="btn_remove" class="btn red"><i class="fa fa-remove"></i>删除</button>
+        </div>
+    </div>
+    <div class="tableContent">
+        <div class="jkf_grid_tbl" id="XXXTable"></div>
+    </div>
+</div>
+<script>
+
+
+
+    var $gridTable = null;
+    var jfkInit = (function ($, jkf) { });
+    $(function () {
+
+        var colHeaders = [
+            { columnName: 'XXXId', width: 30, showName: 'XXXId', hidden: true, align: 'center' },
+            { columnName: 'EnCode', width: 200, showName: '角色编码', align: 'left', sort: true },
+            { columnName: 'Name', width: 200, showName: '角色名称', align: 'left', sort: true },
+            { columnName: 'SortCode', width: 100, showName: '排序', align: 'left', sort: true },
+            { columnName: 'Description', width: 300, showName: '备注', align: 'left' },
+
+        ]
+        top.jkf.processAuthorizedColumns(colHeaders);
+
+        $gridTable = $('#XXXTable').jkfGrid({
+            remoteAddress: '/Base/XXX/GetXXXs',
+            columnHeaders: colHeaders,
+            mainId: 'XXXId',
+            showNumber: true,
+            hasPager: true,
+            pageSize: 20,
+            hasCheckBox: true,
+            sortField: 'SortCode',
+            sortOrder: 'asc'
+        });
+
+        $gridTable.getRemoteData(null, true);
+
+        $('#btn_refresh').click(function () {
+            window.location.reload();
+        });
+
+        $("#btn_search").click(function () {
+            if ($gridTable != null) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+        $("#keyWord").keypress(function (e) {
+
+            if (e.keyCode == 13) {
+                var keyWord = $("#keyWord").val().trim();
+                $gridTable.getRemoteData({ keyWord });
+            }
+        });
+
+        $gridTable.setTableLineDbclick(function ($tr) {
+
+            $("#btn_edit").trigger("click");
+
+        });
+
+        $("#btn_add").click(function () {
+            $gridTable.openFrameWindow({
+                title: "新增-角色",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/XXX/Form',
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_edit").click(function () {
+
+            var XXXId = $gridTable.getSelectRowValue("XXXId");
+            if (!XXXId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+            if (XXXId.indexOf(',') > 0) {
+                top.jkf.showTips('只能选择一行编辑', 3);
+                return;
+            }
+
+            $gridTable.openFrameWindow({
+                title: "编辑--角色",
+                width: 900,
+                height: 600,
+                level: 1,
+                url: '/Base/XXX/Form?XXXId=' + XXXId,
+                data: null,
+                hasMaxButton: true,
+                hasMinButton: true,
+                hasCloseButton: true,
+                parentFrameId: top.jkf.iFrameId,
+                isWizard: true,
+                buttonGroup: [
+                    {
+                        buttonId: "button_save",
+                        buttonText: "保存",
+                        buttonClickAction: function () {
+                            var openWin = top.jkf.openIframe.contentWindow;
+                            openWin.saveForm();
+
+                        }
+                    }
+                ],
+            })
+
+        })
+
+        $("#btn_remove").click(function () {
+            var XXXId = $gridTable.getSelectRowValue("XXXId");
+            if (!XXXId) {
+                top.jkf.showTips('没有选中任何行', 3);
+                return;
+            }
+
+            top.jkf.confirmFrame("是否确认删除？", function () {
+
+                $.httpPostAsync({
+                    url: '/Base/XXX/RemoveForm', param: { XXXId: XXXId }
+                }, function (res) {
+                    if (res.code == 200) {
+                        top.jkf.showTips("删除成功！", 1);
+                        refreshData();
+                    } else {
+                        top.jkf.showTips(res.errMsg, 2);
+                    }
+
+                })
+            })
+
+        })
+
+        top.jkf.processAuthorizedButtons(".buttonBar");
+
+
+    });
+
+    function refreshData() {
+        if ($gridTable != null) {
+            var keyWord = $("#keyWord").val().trim();
+            $gridTable.getRemoteData({ keyWord });
+        }
+    }
+
+</script>
+
+//3.Form模板
+@{
+    Layout = "_Form";
+}
+
+
+<div id="Form" class="form" style="display: none; overflow:auto;height: 85%; border: 0px solid red;">
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="EnCode">角色编码</label></div>
+            <input id="EnCode" data-required="true" class="width_200 default-input" type="text" data-type="text"  />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Name">角色名称</label></div>
+            <input id="Name" data-required="true" data-type="text" class="width_200 default-input" type="text" />
+        </div>
+    </div>
+    <div class="form_row">
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="SortCode">排序</label></div>
+            <input id="SortCode" data-required="true" data-type="integer" class="width_200 default-input" type="text" />
+        </div>
+        <div class="form_item_half">
+            <div class="labelText"><label class="form_label" for="Descrition">备注</label></div>
+            <textarea id="Description" data-type="textarea" class="width_200 height_50 default-input"></textarea>
+        </div>
+    </div>
+</div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var XXXId = request('XXXId');
+    var XXX = {};
+
+    var formValidator = null;
+
+    //$("#EnCode").attr("data-check-exists-url", "/base/XXX/IsExistEnCode?keyValue=" + XXXId);
+    //$("#Name").attr("data-check-exists-url", "/base/XXX/IsExistName?KeyValue=" + XXXId);
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+        jkf.processAuthorizedForms($("#Form"));
+        $("#Form").show();
+
+        if (!!XXXId) {
+
+            getForm();
+
+        }
+        
+        formValidator = $("#Form").formValidator()
+
+
+    });
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/XXX/GetForm', param: { XXXId: XXXId }
+
+        });
+
+        if (res.code == 200) {
+            XXX = res.datas;
+
+            $.setFormData(XXX, $("#Form"));
+        }
+
+    }
+
+    function saveForm() {
+
+        if (!formValidator.valid()) {
+            return false;
+        }
+
+        if (!!XXXId) XXX.XXXId = XXXId;
+        $.getFormData(XXX, $("#Form"));
+
+        $.httpPostAsync({ url: '/Base/XXX/SaveForm', param: XXX }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>
+

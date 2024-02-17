@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>局部打印案例</title>
+
+    <script type="text/javascript">
+        function doPrint() {
+            //获取整个打印前页面，作用是打印后恢复。
+            bdhtml = window.document.body.innerHTML;
+            sprnstr = "<!--startprint-->"; //标记打印区域开始
+            eprnstr = "<!--endprint-->";//标记打印区域结束
+            //获取要打印的区域, 从标记开始处向下获取。
+            prnhtml = bdhtml.substr(bdhtml.indexOf(sprnstr) + 17);//17表示光标右移17个单位
+            //删除结束标记后面的内容。
+            prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));
+            //将页面显示要打印的内容。
+            window.document.body.innerHTML = prnhtml;
+            //打印整个页面
+            window.print(prnhtml);
+            //恢复打印前的页面
+            window.document.body.innerHTML = bdhtml;
+
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <p>1不需要打印的地方</p>
+    <!--startprint-->
+    <!--注意要加上html里star和end的这两个标记-->
+    <h1>打印标题</h1>
+    <p>打印内容~~</p>
+    <!--endprint-->
+    <button type="button" onclick="doPrint()">打印</button>
+    <p>2不需要打印的地方</p>
+</body>
+
+</html>

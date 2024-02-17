@@ -1,0 +1,798 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<link href="/css/tuxing.css?001" rel="stylesheet" />
+<style>
+    .contentWrapper {
+        width: 300%;
+        height: 500%;
+    }
+</style>
+<script src="/js/tuxing.js?0011"></script>
+
+<div class="contentWrapper"></div>
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var workFlowDesignId = request('WorkFlowDesignId');
+    var workFlowDesign = {};
+
+    //var formValidator = null;
+
+    var lineIndex = 0;
+    var nodeList = [];
+    var lineList = [];
+    var flowDesign = {};
+    var controlIndex = 0;
+
+
+    var jfkInit = (function ($, jkf) {
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.flowDesignFormIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+            $("body").niceScroll({
+                'cursorcolor': '#999999',
+                'cursorborder': 'none',
+                'smoothscroll': 'true',
+                'autohidemode': true,
+                'horizrailenabled': true,
+                'enablemousewheel': true,
+                'oneaxismousemode': "auto",
+            });
+        }, 50);
+
+
+        if (!!workFlowDesignId) {
+            getForm();
+        }
+
+        // formValidator = $("#Form").formValidator()
+        $(".contentWrapper").append("<div class='controls'><div class=' control shenpi'>审批</div><div class=' control zhihui'>知会</div><div class=' control childflow'>子流程</div><div class=' control condition'>条件</div></div>");
+        $(".contentWrapper").append("<div class='dragObject'></div>");
+
+        //console.log("workFlowDesign.FlowDesignJson:"+workFlowDesign.FlowDesignJson);
+
+        //如果是新增
+        if (workFlowDesignId && workFlowDesign.FlowDesignJson == null) {
+            $(".contentWrapper").append("<div class='endonTuxing' id='startEndon'></div>");
+            $(".contentWrapper").append("<div class='endonTuxing' id='endEndon'></div>");
+            //起点
+            $(".contentWrapper").find("#startEndon").endonTuxing({
+                width: 30,
+                height: 30,
+                offsetLeft: 300,
+                offsetTop: 120,
+                type: 'startEndon'
+            });
+
+            //终点
+            $(".contentWrapper").find("#endEndon").endonTuxing({
+                width: 30,
+                height: 30,
+                offsetLeft: 300,
+                offsetTop: 320,
+                type: 'endEndon'
+            });
+        }
+
+        $("body").css("user-select", 'none');
+
+        var $controls = $(".contentWrapper").find(".control");
+        var controlDown = false;
+
+        var offsetX = 0;
+        var offsetY = 0;
+
+        var $dragObject = $(".contentWrapper").find(".dragObject");
+
+        var controlDrag = 0;
+        $controls.mousedown(function (e) {
+
+            offsetX = e.clientX;
+            offsetY = e.clientY;
+
+            $dragObject.css("display", "block");
+            $dragObject.css("left", offsetX);
+            $dragObject.css("top", offsetY);
+
+            if ($(this).hasClass("shenpi")) {
+                controlDrag = 1;
+            } else if ($(this).hasClass("zhihui")) {
+                controlDrag = 2;
+            } else if ($(this).hasClass("childflow")) {
+                controlDrag = 3;
+            } else if ($(this).hasClass("condition")) {
+                controlDrag = 4;
+            }
+            controlDown = true;
+        });
+        $(".contentWrapper").mouseup(function (e) {
+
+            if (e.clientY <= $(".controls").offset().top + $(".controls").height()) {
+                return;
+            }
+            $dragObject.css("display", "none");
+
+            if (controlDrag == 1) {
+                var html = '<div class="fangxing" type="shenpi" id="fangxing_' + controlIndex + '"></div>';
+                $(".contentWrapper").append(html);
+                $(".contentWrapper").find("#fangxing_" + controlIndex).
+                    fangxing({
+                        width: 60,
+                        height: 50,
+                        offsetLeft: e.pageX,
+                        offsetTop: e.pageY,
+                        color: 'lightblue',
+                        editFunc: NodeProcessShenpi
+                    });
+                controlIndex++;
+                NodeProcessShenpi("fangxing_" + (controlIndex-1));
+            } else if (controlDrag == 2) {
+                var html = '<div class="fangxing" type="zhihui" id="fangxing_' + controlIndex + '"></div>';
+                $(".contentWrapper").append(html);
+                $(".contentWrapper").find("#fangxing_" + controlIndex).
+                    fangxing({
+                        width: 60,
+                        height: 50,
+                        offsetLeft: e.pageX,
+                        offsetTop: e.pageY,
+                        color: '#00ff00',
+                        editFunc: NodeProcessZhihui
+
+                    });
+                controlIndex++;
+                NodeProcessZhihui("fangxing_" + (controlIndex - 1))
+            } else if (controlDrag == 3) {
+                var html = '<div class="fangxing" type="childflow" id="fangxing_' + controlIndex + '"></div>';
+                $(".contentWrapper").append(html);
+                $(".contentWrapper").find("#fangxing_" + controlIndex).
+                    fangxing({
+                        width: 60,
+                        height: 50,
+                        offsetLeft: e.pageX,
+                        offsetTop: e.pageY,
+                        color: 'orange',
+                        editFunc: NodeProcessChildflow
+                    });
+                controlIndex++;
+                NodeProcessChildflow("fangxing_" + (controlIndex - 1))
+            } else if (controlDrag == 4) {
+                var html = '<div class="lingxing" type="condition"  id="lingxing_' + controlIndex + '"></div>';
+                $(".contentWrapper").append(html);
+                $(".contentWrapper").find("#lingxing_" + controlIndex).
+                    lingxing({
+                        width: 60,
+                        height: 50,
+                        offsetLeft: e.pageX,
+                        offsetTop: e.pageY,
+                        color: '#00ffff',
+                        editFunc: NodeProcessCondition
+                    });
+                controlIndex++;
+                NodeProcessCondition("lingxing_" + (controlIndex - 1))
+            }
+
+            controlDrag = 0;
+            controlDown = false;
+        });
+        $(".contentWrapper").mousemove(function (e) {
+            if (controlDown == true) {
+                $dragObject.css("left", e.pageX);
+                $dragObject.css("top", e.pageY);
+            }
+        });
+        $("body").keyup(function (e) {
+            if (e.keyCode == 49 ) {
+                var lineCount = lineObject.length;
+                var $lineObjects = $(this).find(".lineObject");
+                for (var i = 0; i < lineCount; i++) {
+                    if (i == lineIndex) {
+                        $($lineObjects.get(i)).trigger('dblclick');
+                        lineIndex++;
+                        if (lineIndex == lineCount) lineIndex = 0;
+                        break;
+                    }
+                }
+            }
+            // } else if (e.ctrlKey == true && e.keyCode == 13) {
+            //     if (lineMode == false) {
+            //         startLineMode();
+            //     } else {
+            //         stopLineMode();
+            //     }
+            //     alert(lineMode ? "连线模式启动！" : "连线模式关闭！");
+            // }
+        });
+
+        loadJson();
+        startLineMode();
+    });
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/WorkFlow/workFlowDesign/GetForm', param: { WorkFlowDesignId: workFlowDesignId }
+        });
+
+        if (res.code == 200) {
+            workFlowDesign = res.datas;
+            //$.setFormData(workFlowDesign, $("#Form"));
+        }
+
+    }
+
+    function saveFlowDesign() {
+
+        nodeList = [];
+
+        var $startEndon = $(".contentWrapper").find("#startEndon");
+
+        var offsetX = $startEndon.offset().left;
+        var offsetY = $startEndon.offset().top;
+        var width = $startEndon.width();
+        var height = $startEndon.height();
+        var id = $startEndon.attr("id");
+        var type = "start";
+
+        nodeList.push({ id, offsetX, offsetY, width, height, type });
+
+        var $endEndon = $(".contentWrapper").find("#endEndon");
+
+        var offsetX = $endEndon.offset().left;
+        var offsetY = $endEndon.offset().top;
+        var width = $endEndon.width();
+        var height = $endEndon.height();
+        var id = $endEndon.attr("id");
+        var type = "end";
+
+        nodeList.push({ id, offsetX, offsetY, width, height, type });
+
+        var $fangxing = $(".contentWrapper").find(".fangxing");
+
+        //console.log("$fangxing:" + $fangxing.length);
+
+        $fangxing.each(function (e) {
+            var offsetX = $(this).offset().left;
+            var offsetY = $(this).offset().top;
+            var width = $(this).width();
+            var height = $(this).height();
+            var id = $(this).attr("id");
+            var type = $(this).attr("type");
+
+            nodeList.push({ id, offsetX, offsetY, width, height, type });
+        });
+
+        var $lingxing = $(".contentWrapper").find(".lingxing");
+
+        $lingxing.each(function (e) {
+            var offsetX = $(this).offset().left;
+            var offsetY = $(this).offset().top;
+            var width = $(this).width();
+            var height = $(this).height();
+            var id = $(this).attr("id");
+            var type = $(this).attr("type");
+
+            nodeList.push({ id, offsetX, offsetY, width, height, type });
+        });
+
+        //console.log("nodeList:" + nodeList.length);
+
+
+        lineList = [];
+
+        //console.log("lineObject:" + lineObject.length);
+
+        for (var i in lineObject) {
+            var elem = lineObject[i];
+            var id = elem.id;
+            var startNodeId = elem.$startTuxing.attr("id");
+            var endNodeId = elem.$endTuxing.attr("id");
+            var startPosType = $("#" + id).attr("startPosType");
+            var endPosType = $("#" + id).attr("endPosType");
+
+            //console.log("startPosType:" + startPosType);
+            //console.log("endPosType:" + endPosType);
+            lineList.push({ id, startNodeId, endNodeId, startPosType, endPosType });
+        }
+        //console.log("lineList:" + lineList.length);
+
+
+        flowDesign.nodeList = nodeList;
+        flowDesign.lineList = lineList;
+
+    }
+
+    function NodeProcessShenpi(nodeId) {
+        //alert("call NodeProcessShenpi：" + nodeId);
+
+        if (!workFlowDesignId) {
+            top.jkf.showTips('异常：没有流程设计id', 3);
+            return;
+        }
+
+        top.jkf.openFrame({
+            parentFrameId: $openIframe.attr("id"),
+            title: "流程节点（审批）设置：" + nodeId,
+            width: 1000,
+            height: 600,
+            level: 2,
+            url: '/WorkFlow/WorkFlowDesign/DesignFormNodeShenpi?workFlowDesignId=' + workFlowDesignId + "&nodeId=" + nodeId,
+            data: null,
+            hasMinButton: false,
+            hasMaxButton: true,
+            hasCloseButton: true,
+            isWazard: true,
+            buttonGroup: [
+                {
+                    buttonId: "button_save",
+                    buttonText: "保存",
+                    buttonClickAction: function () {
+                        var openWin = top.jkf.flowDesignFormNodeIframe.contentWindow;
+                        openWin.saveForm();
+
+                    }
+                }
+            ]
+        });
+
+    }
+
+    function NodeProcessZhihui(nodeId) {
+        if (!workFlowDesignId) {
+            top.jkf.showTips('异常：没有流程设计id', 3);
+            return;
+        }
+
+        top.jkf.openFrame({
+            parentFrameId: $openIframe.attr("id"),
+            title: "流程节点（知会）设置：" + nodeId,
+            width: 1000,
+            height: 600,
+            level: 2,
+            url: '/WorkFlow/WorkFlowDesign/DesignFormNodeZhihui?workFlowDesignId=' + workFlowDesignId + "&nodeId=" + nodeId,
+            data: null,
+            hasMinButton: false,
+            hasMaxButton: true,
+            hasCloseButton: true,
+            isWazard: true,
+            buttonGroup: [
+                {
+                    buttonId: "button_save",
+                    buttonText: "保存",
+                    buttonClickAction: function () {
+                        var openWin = top.jkf.flowDesignFormNodeIframe.contentWindow;
+                        openWin.saveForm();
+
+                    }
+                }
+            ]
+        });
+
+    }
+
+    function NodeProcessChildflow(nodeId) {
+        if (!workFlowDesignId) {
+            top.jkf.showTips('异常：没有流程设计id', 3);
+            return;
+        }
+
+        top.jkf.openFrame({
+            parentFrameId: $openIframe.attr("id"),
+            title: "流程节点（子流程）设置：" + nodeId,
+            width: 1000,
+            height: 600,
+            level: 2,
+            url: '/WorkFlow/WorkFlowDesign/DesignFormNodeChildflow?workFlowDesignId=' + workFlowDesignId + "&nodeId=" + nodeId,
+            data: null,
+            hasMinButton: false,
+            hasMaxButton: true,
+            hasCloseButton: true,
+            isWazard: true,
+            buttonGroup: [
+                {
+                    buttonId: "button_save",
+                    buttonText: "保存",
+                    buttonClickAction: function () {
+                        var openWin = top.jkf.flowDesignFormNodeIframe.contentWindow;
+                        openWin.saveForm();
+
+                    }
+                }
+            ]
+        });
+    }
+
+    function NodeProcessCondition(nodeId) {
+        if (!workFlowDesignId) {
+            top.jkf.showTips('异常：没有流程设计id', 3);
+            return;
+        }
+
+        top.jkf.openFrame({
+            parentFrameId: $openIframe.attr("id"),
+            title: "流程节点（条件规格）设置：" + nodeId,
+            width: 1000,
+            height: 600,
+            level: 2,
+            url: '/WorkFlow/WorkFlowDesign/DesignFormNodeCondition?workFlowDesignId=' + workFlowDesignId + "&nodeId=" + nodeId,
+            data: null,
+            hasMinButton: false,
+            hasMaxButton: true,
+            hasCloseButton: true,
+            isWazard: true,
+            buttonGroup: [
+                {
+                    buttonId: "button_save",
+                    buttonText: "保存",
+                    buttonClickAction: function () {
+                        var openWin = top.jkf.flowDesignFormNodeIframe.contentWindow;
+                        openWin.saveForm();
+
+                    }
+                }
+            ]
+        });
+    }
+
+    function LineProcess(lineId) {
+        if (!workFlowDesignId) {
+            top.jkf.showTips('异常：没有流程设计id', 3);
+            return;
+        }
+
+        top.jkf.openFrame({
+            parentFrameId: $openIframe.attr("id"),
+            title: "流程线条设置：" + lineId,
+            width: 1000,
+            height: 600,
+            level: 2,
+            url: '/WorkFlow/WorkFlowDesign/DesignFormLine?workFlowDesignId=' + workFlowDesignId + "&lineId=" + lineId,
+            data: null,
+            hasMinButton: false,
+            hasMaxButton: true,
+            hasCloseButton: true,
+            isWazard: true,
+            buttonGroup: [
+                {
+                    buttonId: "button_save",
+                    buttonText: "保存",
+                    buttonClickAction: function () {
+                        var openWin = top.jkf.flowDesignFormLineIframe.contentWindow;
+                        openWin.saveForm();
+
+                    }
+                }
+            ]
+        });
+    }
+
+    function updateNodeText(nodeType, nodeId, nodeName) {
+        var innerClass = "fangxingInner";
+        if (nodeType == "shenpi") nodeType = "审批";
+        else if (nodeType == "zhihui") nodeType = "知会";
+        else if (nodeType == "childflow") nodeType = "子流程";
+        else if (nodeType == "condition") {
+            nodeType = "条件";
+            innerClass = "lingxingInner";
+        }
+
+        var htmlText = "<div class='jiedianText'>" + nodeType + ":" + nodeName + "</div>";
+        $("#" + nodeId).find(".jiedianText").remove();
+        $("#" + nodeId).find("." + innerClass).append(htmlText);
+    }
+
+
+
+    function getNodeForm(nodeId) {
+        var res = $.httpGet({
+            url: '/Workflow/WorkFlowDesign/GetNodeForm', param: { nodeId: nodeId, workFlowDesignId: workFlowDesignId }
+        });
+
+        if (res.code == 200) {
+            return res.datas;
+        }
+        return null;
+    }
+
+    function loadJson() {
+        //console.log(workFlowDesign);
+        //console.log("loadJson")
+        if (workFlowDesign.FlowDesignJson) {
+            flowDesign = JSON.parse(workFlowDesign.FlowDesignJson);
+
+            var nodeIndex = 0;
+            //console.log(flowDesign.nodeList[0]);
+            //加载节点
+            for (var i in flowDesign.nodeList) {
+                var node = flowDesign.nodeList[i];
+
+                var id = node.id;
+                var offsetX = node.offsetX;
+                var offsetY = node.offsetY;
+                var width = node.width;
+                var height = node.height;
+                var type = node.type;
+                //console.log(type);
+
+                nodeIndex = (id.indexOf("_") >= 1) ? parseInt(id.split('_')[1]) : 0;
+                if (nodeIndex > controlIndex) controlIndex = nodeIndex;
+
+                if (type == "start") {
+                    //console.log(type);
+                    $(".contentWrapper").append("<div class='endonTuxing' id='startEndon'></div>");
+                    $(".contentWrapper").find("#startEndon").endonTuxing({
+                        width: width / 2,
+                        height: height / 2,
+                        offsetLeft: offsetX,
+                        offsetTop: offsetY,
+                        type: 'startEndon'
+                    });
+                }
+                else if (type == "end") {
+
+                    //console.log(type);
+                    $(".contentWrapper").append("<div class='endonTuxing' id='endEndon'></div>");
+                    $(".contentWrapper").find("#endEndon").endonTuxing({
+                        width: width / 2,
+                        height: height / 2,
+                        offsetLeft: offsetX,
+                        offsetTop: offsetY,
+                        type: 'endEndon'
+                    });
+                }
+                else if (type == "shenpi") {
+                    //console.log(type);
+                    $(".contentWrapper").append("<div class='fangxing' type='shenpi' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        fangxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: 'lightblue',
+                            editFunc: NodeProcessShenpi
+                        });
+
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('shenpi', id, nodeName);
+                    }
+
+
+                }
+                else if (type == "zhihui") {
+                    //.log(type);
+                    $(".contentWrapper").append("<div class='fangxing' type='zhihui' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        fangxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: '#00ff00',
+                            editFunc: NodeProcessZhihui
+                        });
+
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('zhihui', id, nodeName);
+                    }
+                }
+                else if (type == "childflow") {
+                    //console.log(type);
+                    $(".contentWrapper").append("<div class='fangxing' type='childflow' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        fangxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: 'orange',
+                            editFunc: NodeProcessChildflow
+                        });
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('childflow', id, nodeName);
+                    }
+                }
+                else if (type == "condition") {
+                    //console.log(type);
+                    $(".contentWrapper").append("<div class='lingxing' type='condition' id='" + id + "'></div>");
+                    $(".contentWrapper").find("#" + id).
+                        lingxing({
+                            width: width / 2,
+                            height: height / 2,
+                            offsetLeft: offsetX,
+                            offsetTop: offsetY,
+                            color: '#00ffff',
+                            editFunc: NodeProcessCondition
+                        });
+                    var node = getNodeForm(id);
+                    if (node != null) {
+                        var nodeName = node.NodeName;
+                        updateNodeText('condition', id, nodeName);
+                    }
+                }
+            }
+            controlIndex++;
+
+            var lineIndex = 0;
+            //var maxLineIndex = 0;
+            //加载线条
+            for (var i in flowDesign.lineList) {
+                var line = flowDesign.lineList[i];
+
+                var id = line.id;
+
+                lineIndex = (id.indexOf("_") >= 1) ? parseInt(id.split('_')[1]) : 0;
+                if (lineIndex > currentLineCount) currentLineCount = lineIndex;
+
+                var startNodeId = line.startNodeId;
+                var endNodeId = line.endNodeId;
+                var startPosType = line.startPosType;
+                var endPosType = line.endPosType;
+
+                var $startNode = $("#" + startNodeId);
+                var $endNode = $("#" + endNodeId);
+
+                var lineHtml = "<div class='lineObject' id='" + id + "'></div>";
+                $(".contentWrapper").append(lineHtml);
+
+                var retStart = null;
+                for (var i in tuxings) {
+                    if (tuxings[i].id == startNodeId) {
+                        retStart = tuxings[i].ret;
+                        break;
+                    }
+                }
+                //console.log("retStart:"+retStart)
+
+                var retEnd = null;
+                for (var i in tuxings) {
+                    if (tuxings[i].id == endNodeId) {
+                        retEnd = tuxings[i].ret;
+                        break;
+                    }
+                }
+                //console.log("retEnd:" + retEnd)
+                var startPoint;
+                var endPoint;
+                var $startObject;
+                var $endObject;
+                var startObjectPointPos;
+                var endObjectPointPos;
+
+                var $pUp1 = $startNode.find("div.point.up");
+                var $pDown1 = $startNode.find("div.point.down");
+                var $pLeft1 = $startNode.find("div.point.left");
+                var $pRight1 = $startNode.find("div.point.right");
+
+                var $pUp2 = $endNode.find("div.point.up");
+                var $pDown2 = $endNode.find("div.point.down");
+                var $pLeft2 = $endNode.find("div.point.left");
+                var $pRight2 = $endNode.find("div.point.right");
+
+                if (startPosType == "down" && endPosType == "up") {
+
+                    var offsetLeft1 = parseInt($startNode.css('left'));
+                    var offsetTop1 = parseInt($startNode.css('top'));
+
+                    var width1 = $startNode.width()
+                    var height1 = $startNode.height();
+
+                    var offsetLeft2 = parseInt($endNode.css('left'));
+                    var offsetTop2 = parseInt($endNode.css('top'));
+
+                    var width2 = $endNode.width()
+                    var height2 = $endNode.height();
+
+                    startPoint = { x: width1 / 2 + offsetLeft1, y: height1 + offsetTop1 }; //down
+                    endPoint = { x: width2 / 2 + offsetLeft2, y: 0 + offsetTop2 };//up
+
+                    $startObject = $pDown1;//down
+                    $endObject = $pUp2;//up
+                } else if (startPosType == "left" && endPosType == "left") {
+                    var offsetLeft1 = parseInt($startNode.css('left'));
+                    var offsetTop1 = parseInt($startNode.css('top'));
+
+                    var width1 = $startNode.width()
+                    var height1 = $startNode.height();
+
+                    var offsetLeft2 = parseInt($endNode.css('left'));
+                    var offsetTop2 = parseInt($endNode.css('top'));
+
+                    var width2 = $endNode.width()
+                    var height2 = $endNode.height();
+
+                    startPoint = { x: 0 + offsetLeft1, y: height1 / 2 + offsetTop1 };
+                    endPoint = { x: 0 + offsetLeft2, y: height2 / 2 + offsetTop2 };
+
+                    $startObject = $pLeft1;
+                    $endObject = $pLeft2;
+                } else if (startPosType == "right" && endPosType == "right") {
+
+                    var offsetLeft1 = parseInt($startNode.css('left'));
+                    var offsetTop1 = parseInt($startNode.css('top'));
+
+                    var width1 = $startNode.width()
+                    var height1 = $startNode.height();
+
+                    var offsetLeft2 = parseInt($endNode.css('left'));
+                    var offsetTop2 = parseInt($endNode.css('top'));
+
+                    var width2 = $endNode.width()
+                    var height2 = $endNode.height();
+
+                    startPoint = { x: width1 + offsetLeft1, y: height1 / 2 + offsetTop1 };
+                    endPoint = { x: width2 + offsetLeft2, y: height2 / 2 + offsetTop2 };
+
+                    $startObject = $pRight1;
+                    $endObject = $pRight2;
+                }
+
+
+                var $lineObject = $(".contentWrapper").find("#" + id);
+                //console.log("line id:" + id);
+                $lineObject.lineObject({
+                    startPoint: startPoint,
+                    endPoint: endPoint,
+                    startPointObject: $startObject,
+                    endPointObject: $endObject,
+                    startObjectPointPos: startPosType,
+                    endObjectPointPos: endPosType,
+                    startTuxingRet: retStart,
+                    endTuxingRet: retEnd,
+                    editFunc: LineProcess,
+                    notPopUp: true,
+                })
+                //console.log("line id:" + id);
+                $startObject.removeClass("clicked");
+                $endObject.removeClass("clicked");
+
+            }
+        }
+        //console.log("currentLineCount:" + currentLineCount);
+
+        currentLineCount++;
+    }
+
+    function saveForm() {
+
+        if (!!workFlowDesignId) workFlowDesign.WorkFlowDesignId = workFlowDesignId;
+        saveFlowDesign();
+        var flowDesignJson = JSON.stringify(flowDesign);
+        workFlowDesign.FlowDesignJson = flowDesignJson;
+
+        $.httpPostAsync({
+            url: '/Workflow/workFlowDesign/SaveForm', param: { WorkFlowDesign: workFlowDesign }
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>

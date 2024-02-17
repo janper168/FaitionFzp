@@ -1,0 +1,477 @@
+﻿@{
+    Layout = "_Form";
+}
+
+<style>
+    .container_left1 {
+        display: block;
+        float: left;
+        width: 40%;
+        height: 98%;
+        padding: 3px;
+        margin: 3px 0px 3px 3px;
+        border: 1px solid #ccc;
+    }
+
+    .container_left2 {
+        display: block;
+        float: left;
+        width: 20%;
+        height: 98%;
+        padding: 3px;
+        margin: 3px 0px 3px 3px;
+        border: 1px solid #ccc;
+    }
+
+    .container_right {
+        display: block;
+        float: left;
+        width: 35%;
+        height: 98%;
+        padding: 3px;
+        margin: 3px 0px 3px 3px;
+        border: 1px solid #ccc;
+    }
+
+    div.layerBar {
+        width: 100%;
+        font-size: 15px;
+        background-color: #fff;
+        //border: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    div.toolLine {
+        display: block;
+        width: 100%;
+        height: 8%;
+        border-bottom: 1px solid #ccc;
+    }
+
+    div.searchBar {
+        display: inline;
+        padding-left: 10px;
+    }
+
+    div.buttonBar {
+        display: inline;
+        border: 0px solid black;
+        float: right;
+        padding-right: 10px;
+    }
+
+    div.Properties {
+        display: block;
+        overflow: auto;
+        width: 100%;
+        height: 80%;
+    }
+
+    div.controller, div.controllerAction {
+        display: block;
+        width: 100%;
+        height: 86%;
+    }
+</style>
+
+<div class="container_left1">
+    <div class="layerBar">选择控制器类</div>
+    <div class="controller">
+        <div id="controllerTree"></div>
+    </div>
+</div>
+<div class="container_left2">
+    <div class="layerBar">选择控制器方法</div>
+    <div class="controllerAction">
+        <div id="controllerActionTree"></div>
+    </div>
+</div>
+<div class="container_right">
+    <div class="layerBar">选择返回类型的实体属性</div>
+    <div style="border-bottom:1px solid #ccc;padding:3px;">
+        <label class="form_label" for="Name">接口名称</label>
+        <input id="Name" data-type="text" class="width_300 default-input" type="text" />
+    </div>
+    <div class="Properties">
+        <div id="actionInfoTree"></div>
+    </div>
+</div>
+
+<script>
+    var parentIframe = null;
+    var currentIframe = null;
+    var interfaceId = request('interfaceId');
+    var interface = {};
+    var controllers = [];
+    var controllerActions = [];
+    var actionInfo = {};
+    var selectedControllerName = '';
+    var selectedControllerActionName = '';
+    var selectedProperties = [];
+    var selectAddress = [];
+    var allAddressProperties = [];
+
+
+
+
+
+    var jfkInit = (function ($, jkf) {
+
+        $("#Name").attr("data-check-exists-url", "/base/interface/IsExistName?KeyValue=" + interfaceId);
+
+        currentIframe = jkf.getIframeByElement(document.body);
+        jkf.openIframe = currentIframe;
+
+        $openIframe = $(currentIframe);
+
+        var parentIframeId = $openIframe.attr('data-parentId');
+
+        if (top.frames[parentIframeId].contentWindow != undefined) {
+            parentIframe = top.frames[parentIframeId].contentWindow;
+        }
+        else {
+            parentIframe = top.frames[parentIframeId];
+        }
+
+        setTimeout(function () {
+
+            //$("body").niceScroll({
+            //    'cursorcolor': '#999999',
+            //    'cursorborder': 'none',
+            //    'smoothscroll': 'true',
+            //    'autohidemode': true,
+            //    'horizrailenabled': true,
+            //    'enablemousewheel': true,
+            //    'oneaxismousemode': "auto",
+            //});
+        }, 50);
+
+        var FormId = $openIframe.attr("id").replace("iframe_", "frameWindow_");
+        var $Form = jkf.$topBody.find("#" + FormId);
+
+        if (!!interfaceId) {
+            getForm();
+
+            //获取控制器类型
+            if (!getControllers()) {
+                return;
+            }
+            //获取控制方法
+            if (!getControllerActions(selectedControllerName)) {
+                return;
+            }
+            if (!getActionInfoSelect(selectedControllerName, selectedControllerActionName)) {
+                return;
+            }
+
+        } else {
+            //获取控制器类型
+            if (!getControllers()) {
+                return;
+            }
+        }
+
+
+    });
+
+
+    function getControllers() {
+        var res = $.httpGet({ url: "/base/interface/getControllers" });
+        if (res.code == 200) {
+            controllers = res.datas;
+            if (!controllers) controllers = [];
+            $("#controllerTree").jkf_tree({
+                url: null,
+                param: null,
+                type: "post",
+                async: false,
+                datas: controllers,
+                treeParentIdKey: '',
+                treeKeyKey: 'controllerId',
+                treeValueKey: 'controllerName',
+                iconValueKey: '',
+                hasCheckBox: false,
+                checkEvent: null,
+                selectEvent: controllerSelect,
+                //initCheckBoxData: interface.ControllerName,
+                initSelectValue: !!interface.ControllerName ? interface.ControllerName : null
+            });
+        } else {
+            top.jkf.showTips("获取控制器实体错误！", 2);
+            return false;
+        }
+        return true;
+    }
+
+    function controllerSelect(controllerId, checked) {
+        for (var i in controllers) {
+            if (controllers[i].controllerId == controllerId) {
+                //alert(controllers[i].controllerName)
+                if (!getControllerActions(controllers[i].controllerName)) return false;
+
+                break;
+            }
+        }
+        return true;
+    }
+
+    function getControllerActions(controllerName) {
+        var res = $.httpGet({ url: "/base/interface/getControllerActions", param: { controllerName: controllerName } });
+        if (res.code == 200) {
+
+            controllerActions = res.datas;
+            if (!controllerActions) controllerActions = [];
+            $("#controllerActionTree").jkf_tree({
+                url: null,
+                param: null,
+                type: "post",
+                async: false,
+                datas: controllerActions,
+                treeParentIdKey: '',
+                treeKeyKey: 'controllerActionId',
+                treeValueKey: 'controllerActionName',
+                iconValueKey: '',
+                hasCheckBox: false,
+                checkEvent: null,
+                selectEvent: controllerActionSelect,
+                //initCheckBoxData: null,//moduleIds
+                initSelectValue: !!interface.ActionName ? interface.ActionName : null
+            });
+            selectedControllerName = controllerName;
+            return true;
+        } else {
+            top.jkf.showTips("获取控制器方法错误！", 2);
+            return false;
+        }
+        return true;
+    }
+
+    function controllerActionSelect(controllerActionId, checked) {
+
+
+        for (var i in controllerActions) {
+            if (controllerActions[i].controllerActionId == controllerActionId) {
+
+                //alert(controllerActions[i].controllerActionName)
+                var actionName = controllerActions[i].controllerActionName
+                selectedControllerActionName = actionName;
+                getActionInfoSelect(selectedControllerName, actionName)
+
+                break;
+            }
+        }
+    }
+
+    function getActionInfoSelect(controllerName, actionName) {
+        var res = $.httpGet({ url: "/base/interface/getActionInfo", param: { controllerName: controllerName, controllerActionName: actionName } });
+        if (res.code == 200) {
+
+            actionInfo = res.datas;
+            if (!actionInfo) actionInfo = {};
+            var propertiesInfo = actionInfo.propertiesInfo;
+            var address = actionInfo.address;
+            selectAddress = address;
+            var isExist = false;
+            for (var j in allAddressProperties) {
+                if (allAddressProperties[j].address == address) {
+                    allAddressProperties[j].propertiesInfo = propertiesInfo;
+                    isExist = true;
+                }
+            }
+            if (isExist == false) {
+                allAddressProperties.push({ address: address, propertiesInfo: propertiesInfo });
+            }
+
+            var properties = [];
+            isExist = false;
+            for (var k in selectedProperties) {
+                if (selectedProperties[k].address == address) {
+                    isExist = true;
+                    for (var l in selectedProperties[k].propertiesInfo) {
+                        var data = selectedProperties[k].propertiesInfo[l];
+                        properties.push(data.propertyName);
+                    }
+
+                    break;
+                }
+            }
+            if (isExist == false) {
+                selectedProperties.push({ address: address, propertiesInfo: properties });
+            }
+
+            $("#actionInfoTree").jkf_tree({
+                url: null,
+                param: null,
+                type: "post",
+                async: false,
+                datas: propertiesInfo,
+                treeParentIdKey: '',
+                treeKeyKey: 'propertyId',
+                treeValueKey: 'propertyName',
+                iconValueKey: '',
+                hasCheckBox: true,
+                checkEvent: propertiesCheckEvent,
+                selectEvent: null,
+                initCheckBoxData: null,
+                initCheckBoxByValues: properties
+            });
+            selectedActionInfo = actionInfo;
+        } else {
+            top.jkf.showTips("获取控制器方法信息错误！", 2);
+            $("#actionInfoTree").empty();
+            return false;
+        }
+        return true;
+    }
+
+    function propertiesCheckEvent(propertyId, checked, isSingle) {
+
+        var checkPropertyIds = [];
+        if (propertyId != "0")
+            checkPropertyIds.push(propertyId);
+        if (isSingle) {//只有根节点
+            for (var i in checkPropertyIds) {
+                propertyCheck(checkPropertyIds[i], checked);
+            }
+            return;
+        }
+
+        if (propertyId == "0") {
+
+            for (var i in allAddressProperties) {
+                if (allAddressProperties[i].address == selectAddress) {
+                    pushSelectPropertiesFormIds(checkPropertyIds,
+                        allAddressProperties[i].propertiesInfo);
+                }
+                break;
+            }
+        }
+
+        for (var i in checkPropertyIds) {
+            propertyCheck(checkPropertyIds[i], checked);
+        }
+
+
+    }
+
+    function pushSelectPropertiesFormIds(checkPropertyIds, properties) {
+        for (var i in properties) {
+
+            checkPropertyIds.push(properties[i].propertyId);
+        }
+
+    }
+
+    function propertyCheck(propertyId, checked) {
+        var deleteId = -1;
+
+        //alert(propertyId);
+        //console.log(allAddressProperties);
+
+        var propertyName = '';
+        for (var i in allAddressProperties) {
+            if (allAddressProperties[i].address == selectAddress) {
+                for (var j in allAddressProperties[i].propertiesInfo) {
+                    if (allAddressProperties[i].propertiesInfo[j].propertyId == propertyId) {
+                        // alert(123)
+                        propertyName = allAddressProperties[i].propertiesInfo[j].propertyName;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        //alert(propertyName);
+
+
+        for (var i in selectedProperties) {
+            if (selectedProperties[i].address == selectAddress) {
+                for (var j in selectedProperties[i].propertiesInfo) {
+                    if (selectedProperties[i].propertiesInfo[j].propertyName == propertyName) {
+                        deleteId = j;
+                        break;
+                    }
+                }
+                if (deleteId != -1) {
+                    if (checked == false)
+                        selectedProperties[i].propertiesInfo.splice(deleteId, 1);
+                } else {
+                    if (checked == true)
+                        selectedProperties[i].propertiesInfo.push({ propertyName: propertyName });
+                }
+            }
+        }
+
+
+    }
+
+
+
+
+    function getForm() {
+
+        var res = $.httpGet({
+            url: '/Base/Interface/GetForm', param: { interfaceId: interfaceId }
+
+        });
+
+        if (res.code == 200) {
+            interface = res.datas;
+            $("#Name").val(interface.Name);
+            selectedControllerName = interface.ControllerName;
+            selectedControllerActionName = interface.ActionName;
+            selectAddress = interface.Address;
+            returnTypeName = interface.ReturnTypeName;
+
+            var isExist = false;
+            for (var j in selectedProperties) {
+                if (selectedProperties[i].Address == interface.Address) {
+                    selectedProperties[i].propertiesInfo = JSON.parse(interface.PropertiesJson);
+                    isExist = true;
+                }
+            }
+            if (isExist == false) {
+                selectedProperties.push({ address: interface.Address, propertiesInfo: JSON.parse(interface.PropertiesJson) });
+            }
+
+        }
+    }
+
+    function saveForm() {
+
+
+        if (!!interfaceId) interface.interfaceId = interfaceId;
+        interface.Name = $("#Name").val();
+        interface.ControllerName = selectedControllerName;
+        interface.ActionName = selectedControllerActionName;
+        interface.Address = actionInfo.address;
+        interface.ReturnTypeName = actionInfo.returnTypeName;
+        for (var i in selectedProperties) {
+            //alert(selectedProperties.length);
+            //alert(selectAddress);
+            //alert(selectedProperties[i].address);
+            if (selectedProperties[i].address == selectAddress) {
+                interface.PropertiesJson = JSON.stringify(selectedProperties[i].propertiesInfo);
+                break;
+            }
+        }
+        //console.log(interface)
+        $.httpPostAsync({
+            url: '/Base/interface/SaveForm', param: { entity: interface }
+        }, function (res) {
+            if (res.code == 200) {
+                top.jkf.showTips("保存成功！", 1);
+                if (parentIframe != null) {
+                    parentIframe.refreshData();
+                }
+                window.location.reload();
+            } else {
+                top.jkf.showTips("保存失败！", 2);
+            }
+
+        })
+    }
+</script>
